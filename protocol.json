@@ -1,0 +1,85 @@
+{
+    "check": {
+        "request": {
+            "uri": "/api/check",
+            "method": "POST",
+            "params": {
+                "id": "string"
+            }
+        },
+        "response": {
+            "pass": true,
+            "temperature": 37.5,
+            "time": "2020-02-20T08:04:03"
+        }
+    },
+    "submit": {
+        "request": {
+            "uri": "/api/records",
+            "method": "POST",
+            "params": {
+                "id": "string",
+                "pass": true,
+                "temperature": 37.5
+            }
+        },
+        "response": [200, 401, 415]
+    },
+    "list": {
+        "request": {
+            "uri": "/api/records",
+            "method": "GET",
+            "params": {}
+        },
+        "response": [
+            {
+                "id": "string",
+                "pass": true,
+                "temperature": 37.5,
+                "time": "2020-02-20T08:04:03"
+            }
+        ]
+    },
+    "update": {
+        "request": {
+            "uri": "/api/records",
+            "method": "PUT",
+            "params": {
+                "id": "string",
+                "pass": true,
+                "temperature": 37.5,
+                "time": "2020-02-20T08:04:03"
+            }
+        },
+        "response": [200, 401, 404, 415]
+    },
+    "delete": {
+        "request": {
+            "uri": "/api/records",
+            "method": "DELETE",
+            "params": {
+                "id":"string"
+            }
+        },
+        "response": [200, 401, 404]
+    },
+    "login": {
+        "request": {
+            "uri": "/api/login",
+            "method": "POST",
+            "params": {
+                "username": "admin",
+                "password": "password"
+            }
+        },
+        "response": [200, 401, 404]
+    },
+    "logout": {
+        "request": {
+            "uri": "/api/logout",
+            "method": "GET",
+            "params": {}   
+        },
+        "response": [200, 400]
+    }
+}
