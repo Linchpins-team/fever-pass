@@ -1,13 +1,15 @@
 {
     "check": {
         "request": {
-            "uri": "/api/check",
+            "uri": "/api/records/:user_id",
             "method": "POST",
             "params": {
-                "id": "string"
+                "user_id": "string"
             }
         },
         "response": {
+			"id": 1,
+			"user_id": "string",
             "pass": true,
             "temperature": 37.5,
             "time": "2020-02-20T08:04:03"
@@ -18,7 +20,7 @@
             "uri": "/api/records",
             "method": "POST",
             "params": {
-                "id": "string",
+                "user_id": "string",
                 "pass": true,
                 "temperature": 37.5
             }
@@ -33,7 +35,8 @@
         },
         "response": [
             {
-                "id": "string",
+				"id": 1,
+                "user_id": "string",
                 "pass": true,
                 "temperature": 37.5,
                 "time": "2020-02-20T08:04:03"
@@ -45,7 +48,8 @@
             "uri": "/api/records",
             "method": "PUT",
             "params": {
-                "id": "string",
+				"id": 1,
+                "user_id": "string",
                 "pass": true,
                 "temperature": 37.5,
                 "time": "2020-02-20T08:04:03"
@@ -58,7 +62,7 @@
             "uri": "/api/records",
             "method": "DELETE",
             "params": {
-                "id":"string"
+                "id": 1
             }
         },
         "response": [200, 401, 404]
