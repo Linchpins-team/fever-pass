@@ -93,8 +93,8 @@ func (h Handler) register(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h Handler) auth(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func (h Handler) auth(next http.HandlerFunc, role Role) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		s := securecookie.New(hashKey, blockKey)
 		if cookie, err := r.Cookie("session"); err == nil {
 			var id uint32
@@ -104,6 +104,14 @@ func (h Handler) auth(next http.Handler) http.Handler {
 					http.Error(w, "account not found", 401)
 					return
 				}
+				switch {
+				case acct.Role == Unknown:
+					http.Error(w, "unknown role", 401)
+					return
+				case acct.Role > role:
+					http.Error(w, "permission denied", 401)
+					return
+				}
 				ctx := r.Context()
 				ctx = context.WithValue(ctx, KeyAccount, acct)
 				r = r.WithContext(ctx)
@@ -111,8 +119,9 @@ func (h Handler) auth(next http.Handler) http.Handler {
 				return
 			}
 			http.Error(w, "session cannot be decode", 401)
+			logout(w, r)
 			return
 		}
 		http.Error(w, "session not found", 401)
-	})
+	}
 }

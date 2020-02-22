@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/gorilla/securecookie"
 	"github.com/jinzhu/gorm"
 )
 
@@ -18,11 +17,6 @@ type ContextKey uint32
 
 const (
 	KeyAccount ContextKey = iota
-)
-
-var (
-	hashKey  = securecookie.GenerateRandomKey(32)
-	blockKey = securecookie.GenerateRandomKey(32)
 )
 
 func NewHandler(db *gorm.DB) Handler {
@@ -42,17 +36,13 @@ func (h *Handler) newRouter() {
 
 	r.HandleFunc("/api/check", h.findRecord).Methods("GET")
 
-	{
-		s := r.PathPrefix("/api/records").Subrouter()
-		s.Use(h.auth)
-		s.HandleFunc("", h.newRecord).Methods("POST")
-		s.HandleFunc("", h.listRecord).Methods("GET")
-		s.HandleFunc("/{id}", h.deleteRecord).Methods("DELETE")
-	}
+	r.HandleFunc("/api/records", h.auth(h.newRecord, Editor)).Methods("POST")
+	r.HandleFunc("/api/records", h.auth(h.listRecord, Editor)).Methods("GET")
+	r.HandleFunc("/api/records/{id}", h.auth(h.deleteRecord, Editor)).Methods("DELETE")
 
 	r.HandleFunc("/api/login", h.login)
 	r.HandleFunc("/api/logout", logout)
-	r.HandleFunc("/api/register", h.register)
+	r.HandleFunc("/api/register", h.auth(h.register, Admin))
 	r.Handle("/", http.FileServer(http.Dir("static")))
 	h.router = r
 }

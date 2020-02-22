@@ -36,7 +36,6 @@ func TestLogin(t *testing.T) {
 		t.Error("response not success:", rr.Code, rr.Body.String())
 		t.FailNow()
 	}
-	t.Log(rr.Body.String())
 
 	body = fmt.Sprintf("username=%s&password=%s", acct.Name, "wrong_password")
 	rr = testHandler("POST", "/api/login", body)

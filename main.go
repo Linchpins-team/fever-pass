@@ -5,8 +5,14 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gorilla/securecookie"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+)
+
+var (
+	hashKey  = securecookie.GenerateRandomKey(32)
+	blockKey = securecookie.GenerateRandomKey(32)
 )
 
 func initDB() *gorm.DB {
