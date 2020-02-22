@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gorilla/securecookie"
 	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
 )
@@ -99,9 +99,17 @@ func TestNewRecord(t *testing.T) {
 }
 
 func adminSession(r *http.Request) *http.Request {
-	ctx := r.Context()
-	ctx = context.WithValue(ctx, KeyAccount, admin)
-	return r.WithContext(ctx)
+	s := securecookie.New(hashKey, blockKey)
+	var encoded string
+	var err error
+	if encoded, err = s.Encode("session", admin.ID); err != nil {
+		panic(err)
+	}
+	r.AddCookie(&http.Cookie{
+		Name:  "session",
+		Value: encoded,
+	})
+	return r
 }
 
 func testHandler(method, url, body string) *httptest.ResponseRecorder {
