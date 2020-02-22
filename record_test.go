@@ -1,0 +1,100 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"strings"
+	"testing"
+	"time"
+
+	"github.com/jinzhu/gorm"
+	"github.com/stretchr/testify/assert"
+)
+
+var (
+	testDB *gorm.DB
+	admin  = Account{
+		ID:       1,
+		Role:     Admin,
+		Name:     "admin",
+		Password: []byte{},
+	}
+	mockData = []Record{
+		Record{1, "109123456", true, 0, time.Now().Add(-10 * time.Minute), admin, admin.ID},
+		Record{2, "108234567", false, 37.8, time.Now().Add(-5 * time.Minute), admin, admin.ID},
+	}
+	testH Handler
+)
+
+func TestMain(m *testing.M) {
+	setupTestDB()
+	os.Exit(m.Run())
+}
+
+func setupTestDB() {
+	var err error
+	testDB, err = gorm.Open("sqlite3", ":memory:")
+	if err != nil {
+		panic(err)
+	}
+	testH.db = testDB
+	migrate(testDB)
+	insertMockData(testDB)
+}
+
+func insertMockData(db *gorm.DB) {
+	err := db.Create(&admin).Error
+	if err != nil {
+		panic(err)
+	}
+	for _, record := range mockData {
+		err := db.Create(&record).Error
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func TestNewRecord(t *testing.T) {
+	record := Record{
+		UserID:      "108222333",
+		Pass:        true,
+		Temperature: 0,
+	}
+	body := fmt.Sprintf("user_id=%s&pass=%t&temperature=%f", record.UserID, record.Pass, record.Temperature)
+	rr := testHandler(testH.newRecord, "/api/records", body)
+	if rr.Code != 200 {
+		t.Errorf("status code is not 200, got %d\n%s\n", rr.Code, rr.Body.String())
+	}
+
+	var r Record
+	err := testH.db.Where("user_id = ?", record.UserID).First(&r).Error
+	if err != nil {
+		t.Error(err)
+	}
+	assert.Equal(t, record.Pass, r.Pass)
+	assert.Equal(t, record.Temperature, r.Temperature)
+}
+
+func adminSession(r *http.Request) *http.Request {
+	ctx := r.Context()
+	ctx = context.WithValue(ctx, KeyAccount, admin)
+	return r.WithContext(ctx)
+}
+
+func testHandler(handler func(w http.ResponseWriter, r *http.Request), url, body string) *httptest.ResponseRecorder {
+	req, err := http.NewRequest("POST", url, strings.NewReader(body))
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	if err != nil {
+		panic(err)
+	}
+
+	req = adminSession(req)
+	rr := httptest.NewRecorder()
+	http.HandlerFunc(handler).ServeHTTP(rr, req)
+	return rr
+}
