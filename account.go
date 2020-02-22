@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -27,12 +28,12 @@ type Account struct {
 	Role Role
 }
 
-func parseRole(str string) Role {
+func parseRole(str string) (Role, error) {
 	role, err := strconv.Atoi(str)
 	if err != nil || role < 0 || role > 3 {
-		return Unknown
+		return Unknown, fmt.Errorf("Cannot parse '%s' as role", str)
 	}
-	return Role(role)
+	return Role(role), nil
 }
 
 func session(id uint32) *http.Cookie {
@@ -75,10 +76,14 @@ func logout(w http.ResponseWriter, r *http.Request) {
 
 func (h Handler) register(w http.ResponseWriter, r *http.Request) {
 	var acct Account
-	acct.Name = r.FormValue("username")
-	acct.Role = parseRole(r.FormValue("role"))
-	password := r.FormValue("password")
 	var err error
+	acct.Name = r.FormValue("username")
+	acct.Role, err = parseRole(r.FormValue("role"))
+	if err != nil {
+		http.Error(w, err.Error(), 415)
+		return
+	}
+	password := r.FormValue("password")
 	acct.Password, err = bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		panic(err)
