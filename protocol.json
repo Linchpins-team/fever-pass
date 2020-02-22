@@ -45,10 +45,9 @@
     },
     "update": {
         "request": {
-            "uri": "/api/records",
+            "uri": "/api/records/:id",
             "method": "PUT",
             "params": {
-				"id": 1,
                 "user_id": "string",
                 "pass": true,
                 "temperature": 37.5,
@@ -59,11 +58,8 @@
     },
     "delete": {
         "request": {
-            "uri": "/api/records",
-            "method": "DELETE",
-            "params": {
-                "id": 1
-            }
+            "uri": "/api/records/:id",
+            "method": "DELETE"
         },
         "response": [200, 401, 404]
     },

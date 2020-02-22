@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -56,7 +57,7 @@ func setupTestDB() {
 	if err != nil {
 		panic(err)
 	}
-	testH.db = testDB
+	testH = NewHandler(testDB)
 	migrate(testDB)
 	insertMockData(testDB)
 }
@@ -83,7 +84,7 @@ func TestNewRecord(t *testing.T) {
 	}
 
 	body := fmt.Sprintf("user_id=%s&pass=%t&temperature=%f", record.UserID, record.Pass, record.Temperature)
-	rr := testHandler(testH.newRecord, "POST", "/api/records", body)
+	rr := testHandler("POST", "/api/records", body)
 	if rr.Code != 200 {
 		t.Errorf("status code is not 200, got %d\n%s\n", rr.Code, rr.Body.String())
 	}
@@ -103,8 +104,15 @@ func adminSession(r *http.Request) *http.Request {
 	return r.WithContext(ctx)
 }
 
-func testHandler(handler func(w http.ResponseWriter, r *http.Request), method, url, body string) *httptest.ResponseRecorder {
-	req, err := http.NewRequest(method, url, strings.NewReader(body))
+func testHandler(method, url, body string) *httptest.ResponseRecorder {
+	var bodyReader io.Reader
+	if body != "" {
+		bodyReader = strings.NewReader(body)
+	}
+	req, err := http.NewRequest(method, url, bodyReader)
+	if err != nil {
+		panic(err)
+	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	if err != nil {
@@ -113,20 +121,20 @@ func testHandler(handler func(w http.ResponseWriter, r *http.Request), method, u
 
 	req = adminSession(req)
 	rr := httptest.NewRecorder()
-	http.HandlerFunc(handler).ServeHTTP(rr, req)
+	testH.Router().ServeHTTP(rr, req)
 	return rr
 }
 
 func TestFindRecord(t *testing.T) {
-	body := "user_id=" + mockData[0].UserID
-	rr := testHandler(testH.findRecord, "POST", "/api/check", body)
+	url := fmt.Sprintf("/api/check?user_id=%s", mockData[0].UserID)
+	rr := testHandler("GET", url, "")
 	if rr.Code != 200 {
 		t.Errorf("status code is not 200, got %d\n%s\n", rr.Code, rr.Body.String())
 	}
 	t.Log(rr.Body.String())
 
-	body = "user_id=" + mockData[1].UserID
-	rr = testHandler(testH.findRecord, "POST", "/api/check", body)
+	url = fmt.Sprintf("/api/check?user_id=%s", mockData[1].UserID)
+	rr = testHandler("GET", url, "")
 	if rr.Code != 200 {
 		t.Errorf("status code is not 200, got %d\n%s\n", rr.Code, rr.Body.String())
 	}
@@ -134,7 +142,7 @@ func TestFindRecord(t *testing.T) {
 }
 
 func TestListRecord(t *testing.T) {
-	rr := testHandler(testH.listRecord, "GET", "/api/records", "")
+	rr := testHandler("GET", "/api/records", "")
 	if rr.Code != 200 {
 		t.Errorf("status code is not 200, got %d\n%s\n", rr.Code, rr.Body.String())
 	}
@@ -152,4 +160,17 @@ func TestListRecord(t *testing.T) {
 		}
 	}
 	t.Log(records)
+}
+
+func TestDeleteRecord(t *testing.T) {
+	id := mockData[0].ID
+	url := fmt.Sprintf("/api/records/%d", id)
+	rr := testHandler("DELETE", url, "")
+	if rr.Code != 200 {
+		t.Errorf("status code is not 200, got %d\n%s\n", rr.Code, rr.Body.String())
+	}
+
+	var record Record
+	err := testH.db.First(&record, id).Error
+	assert.Equal(t, gorm.ErrRecordNotFound, err)
 }

@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 )
 
@@ -84,6 +85,20 @@ func (h Handler) listRecord(w http.ResponseWriter, r *http.Request) {
 
 	enc := json.NewEncoder(w)
 	if err = enc.Encode(&records); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+}
+
+func (h Handler) deleteRecord(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		http.Error(w, err.Error(), 415)
+		return
+	}
+
+	err = h.db.Delete(&Record{}, "id = ?", id).Error
+	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
