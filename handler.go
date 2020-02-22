@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 
@@ -51,34 +50,13 @@ func (h *Handler) newRouter() {
 		s.HandleFunc("/{id}", h.deleteRecord).Methods("DELETE")
 	}
 
+	r.HandleFunc("/api/login", h.login)
+	r.HandleFunc("/api/logout", logout)
+	r.HandleFunc("/api/register", h.register)
 	r.Handle("/", http.FileServer(http.Dir("static")))
 	h.router = r
 }
 
 func (h Handler) Router() *mux.Router {
 	return h.router
-}
-
-func (h Handler) auth(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		s := securecookie.New(hashKey, blockKey)
-		if cookie, err := r.Cookie("session"); err == nil {
-			var id uint32
-			if err := s.Decode("session", cookie.Value, &id); err == nil {
-				var acct Account
-				if err = h.db.First(&acct, id).Error; err != nil {
-					http.Error(w, "account not found", 401)
-					return
-				}
-				ctx := r.Context()
-				ctx = context.WithValue(ctx, KeyAccount, acct)
-				r = r.WithContext(ctx)
-				next.ServeHTTP(w, r)
-				return
-			}
-			http.Error(w, "session cannot be decode", 401)
-			return
-		}
-		http.Error(w, "session not found", 401)
-	})
 }

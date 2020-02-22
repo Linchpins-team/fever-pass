@@ -2,7 +2,7 @@
     "check": {
         "request": {
             "uri": "/api/check",
-            "method": "POST",
+            "method": "GET",
             "params": {
                 "user_id": "string"
             }
@@ -81,5 +81,23 @@
             "params": {}   
         },
         "response": [200, 400]
-    }
+    },
+    "register": {
+        "request": {
+            "uri": "/api/accounts",
+            "method": "POST",
+            "params": {
+                "username": "admin",
+                "password": "password",
+                "role": 1
+            }
+        },
+        "response": [200, 401]
+    },
+    "role": [
+        "Unknown",
+        "Admin",
+        "Editor",
+        "User"
+    ]
 }
