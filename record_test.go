@@ -17,14 +17,23 @@ import (
 var (
 	testDB *gorm.DB
 	admin  = Account{
-		ID:       1,
 		Role:     Admin,
 		Name:     "admin",
 		Password: []byte{},
 	}
 	mockData = []Record{
-		Record{1, "109123456", true, 0, time.Now().Add(-10 * time.Minute), admin, admin.ID},
-		Record{2, "108234567", false, 37.8, time.Now().Add(-5 * time.Minute), admin, admin.ID},
+		Record{
+			UserID:      "109123456",
+			Pass:        true,
+			Temperature: 0,
+			Time:        time.Now().Add(-10 * time.Minute),
+		},
+		Record{
+			UserID:      "108234567",
+			Pass:        false,
+			Temperature: 37.8,
+			Time:        time.Now().Add(-5 * time.Minute),
+		},
 	}
 	testH Handler
 )
@@ -51,6 +60,7 @@ func insertMockData(db *gorm.DB) {
 		panic(err)
 	}
 	for _, record := range mockData {
+		record.RecordedBy = admin
 		err := db.Create(&record).Error
 		if err != nil {
 			panic(err)
@@ -64,6 +74,7 @@ func TestNewRecord(t *testing.T) {
 		Pass:        true,
 		Temperature: 0,
 	}
+
 	body := fmt.Sprintf("user_id=%s&pass=%t&temperature=%f", record.UserID, record.Pass, record.Temperature)
 	rr := testHandler(testH.newRecord, "/api/records", body)
 	if rr.Code != 200 {
@@ -97,4 +108,20 @@ func testHandler(handler func(w http.ResponseWriter, r *http.Request), url, body
 	rr := httptest.NewRecorder()
 	http.HandlerFunc(handler).ServeHTTP(rr, req)
 	return rr
+}
+
+func TestFindRecord(t *testing.T) {
+	body := "user_id=" + mockData[0].UserID
+	rr := testHandler(testH.findRecord, "/api/check", body)
+	if rr.Code != 200 {
+		t.Errorf("status code is not 200, got %d\n%s\n", rr.Code, rr.Body.String())
+	}
+	t.Log(rr.Body.String())
+
+	body = "user_id=" + mockData[1].UserID
+	rr = testHandler(testH.findRecord, "/api/check", body)
+	if rr.Code != 200 {
+		t.Errorf("status code is not 200, got %d\n%s\n", rr.Code, rr.Body.String())
+	}
+	t.Log(rr.Body.String())
 }

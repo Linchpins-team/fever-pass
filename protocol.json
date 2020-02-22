@@ -1,7 +1,7 @@
 {
     "check": {
         "request": {
-            "uri": "/api/records/:user_id",
+            "uri": "/api/check",
             "method": "POST",
             "params": {
                 "user_id": "string"
