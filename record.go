@@ -57,9 +57,7 @@ func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 func (h Handler) findRecord(w http.ResponseWriter, r *http.Request) {
 	userID := r.FormValue("user_id")
 	var record Record
-	now := time.Now()
-	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
-	err := h.db.Where("user_id = ? and time > ?", userID, today).Order("time desc").First(&record).Error
+	err := h.db.Where("user_id = ? and time > ?", userID, today()).Order("time desc").First(&record).Error
 	if gorm.IsRecordNotFoundError(err) {
 		http.Error(w, "record not found", 404)
 		return
@@ -70,6 +68,22 @@ func (h Handler) findRecord(w http.ResponseWriter, r *http.Request) {
 
 	enc := json.NewEncoder(w)
 	if err = enc.Encode(&record); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+}
+
+func today() time.Time {
+	now := time.Now()
+	return time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
+}
+
+func (h Handler) listRecord(w http.ResponseWriter, r *http.Request) {
+	var records []Record
+	err := h.db.Where("time > ?", today()).Order("time desc").Find(&records).Error
+
+	enc := json.NewEncoder(w)
+	if err = enc.Encode(&records); err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
