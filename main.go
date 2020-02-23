@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -21,25 +22,24 @@ var (
 )
 
 func init() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatalln("Cannot load .env")
+	godotenv.Load()
+	file, err := os.OpenFile(".env", os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		panic(err)
 	}
-	loadKeys()
+	defer file.Close()
+	hashKey = loadKey("HASH_KEY", file)
+	blockKey = loadKey("BLOCK_KEY", file)
 }
 
-func loadKeys() {
-	if k := os.Getenv("HASH_KEY"); k != "" {
-		hashKey = decodeKey(k)
+func loadKey(name string, w io.Writer) (key []byte) {
+	if k := os.Getenv(name); k != "" {
+		key = decodeKey(k)
 	} else {
-		hashKey = securecookie.GenerateRandomKey(32)
-		fmt.Println("HASH_KEY=" + encodeKey(hashKey))
+		key = securecookie.GenerateRandomKey(32)
+		fmt.Fprintln(w, name+"="+encodeKey(key))
 	}
-	if k := os.Getenv("BLOCK_KEY"); k != "" {
-		blockKey = decodeKey(k)
-	} else {
-		blockKey = securecookie.GenerateRandomKey(32)
-		fmt.Println("BLOCK_KEY=" + encodeKey(blockKey))
-	}
+	return
 }
 
 func encodeKey(key []byte) string {

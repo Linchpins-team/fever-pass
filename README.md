@@ -36,18 +36,17 @@
 可取得他人資料，或盜用他人帳號登入，較難避免
 
 ## 架設測試環境
-建立 .env 填入以下內容：
-
-	ADMIN_PASSWORD=password
-
-編譯執行：
+編譯：
 
 	go build
-	./fever-pass
 
-程式會將資料儲存在 /tmp/gorm.sqlite，第一次啟動會從 .env 讀取管理員密碼並建立。session 加密金鑰如果找不到，會自動生成，並顯示出來，請將其複製放於 .env 中，程式啟動即可讀取。範例：
+建立設定檔：
 
-	HASH_KEY=jze8ITacjbsXnVyCzDPFsWhwTjoTDCZvLtXo2AUEAvw=
-	BLOCK_KEY=Qw9gRZx+5jDIPVafgWm4VqIYtIvB46Co1X7g5F3fPEA=
+	./fever-pass -init
+	./fever-pass -conf /path/to/config.toml 
+
+接下來會詢問一系列問題，留空為預設值。debug 模式將使用 SQLite，儲存在 /tmp/gorm.sqlite，release 則是連線到本機的 MySQL，填寫資料庫名稱、使用者帳密後會嘗試連結，如果尚未建立可以選擇自動建立。最後設定管理員密碼。完成後設定檔會儲存於 config.toml，管理員密碼不會儲存於設定檔。
+
+加密金鑰將會自動生成，儲存於 .env 中供下次存取。
 
 可以透過 `quicktest.sh` 執行 curl 測試，go 測試使用 `go test`  
