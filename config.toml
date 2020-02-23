@@ -1,0 +1,10 @@
+Mode = "release"
+
+[Server]
+  Base = "localhost:8080"
+  Port = 8080
+
+[Database]
+  Name = "fever_db"
+  User = "fever_user"
+  Password = "fever_password"

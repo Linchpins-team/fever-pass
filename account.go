@@ -21,8 +21,8 @@ const (
 )
 
 type Account struct {
-	ID       uint32
-	Name     string `gorm:"unique"`
+	ID       uint32 `gorm:"primary_key"`
+	Name     string `gorm:"unique;type:varchar(32)"`
 	Password []byte
 
 	Role Role

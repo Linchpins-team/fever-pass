@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/base64"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -53,14 +54,21 @@ func decodeKey(key string) []byte {
 	}
 }
 
-func initDB() *gorm.DB {
-	db, err := gorm.Open("sqlite3", "/tmp/gorm.sqlite")
+func initDB(c Config) (db *gorm.DB, err error) {
+	switch c.Mode {
+	case Debug:
+		db, err = gorm.Open("sqlite3", "/tmp/gorm.sqlite")
+
+	case Release:
+		connection := fmt.Sprintf("%s:%s@/%s?charset=utf8&parseTime=True&loc=Local", c.Database.User, c.Database.Password, c.Database.Name)
+		db, err = gorm.Open("mysql", connection)
+	}
 	if err != nil {
-		panic(err)
+		return
 	}
 	migrate(db)
-	setupDB(db)
-	return db
+	setupDB(c, db)
+	return
 }
 
 func migrate(db *gorm.DB) {
@@ -69,41 +77,54 @@ func migrate(db *gorm.DB) {
 	}
 }
 
-func setupDB(db *gorm.DB) {
+func setupDB(c Config, db *gorm.DB) {
 	var admin Account
 	err := db.First(&admin, 1).Error
-	if gorm.IsRecordNotFoundError(err) {
-		admin = Account{
-			Name: "admin",
-			Role: Admin,
-		}
-		password := os.Getenv("ADMIN_PASSWORD")
-		admin.Password, err = bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-		if err != nil {
-			panic(err)
-		}
-		err = db.Create(&admin).Error
-		if err != nil {
-			panic(err)
-		}
-	} else if err != nil {
+	if err != nil && !gorm.IsRecordNotFoundError(err) {
+		panic(err)
+	}
+	admin.Name = "admin"
+	admin.Role = Admin
+	password := c.Password
+	admin.Password, err = bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		panic(err)
+	}
+	err = db.Save(&admin).Error
+	if err != nil {
 		panic(err)
 	}
 }
 
 func main() {
-	h := NewHandler(initDB())
+	var init bool
+	var confPath string
+	flag.BoolVar(&init, "init", false, "init configuration")
+	flag.StringVar(&confPath, "conf", "config.toml", "configuration file path")
+	flag.Parse()
+
+	if init {
+		setupConfig()
+		return
+	}
+
+	c := loadConfig(confPath)
+	db, err := initDB(c)
+	if err != nil {
+		panic(err)
+	}
+	h := NewHandler(db)
 	defer h.db.Close()
 
 	srv := &http.Server{
 		Handler: h.Router(),
-		Addr:    "127.0.0.1:8000",
+		Addr:    fmt.Sprintf("127.0.0.1:%d", c.Server.Port),
 		// Good practice: enforce timeouts for servers you create!
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
 
-	log.Printf("Server is listen on http://%s", srv.Addr)
+	log.Printf("Server is listen on http://%s", c.Server.Base)
 
 	log.Fatal(srv.ListenAndServe())
 }

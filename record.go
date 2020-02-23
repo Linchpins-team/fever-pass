@@ -11,7 +11,7 @@ import (
 )
 
 type Record struct {
-	ID          uint32
+	ID          uint32 `gorm:"primary_key"`
 	UserID      string
 	Pass        bool
 	Temperature float64

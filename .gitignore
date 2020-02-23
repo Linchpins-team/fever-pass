@@ -2,3 +2,4 @@ go.sum
 *.backup
 .cookie
 .env
+cmd
