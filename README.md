@@ -34,3 +34,20 @@
 
 ### 使用他人帳號登入
 可取得他人資料，或盜用他人帳號登入，較難避免
+
+## 架設測試環境
+建立 .env 填入以下內容：
+
+	ADMIN_PASSWORD=password
+
+編譯執行：
+
+	go build
+	./fever-pass
+
+程式會將資料儲存在 /tmp/gorm.sqlite，第一次啟動會從 .env 讀取管理員密碼並建立。session 加密金鑰如果找不到，會自動生成，並顯示出來，請將其複製放於 .env 中，程式啟動即可讀取。範例：
+
+	HASH_KEY=jze8ITacjbsXnVyCzDPFsWhwTjoTDCZvLtXo2AUEAvw=
+	BLOCK_KEY=Qw9gRZx+5jDIPVafgWm4VqIYtIvB46Co1X7g5F3fPEA=
+
+可以透過 `quicktest.sh` 執行 curl 測試，go 測試使用 `go test`  
