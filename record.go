@@ -34,8 +34,9 @@ func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 	}
 
 	record.Time = time.Now()
+
 	if acct, ok := r.Context().Value(KeyAccount).(Account); ok {
-		record.RecordedBy = acct
+		record.AccountID = acct.ID
 	} else {
 		http.Error(w, "cannot read account from session", 500)
 		return
@@ -107,4 +108,22 @@ func (h Handler) deleteRecord(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
+}
+
+func (h Handler) editPage(w http.ResponseWriter, r *http.Request) {
+	var records []Record
+	if acct, ok := r.Context().Value(KeyAccount).(Account); ok {
+		err := h.db.Where("account_id = ?", acct.ID).Order("time desc").Limit(20).Find(&records).Error
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+	} else {
+		http.Error(w, "cannot read account from session", 500)
+		return
+	}
+	page := struct {
+		Records []Record
+	}{records}
+	h.tpl.ExecuteTemplate(w, "new.htm", page)
 }

@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"text/template"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
@@ -11,6 +13,7 @@ import (
 type Handler struct {
 	db     *gorm.DB
 	router *mux.Router
+	tpl    *template.Template
 }
 
 type ContextKey uint32
@@ -23,6 +26,13 @@ func NewHandler(db *gorm.DB) Handler {
 	h := Handler{
 		db: db,
 	}
+	h.tpl = template.New("")
+	h.tpl.Funcs(template.FuncMap{
+		"formatTime": func(t time.Time) string {
+			return t.Format("01-02 15:04")
+		},
+	})
+	h.tpl.ParseGlob("templates/*.htm")
 	h.newRouter()
 	return h
 }
@@ -43,6 +53,8 @@ func (h *Handler) newRouter() {
 	r.HandleFunc("/api/login", h.login)
 	r.HandleFunc("/api/logout", logout)
 	r.HandleFunc("/api/register", h.auth(h.register, Admin))
+
+	r.HandleFunc("/admin/new", h.auth(h.editPage, Editor))
 	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("static"))))
 	h.router = r
 }
