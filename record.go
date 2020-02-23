@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -11,11 +12,10 @@ import (
 )
 
 type Record struct {
-	ID          uint32 `gorm:"primary_key"`
-	UserID      string
-	Pass        bool
-	Temperature float64
-	Time        time.Time
+	ID     uint32 `gorm:"primary_key"`
+	UserID string
+	Pass   bool
+	Time   time.Time
 
 	RecordedBy Account `json:"-"`
 	AccountID  uint32  `json:"-"`
@@ -25,17 +25,11 @@ type Record struct {
 func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 	var record Record
 	var err error
-	record.UserID = r.PostFormValue("user_id")
+	record.UserID = r.FormValue("user_id")
 
-	record.Pass, err = strconv.ParseBool(r.PostFormValue("pass")) // default false
+	record.Pass, err = parseBool(r.FormValue("pass")) // default false
 	if err != nil {
-		http.Error(w, "Pass cannot be parsed", 415)
-		return
-	}
-
-	record.Temperature, err = strconv.ParseFloat(r.PostFormValue("temperature"), 64)
-	if err != nil {
-		http.Error(w, "Temperature cannot be parsed", 415)
+		http.Error(w, err.Error(), 415)
 		return
 	}
 
@@ -53,6 +47,17 @@ func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 	}
 	enc := json.NewEncoder(w)
 	enc.Encode(record)
+}
+
+func parseBool(str string) (bool, error) {
+	switch str {
+	case "on", "true":
+		return true, nil
+	case "off", "false", "":
+		return false, nil
+	default:
+		return false, fmt.Errorf("'%s' cannot parse to bool", str)
+	}
 }
 
 func (h Handler) findRecord(w http.ResponseWriter, r *http.Request) {

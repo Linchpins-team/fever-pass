@@ -24,22 +24,19 @@ var (
 	}
 	mockData = []Record{
 		Record{
-			UserID:      "109123456",
-			Pass:        true,
-			Temperature: 0,
-			Time:        time.Now().Add(-10 * time.Minute),
+			UserID: "109123456",
+			Pass:   true,
+			Time:   time.Now().Add(-10 * time.Minute),
 		},
 		Record{
-			UserID:      "108234567",
-			Pass:        false,
-			Temperature: 37.8,
-			Time:        time.Now().Add(-5 * time.Minute),
+			UserID: "108234567",
+			Pass:   false,
+			Time:   time.Now().Add(-5 * time.Minute),
 		},
 		Record{
-			UserID:      "108114256",
-			Pass:        true,
-			Temperature: 0,
-			Time:        today().Add(-1 * time.Hour),
+			UserID: "108114256",
+			Pass:   true,
+			Time:   today().Add(-1 * time.Hour),
 		},
 	}
 	testH Handler
@@ -77,12 +74,11 @@ func insertMockData(db *gorm.DB) {
 
 func TestNewRecord(t *testing.T) {
 	record := Record{
-		UserID:      "108222333",
-		Pass:        true,
-		Temperature: 0,
+		UserID: "108222333",
+		Pass:   true,
 	}
 
-	body := fmt.Sprintf("user_id=%s&pass=%t&temperature=%f", record.UserID, record.Pass, record.Temperature)
+	body := fmt.Sprintf("user_id=%s&pass=%t", record.UserID, record.Pass)
 	rr := testHandler("POST", "/api/records", body)
 	if rr.Code != 200 {
 		t.Errorf("status code is not 200, got %d\n%s\n", rr.Code, rr.Body.String())
@@ -94,7 +90,6 @@ func TestNewRecord(t *testing.T) {
 		t.Error(err)
 	}
 	assert.Equal(t, record.Pass, r.Pass)
-	assert.Equal(t, record.Temperature, r.Temperature)
 }
 
 func adminSession(r *http.Request) *http.Request {

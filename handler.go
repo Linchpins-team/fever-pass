@@ -43,7 +43,7 @@ func (h *Handler) newRouter() {
 	r.HandleFunc("/api/login", h.login)
 	r.HandleFunc("/api/logout", logout)
 	r.HandleFunc("/api/register", h.auth(h.register, Admin))
-	r.Handle("/", http.FileServer(http.Dir("static")))
+	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("static"))))
 	h.router = r
 }
 
