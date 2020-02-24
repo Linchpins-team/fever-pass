@@ -4,3 +4,4 @@ go.sum
 .env
 cmd
 fever-pass
+static/qrcodes

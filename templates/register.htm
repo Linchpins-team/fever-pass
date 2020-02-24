@@ -1,0 +1,11 @@
+{{ define "title" }}註冊{{ end }}
+{{ define "content" }}
+<script src="/js/register.js" defer></script>
+<h1>註冊</h1>
+<form action="" id="form">
+    <input type="hidden" name="key" value="{{ .Key }}">
+    帳號 <input type="text" name="username" id=""><br>
+    密碼 <input type="password" name="password" id=""><br>
+    <input type="submit" value="送出">
+</form>
+{{ end }}

@@ -71,7 +71,7 @@ func initDB(c Config) (db *gorm.DB, err error) {
 }
 
 func migrate(db *gorm.DB) {
-	if err := db.AutoMigrate(&Record{}, &Account{}).Error; err != nil {
+	if err := db.AutoMigrate(&Record{}, &Account{}, &URL{}).Error; err != nil {
 		panic(err)
 	}
 }
@@ -112,7 +112,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	h := NewHandler(db)
+	h := NewHandler(db, c)
 	defer h.db.Close()
 
 	srv := &http.Server{
@@ -123,7 +123,7 @@ func main() {
 		ReadTimeout:  15 * time.Second,
 	}
 
-	log.Printf("Server is listen on http://%s", c.Server.Base)
+	log.Printf("Server is listen on %s", c.Server.Base)
 
 	log.Fatal(srv.ListenAndServe())
 }

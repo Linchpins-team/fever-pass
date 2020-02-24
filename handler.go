@@ -12,6 +12,7 @@ import (
 type Handler struct {
 	db     *gorm.DB
 	router *mux.Router
+	config Config
 	tpls   map[string]*template.Template
 }
 
@@ -21,9 +22,10 @@ const (
 	KeyAccount ContextKey = iota
 )
 
-func NewHandler(db *gorm.DB) Handler {
+func NewHandler(db *gorm.DB, config Config) Handler {
 	h := Handler{
-		db: db,
+		db:     db,
+		config: config,
 	}
 	h.loadTemplates()
 	h.newRouter()
@@ -45,12 +47,17 @@ func (h *Handler) newRouter() {
 
 	r.HandleFunc("/api/login", h.login)
 	r.HandleFunc("/api/logout", logout)
-	r.HandleFunc("/api/register", h.auth(h.register, Admin))
+	r.HandleFunc("/api/register", h.register).Methods("POST")
+
+	r.HandleFunc("/api/url", h.auth(h.newURL, Admin)).Methods("POST")
 
 	r.HandleFunc("/admin/new", h.auth(h.newRecordPage, Editor))
 	r.HandleFunc("/admin/list", h.auth(h.listRecordsPage, Editor))
+	r.HandleFunc("/admin/invite", h.auth(h.page("generate_url.htm"), Admin))
+
 	r.HandleFunc("/", h.page("index.htm"))
 	r.Handle("/login", h.page("login.htm"))
+	r.HandleFunc("/register", h.registerPage)
 	r.HandleFunc("/check", h.check)
 	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("static"))))
 	h.router = r

@@ -1,7 +1,7 @@
 Mode = "release"
 
 [Server]
-  Base = "localhost:8080"
+  Base = "http://localhost:8080"
   Port = 8080
 
 [Database]

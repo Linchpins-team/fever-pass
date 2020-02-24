@@ -53,7 +53,8 @@ func setupTestDB() {
 	if err != nil {
 		panic(err)
 	}
-	testH = NewHandler(testDB)
+	c := loadConfig("config.toml")
+	testH = NewHandler(testDB, c)
 	migrate(testDB)
 	insertMockData(testDB)
 }

@@ -46,7 +46,7 @@ func generateConfig() (c Config) {
 	fmt.Print("server base url (default localhost:8080): ")
 	fmt.Scanln(&c.Server.Base)
 	if c.Server.Base == "" {
-		c.Server.Base = "localhost:8080"
+		c.Server.Base = "http://localhost:8080"
 	}
 
 	fmt.Print("server listen port (default: 8080): ")

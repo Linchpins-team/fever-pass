@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/securecookie"
 	"github.com/jinzhu/gorm"
@@ -75,22 +76,49 @@ func logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h Handler) register(w http.ResponseWriter, r *http.Request) {
-	var acct Account
 	var err error
+	var url URL
+	key := r.FormValue("key")
+	err = h.db.Where("id = ? and expire_at > ? and last > 0", key, time.Now()).First(&url).Error
+	if gorm.IsRecordNotFoundError(err) {
+		http.Error(w, "invalid key", 404)
+		return
+	} else if err != nil {
+		panic(err)
+	}
+
+	var acct Account
 	acct.Name = r.FormValue("username")
-	acct.Role, err = parseRole(r.FormValue("role"))
+	acct.Role = Editor
 	if err != nil {
 		http.Error(w, err.Error(), 415)
 		return
 	}
+
 	password := r.FormValue("password")
 	acct.Password, err = bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		panic(err)
 	}
-	if err = h.db.Create(&acct).Error; err != nil {
-		http.Error(w, "cannot register user "+err.Error(), 500)
+
+	tx := h.db.Begin()
+	url.Last--
+	if err = tx.Save(&url).Error; err != nil {
+		tx.Rollback()
+		panic(err)
 	}
+
+	if err = tx.Create(&acct).Error; err != nil {
+		tx.Rollback()
+		http.Error(w, "cannot register user "+err.Error(), 500)
+		return
+	}
+
+	if err = tx.Commit().Error; err != nil {
+		panic(err)
+	}
+
+	http.SetCookie(w, session(acct.ID))
 }
 
 func (h Handler) auth(next http.HandlerFunc, role Role) http.HandlerFunc {

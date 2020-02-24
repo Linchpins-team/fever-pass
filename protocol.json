@@ -99,5 +99,19 @@
         "Admin",
         "Editor",
         "User"
-    ]
+    ],
+    "invite_url": {
+        "request": {
+            "url": "/api/url",
+            "method": "POST",
+            "params": {
+                "valid_time": 10,
+                "max_usage": 100
+            }
+        },
+        "response": {
+            "url": "http://localhost:8080/register?key=random-key",
+            "qrcode": "http://localhost:8080/qrcodes/random-key.png"
+        }
+    }
 }
