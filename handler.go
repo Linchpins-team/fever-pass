@@ -50,6 +50,7 @@ func (h *Handler) newRouter() {
 	r.HandleFunc("/admin/new", h.auth(h.newRecordPage, Editor))
 	r.HandleFunc("/admin/list", h.auth(h.listRecordsPage, Editor))
 	r.HandleFunc("/", h.page("index.htm"))
+	r.Handle("/login", h.page("login.htm"))
 	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("static"))))
 	h.router = r
 }

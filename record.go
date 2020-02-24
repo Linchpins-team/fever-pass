@@ -13,7 +13,7 @@ import (
 type Record struct {
 	ID     uint32 `gorm:"primary_key"`
 	UserID string
-	Pass   bool
+	Fever  bool
 	Time   time.Time
 
 	RecordedBy Account `json:"-"`
@@ -26,7 +26,7 @@ func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 	var err error
 	record.UserID = r.FormValue("user_id")
 
-	record.Pass, err = parseBool(r.FormValue("pass")) // default false
+	record.Fever, err = parseBool(r.FormValue("pass")) // default false
 	if err != nil {
 		http.Error(w, err.Error(), 415)
 		return
@@ -52,7 +52,7 @@ func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 func (h Handler) findRecord(w http.ResponseWriter, r *http.Request) {
 	userID := r.FormValue("user_id")
 	var record Record
-	err := h.db.Where("user_id = ? and time > ?", userID, today()).Order("time desc").First(&record).Error
+	err := h.db.Where("user_id = ? and time > ?", userID, today()).Order("id desc").First(&record).Error
 	if gorm.IsRecordNotFoundError(err) {
 		http.Error(w, "record not found", 404)
 		return
@@ -70,7 +70,7 @@ func (h Handler) findRecord(w http.ResponseWriter, r *http.Request) {
 
 func (h Handler) listRecord(w http.ResponseWriter, r *http.Request) {
 	var records []Record
-	err := h.db.Where("time > ?", today()).Order("time desc").Find(&records).Error
+	err := h.db.Where("time > ?", today()).Order("id desc").Find(&records).Error
 
 	enc := json.NewEncoder(w)
 	if err = enc.Encode(&records); err != nil {

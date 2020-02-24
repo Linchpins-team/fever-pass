@@ -4,7 +4,7 @@
 <script src="/js/delete.js"></script>
 <form action="" id="form">
     User ID:<input type="text" name="user_id" autocomplete="off" autofocus>
-    通過 <input type="checkbox" name="pass" id="" value="true" checked>
+    發燒 <input type="checkbox" name="pass" id="" value="true">
     <input type="submit" value="送出">
 </form>
 <script>
@@ -13,7 +13,7 @@
     <tr>
         <th>ID</th>
         <th>User</th>
-        <th>Pass</th>
+        <th>Fever</th>
         <th>Time</th>
         <th></th>
     </tr>
@@ -22,7 +22,7 @@
         <tr>
             <td>{{.ID}}</td>
             <td>{{.UserID}}</td>
-            <td>{{.Pass}}</td>
+            <td>{{.Fever}}</td>
             <td>{{formatTime .Time}}</td>
             <td><button value="{{.ID}}" onclick="delRecord(this)">刪除</button></td>
         </tr>

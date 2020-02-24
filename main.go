@@ -67,7 +67,6 @@ func initDB(c Config) (db *gorm.DB, err error) {
 		return
 	}
 	migrate(db)
-	setupDB(c, db)
 	return
 }
 

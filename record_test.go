@@ -25,17 +25,17 @@ var (
 	mockData = []Record{
 		Record{
 			UserID: "109123456",
-			Pass:   true,
+			Fever:  true,
 			Time:   time.Now().Add(-10 * time.Minute),
 		},
 		Record{
 			UserID: "108234567",
-			Pass:   false,
+			Fever:  false,
 			Time:   time.Now().Add(-5 * time.Minute),
 		},
 		Record{
 			UserID: "108114256",
-			Pass:   true,
+			Fever:  true,
 			Time:   today().Add(-1 * time.Hour),
 		},
 	}
@@ -75,10 +75,10 @@ func insertMockData(db *gorm.DB) {
 func TestNewRecord(t *testing.T) {
 	record := Record{
 		UserID: "108222333",
-		Pass:   true,
+		Fever:  true,
 	}
 
-	body := fmt.Sprintf("user_id=%s&pass=%t", record.UserID, record.Pass)
+	body := fmt.Sprintf("user_id=%s&pass=%t", record.UserID, record.Fever)
 	rr := testHandler("POST", "/api/records", body)
 	if rr.Code != 200 {
 		t.Errorf("status code is not 200, got %d\n%s\n", rr.Code, rr.Body.String())
@@ -89,7 +89,7 @@ func TestNewRecord(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	assert.Equal(t, record.Pass, r.Pass)
+	assert.Equal(t, record.Fever, r.Fever)
 }
 
 func adminSession(r *http.Request) *http.Request {

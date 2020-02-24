@@ -51,7 +51,7 @@ func (h Handler) HTML(w http.ResponseWriter, page string, data interface{}) {
 func (h Handler) newRecordPage(w http.ResponseWriter, r *http.Request) {
 	var records []Record
 	if acct, ok := r.Context().Value(KeyAccount).(Account); ok {
-		err := h.db.Where("account_id = ?", acct.ID).Order("time desc").Limit(20).Find(&records).Error
+		err := h.db.Where("account_id = ?", acct.ID).Order("id desc").Limit(20).Find(&records).Error
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
@@ -80,7 +80,7 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 		"records.id, records.user_id, records.pass, records.time, accounts.name",
 	).Joins(
 		"left join accounts on records.account_id = accounts.id",
-	).Order("time desc").Offset(p * 20).Limit(20).Rows()
+	).Order("id desc").Offset(p * 20).Limit(20).Rows()
 
 	if err != nil {
 		panic(err)
@@ -88,7 +88,7 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		var record recordT
-		err := rows.Scan(&record.ID, &record.UserID, &record.Pass, &record.Time, &record.Recorder)
+		err := rows.Scan(&record.ID, &record.UserID, &record.Fever, &record.Time, &record.Recorder)
 		if err != nil {
 			panic(err)
 		}
