@@ -47,6 +47,7 @@ func session(id uint32) *http.Cookie {
 	return &http.Cookie{
 		Name:  "session",
 		Value: encoded,
+		Path:  "/",
 	}
 }
 
@@ -148,8 +149,8 @@ func (h Handler) auth(next http.HandlerFunc, role Role) http.HandlerFunc {
 			}
 			http.Error(w, "session cannot be decode", 401)
 			logout(w, r)
-			return
+		} else {
+			http.Error(w, err.Error(), 401)
 		}
-		http.Error(w, "session not found", 401)
 	}
 }
