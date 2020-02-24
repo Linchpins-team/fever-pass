@@ -25,7 +25,7 @@ function newRecord(form) {
     .then(record => {
         let table = document.getElementById("table")
         let tr = document.createElement("tr")
-        tr.innerHTML = `<td>${record.ID}</td><td>${record.UserID}</td><td>${record.Pass}</td><td>${formatTime(record.Time)}</td><button value=${record.ID}>刪除</button>`
+        tr.innerHTML = `<td>${record.ID}</td><td>${record.UserID}</td><td>${record.Pass}</td><td>${formatTime(record.Time)}</td><td><button value=${record.ID} onclick="delRecord(this)">刪除</button></td>`
         table.insertBefore(tr, table.firstChild)
         form.reset()
     })

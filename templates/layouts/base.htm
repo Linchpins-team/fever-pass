@@ -1,4 +1,5 @@
 {{ define "main" }}
+<!DOCTYPE html>
 <html>
     <head>
         {{ template "head" . }}
@@ -18,6 +19,8 @@
 {{ end }}
 
 {{ define "head" }}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{{ block "title" . }} {{ end }}</title>
 <link rel="stylesheet" href="/css/style.css">
 {{ end }}

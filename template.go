@@ -101,3 +101,9 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 	}{p, records}
 	h.HTML(w, "list.htm", page)
 }
+
+func (h Handler) page(path string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		h.HTML(w, path, nil)
+	}
+}
