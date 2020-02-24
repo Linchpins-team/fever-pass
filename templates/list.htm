@@ -2,6 +2,7 @@
 <html>
     <head>
         <title>紀錄列表</title>
+        <script src="/js/delete.js" ></script>
     </head>
     <body>
         <p>第 {{ .Page }} 頁</p>
@@ -22,7 +23,7 @@
                 <td>{{.Pass}}</td>
                 <td>{{formatTime .Time}}</td>
                 <td>{{if .Recorder.Valid}}{{.Recorder.String}}{{end}}</td>
-                <td><button value="{{.ID}}">刪除</button></td>
+                <td><button value="{{.ID}}" onclick="delRecord(this)">刪除</button></td>
             </tr>
             {{end}}
             </tbody>

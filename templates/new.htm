@@ -3,6 +3,7 @@
     <head>
         <title>管理頁面</title>
         <script src="/js/new.js" defer></script>
+        <script src="/js/delete.js"></script>
     </head>
     <body>
         <form action="" id="form">
@@ -27,7 +28,7 @@
                 <td>{{.UserID}}</td>
                 <td>{{.Pass}}</td>
                 <td>{{formatTime .Time}}</td>
-                <td><button value="{{.ID}}">刪除</button></td>
+                <td><button value="{{.ID}}" onclick="delRecord(this)">刪除</button></td>
             </tr>
             {{end}}
             </tbody>
