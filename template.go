@@ -77,7 +77,7 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 		p = 0
 	}
 	rows, err := h.db.Table("records").Select(
-		"records.id, records.user_id, records.pass, records.time, accounts.name",
+		"records.id, records.user_id, records.fever, records.time, accounts.name",
 	).Joins(
 		"left join accounts on records.account_id = accounts.id",
 	).Order("id desc").Offset(p * 20).Limit(20).Rows()
