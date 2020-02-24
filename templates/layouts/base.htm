@@ -9,7 +9,7 @@
             {{ template "header" . }}
         </header>
         <main>
-            {{ block "content" . }} {{ end }}
+            {{ block "content" .Data }} {{ end }}
         </main>
         <footer>
             {{ template "footer" . }}

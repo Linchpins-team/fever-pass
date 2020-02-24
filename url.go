@@ -88,5 +88,5 @@ func (h Handler) registerPage(w http.ResponseWriter, r *http.Request) {
 	page := struct {
 		Key string
 	}{key}
-	h.HTML(w, "register.htm", page)
+	h.HTML(w, r, "register.htm", page)
 }
