@@ -2,9 +2,51 @@ package main
 
 import (
 	"database/sql"
+	"log"
 	"net/http"
+	"path/filepath"
 	"strconv"
+	"text/template"
 )
+
+func (h *Handler) loadTemplates() {
+	h.tpls = make(map[string]*template.Template)
+	mainTmpl := template.New("main")
+	mainTmpl.Funcs(template.FuncMap{
+		"formatTime": formatTime,
+	})
+	layoutFiles, err := filepath.Glob("templates/layouts/*.htm")
+	if err != nil {
+		panic(err)
+	}
+
+	includeFiles, err := filepath.Glob("templates/*.htm")
+	if err != nil {
+		panic(err)
+	}
+
+	log.Println(includeFiles)
+	log.Println(layoutFiles)
+	for _, file := range includeFiles {
+		fileName := filepath.Base(file)
+		files := append(layoutFiles, file)
+		tpl := template.Must(mainTmpl.Clone())
+		h.tpls[fileName] = template.Must(tpl.ParseFiles(files...))
+	}
+	log.Println(h.tpls)
+}
+
+func (h Handler) HTML(w http.ResponseWriter, page string, data interface{}) {
+	log.Println(page)
+	if tpl, ok := h.tpls[page]; ok {
+		if err := tpl.ExecuteTemplate(w, "main", data); err != nil {
+			http.Error(w, err.Error(), 500)
+		}
+	} else {
+		log.Println(tpl)
+		http.Error(w, "cannot find templates", 500)
+	}
+}
 
 func (h Handler) newRecordPage(w http.ResponseWriter, r *http.Request) {
 	var records []Record
@@ -21,7 +63,7 @@ func (h Handler) newRecordPage(w http.ResponseWriter, r *http.Request) {
 	page := struct {
 		Records []Record
 	}{records}
-	h.tpl.ExecuteTemplate(w, "new.htm", page)
+	h.HTML(w, "new.htm", page)
 }
 
 func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +99,5 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 		Page    int
 		Records []recordT
 	}{p, records}
-	if err := h.tpl.ExecuteTemplate(w, "list.htm", page); err != nil {
-		panic(err)
-	}
+	h.HTML(w, "list.htm", page)
 }

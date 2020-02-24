@@ -1,0 +1,23 @@
+{{ define "main" }}
+<html>
+    <head>
+        {{ template "head" . }}
+    </head>
+    <body>
+        <header>
+            {{ template "header" . }}
+        </header>
+        <main>
+            {{ block "content" .}} {{ end }}
+        </main>
+        <footer>
+            {{ template "footer" .}}
+        </footer>
+    </body>
+</html>
+{{ end }}
+
+{{ define "head" }}
+<title>{{ block "title" . }} {{ end }}</title>
+<link rel="stylesheet" href="/css/style.css">
+{{ end }}

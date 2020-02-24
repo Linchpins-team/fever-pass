@@ -12,7 +12,7 @@ import (
 type Handler struct {
 	db     *gorm.DB
 	router *mux.Router
-	tpl    *template.Template
+	tpls   map[string]*template.Template
 }
 
 type ContextKey uint32
@@ -25,11 +25,7 @@ func NewHandler(db *gorm.DB) Handler {
 	h := Handler{
 		db: db,
 	}
-	h.tpl = template.New("")
-	h.tpl.Funcs(template.FuncMap{
-		"formatTime": formatTime,
-	})
-	h.tpl.ParseGlob("templates/*.htm")
+	h.loadTemplates()
 	h.newRouter()
 	return h
 }

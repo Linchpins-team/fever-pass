@@ -1,37 +1,32 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>管理頁面</title>
-        <script src="/js/new.js" defer></script>
-        <script src="/js/delete.js"></script>
-    </head>
-    <body>
-        <form action="" id="form">
-            User ID:<input type="text" name="user_id" autocomplete="off" autofocus>
-            通過 <input type="checkbox" name="pass" id="" value="true" checked>
-            <input type="submit" value="送出">
-        </form>
-        <script>
-        </script>
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>User</th>
-                <th>Pass</th>
-                <th>Time</th>
-                <th></th>
-            </tr>
-            <tbody id="table">
-            {{range .Records}}
-            <tr>
-                <td>{{.ID}}</td>
-                <td>{{.UserID}}</td>
-                <td>{{.Pass}}</td>
-                <td>{{formatTime .Time}}</td>
-                <td><button value="{{.ID}}" onclick="delRecord(this)">刪除</button></td>
-            </tr>
-            {{end}}
-            </tbody>
-        </table>
-    </body>
-</html>
+{{ define "title" }}管理頁面{{ end }}
+{{ define "content" }}
+<script src="/js/new.js" defer></script>
+<script src="/js/delete.js"></script>
+<form action="" id="form">
+    User ID:<input type="text" name="user_id" autocomplete="off" autofocus>
+    通過 <input type="checkbox" name="pass" id="" value="true" checked>
+    <input type="submit" value="送出">
+</form>
+<script>
+</script>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>User</th>
+        <th>Pass</th>
+        <th>Time</th>
+        <th></th>
+    </tr>
+    <tbody id="table">
+        {{range .Records}}
+        <tr>
+            <td>{{.ID}}</td>
+            <td>{{.UserID}}</td>
+            <td>{{.Pass}}</td>
+            <td>{{formatTime .Time}}</td>
+            <td><button value="{{.ID}}" onclick="delRecord(this)">刪除</button></td>
+        </tr>
+        {{end}}
+    </tbody>
+</table>
+{{ end }}
