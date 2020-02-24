@@ -103,7 +103,7 @@ func main() {
 	flag.Parse()
 
 	if init {
-		setupConfig()
+		setupConfig(confPath)
 		return
 	}
 
