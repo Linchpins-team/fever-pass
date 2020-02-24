@@ -5,6 +5,6 @@ Mode = "release"
   Port = 8080
 
 [Database]
-  Name = "fever_db"
-  User = "fever_user"
-  Password = "fever_password"
+  Name = "Name"
+  User = "User"
+  Password = "0000"

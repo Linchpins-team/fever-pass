@@ -1,5 +1,4 @@
 form button {
-    background-color: #2b6;
     border: none;
     color: white;
     padding: 20px 28px;
@@ -9,30 +8,67 @@ form button {
     cursor: pointer;
 }
 
+form {
+    margin: 32px;
+}
+
+button:hover {
+    background-color: #2b6;
+}
+
 main {
-    margin: 35vh auto 0;
     text-align: center;
 }
 
-input {
-    font-size: 20px;
+#middle {
+    margin: 35vh auto 0;
+}
+
+#login-input {
     padding: 20px;
+    font-size: 20px;
 }
 
 input:focus {
     background-color: #eef;
 }
 
+input[type="checkbox"] {
+    height: 16px;
+    width: 16px;
+}
+
+input[name="user_id"] {
+    margin: 6px;
+}
+
+footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 30%;
+    margin: auto;
+}
+
 table {
     margin: 0 auto;
-    width: 50%;
+    width: 70%;
+}
+
+th {
+    background: #aad;
+}
+
+tr {
+    background: #ddf;
 }
 
 h1 {
     font-size: 72px;
+    margin-top: 0;
 }
 
 h2 {
     font-size: 32px;
-    margin-bottom: 48px;
+    margin-bottom: 0;
 }
