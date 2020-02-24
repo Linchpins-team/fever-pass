@@ -46,7 +46,6 @@ func (h *Handler) newRouter() {
 	r.HandleFunc("/api/records/{id}", h.auth(h.deleteRecord, Editor)).Methods("DELETE")
 
 	r.HandleFunc("/api/login", h.login)
-	r.HandleFunc("/api/logout", logout)
 	r.HandleFunc("/api/register", h.register).Methods("POST")
 
 	r.HandleFunc("/api/url", h.auth(h.newURL, Admin)).Methods("POST")
@@ -57,6 +56,7 @@ func (h *Handler) newRouter() {
 
 	r.HandleFunc("/", h.page("index.htm"))
 	r.Handle("/login", h.page("login.htm"))
+	r.HandleFunc("/logout", logout)
 	r.HandleFunc("/register", h.registerPage)
 	r.HandleFunc("/check", h.check)
 	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("static"))))
