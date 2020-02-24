@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"text/template"
+
+	"github.com/jinzhu/gorm"
 )
 
 func (h *Handler) loadTemplates() {
@@ -106,4 +108,27 @@ func (h Handler) page(path string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		h.HTML(w, path, nil)
 	}
+}
+
+func (h Handler) check(w http.ResponseWriter, r *http.Request) {
+	userID := r.FormValue("user_id")
+	var record Record
+	page := struct {
+		Record
+		Found bool
+	}{}
+	err := h.db.Where("user_id = ? and time > ?", userID, today()).Order("id desc").First(&record).Error
+	if gorm.IsRecordNotFoundError(err) {
+		page.Found = false
+		h.HTML(w, "check.htm", page)
+		return
+	} else if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	page.Found = true
+	page.Record = record
+
+	h.HTML(w, "check.htm", page)
 }
