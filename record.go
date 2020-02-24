@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -50,17 +49,6 @@ func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 	enc.Encode(record)
 }
 
-func parseBool(str string) (bool, error) {
-	switch str {
-	case "on", "true":
-		return true, nil
-	case "off", "false", "":
-		return false, nil
-	default:
-		return false, fmt.Errorf("'%s' cannot parse to bool", str)
-	}
-}
-
 func (h Handler) findRecord(w http.ResponseWriter, r *http.Request) {
 	userID := r.FormValue("user_id")
 	var record Record
@@ -78,11 +66,6 @@ func (h Handler) findRecord(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-}
-
-func today() time.Time {
-	now := time.Now()
-	return time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
 }
 
 func (h Handler) listRecord(w http.ResponseWriter, r *http.Request) {
@@ -108,22 +91,4 @@ func (h Handler) deleteRecord(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-}
-
-func (h Handler) editPage(w http.ResponseWriter, r *http.Request) {
-	var records []Record
-	if acct, ok := r.Context().Value(KeyAccount).(Account); ok {
-		err := h.db.Where("account_id = ?", acct.ID).Order("time desc").Limit(20).Find(&records).Error
-		if err != nil {
-			http.Error(w, err.Error(), 500)
-			return
-		}
-	} else {
-		http.Error(w, "cannot read account from session", 500)
-		return
-	}
-	page := struct {
-		Records []Record
-	}{records}
-	h.tpl.ExecuteTemplate(w, "new.htm", page)
 }

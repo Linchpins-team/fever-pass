@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>紀錄列表</title>
+    </head>
+    <body>
+        <p>第 {{ .Page }} 頁</p>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>通過</th>
+                <th>時間</th>
+                <th>紀錄者</th>
+                <th></th>
+            </tr>
+            <tbody id="table">
+            {{range .Records}}
+            <tr>
+                <td>{{.ID}}</td>
+                <td>{{.UserID}}</td>
+                <td>{{.Pass}}</td>
+                <td>{{formatTime .Time}}</td>
+                <td>{{if .Recorder.Valid}}{{.Recorder.String}}{{end}}</td>
+                <td><button value="{{.ID}}">刪除</button></td>
+            </tr>
+            {{end}}
+            </tbody>
+        </table>
+    </body>
+</html>

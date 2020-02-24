@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"text/template"
-	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
@@ -28,9 +27,7 @@ func NewHandler(db *gorm.DB) Handler {
 	}
 	h.tpl = template.New("")
 	h.tpl.Funcs(template.FuncMap{
-		"formatTime": func(t time.Time) string {
-			return t.Format("01-02 15:04")
-		},
+		"formatTime": formatTime,
 	})
 	h.tpl.ParseGlob("templates/*.htm")
 	h.newRouter()
@@ -54,7 +51,8 @@ func (h *Handler) newRouter() {
 	r.HandleFunc("/api/logout", logout)
 	r.HandleFunc("/api/register", h.auth(h.register, Admin))
 
-	r.HandleFunc("/admin/new", h.auth(h.editPage, Editor))
+	r.HandleFunc("/admin/new", h.auth(h.newRecordPage, Editor))
+	r.HandleFunc("/admin/list", h.auth(h.listRecordsPage, Editor))
 	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("static"))))
 	h.router = r
 }
