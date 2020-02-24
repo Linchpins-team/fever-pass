@@ -32,14 +32,20 @@ type Config struct {
 	Password string `toml:"-"`
 }
 
-func setupConfig() {
+func setupConfig(path string) {
+	var ok string
+	fmt.Print("This will overwrite your existing setting, continue? (y/n) ")
+	fmt.Scanln(&ok)
+	if ok != "y" && ok != "Y" {
+		return
+	}
 	c := generateConfig()
 	db, err := initDB(c)
 	if err != nil {
 		panic(err)
 	}
 	setupDB(c, db)
-	writeConfig(c)
+	writeConfig(c, path)
 }
 
 func generateConfig() (c Config) {
@@ -93,8 +99,9 @@ func generateConfig() (c Config) {
 	return
 }
 
-func writeConfig(c Config) {
-	file, err := os.OpenFile("config.toml", os.O_WRONLY|os.O_CREATE, 0644)
+func writeConfig(c Config, path string) {
+	os.Remove(path)
+	file, err := os.Create(path)
 	if err != nil {
 		panic(err)
 	}

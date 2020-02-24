@@ -38,10 +38,20 @@ func (h *Handler) loadTemplates() {
 	log.Println(h.tpls)
 }
 
-func (h Handler) HTML(w http.ResponseWriter, page string, data interface{}) {
+func (h Handler) HTML(w http.ResponseWriter, r *http.Request, page string, data interface{}) {
 	log.Println(page)
+	acct, ok := r.Context().Value(KeyAccount).(Account)
+	pageData := struct {
+		Data  interface{}
+		Login bool
+		Account
+	}{
+		data,
+		ok,
+		acct,
+	}
 	if tpl, ok := h.tpls[page]; ok {
-		if err := tpl.ExecuteTemplate(w, "main", data); err != nil {
+		if err := tpl.ExecuteTemplate(w, "main", pageData); err != nil {
 			http.Error(w, err.Error(), 500)
 		}
 	} else {
@@ -65,7 +75,7 @@ func (h Handler) newRecordPage(w http.ResponseWriter, r *http.Request) {
 	page := struct {
 		Records []Record
 	}{records}
-	h.HTML(w, "new.htm", page)
+	h.HTML(w, r, "new.htm", page)
 }
 
 func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
@@ -101,12 +111,12 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 		Page    int
 		Records []recordT
 	}{p, records}
-	h.HTML(w, "list.htm", page)
+	h.HTML(w, r, "list.htm", page)
 }
 
 func (h Handler) page(path string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		h.HTML(w, path, nil)
+		h.HTML(w, r, path, nil)
 	}
 }
 
@@ -120,7 +130,7 @@ func (h Handler) check(w http.ResponseWriter, r *http.Request) {
 	err := h.db.Where("user_id = ? and time > ?", userID, today()).Order("id desc").First(&record).Error
 	if gorm.IsRecordNotFoundError(err) {
 		page.Found = false
-		h.HTML(w, "check.htm", page)
+		h.HTML(w, r, "check.htm", page)
 		return
 	} else if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -130,5 +140,5 @@ func (h Handler) check(w http.ResponseWriter, r *http.Request) {
 	page.Found = true
 	page.Record = record
 
-	h.HTML(w, "check.htm", page)
+	h.HTML(w, r, "check.htm", page)
 }
