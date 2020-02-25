@@ -1,5 +1,5 @@
-function delRecord(button) {
-    fetch(`/api/records/${button.value}`, {
+function deleteRow(button, type) {
+    fetch(`/api/${type}/${button.value}`, {
         method: "DELETE", 
     })
     .then(response => {
@@ -8,8 +8,14 @@ function delRecord(button) {
                 removeRow(button)
                 break
             
-            default:
-                throw response.text()
+            case 404:
+                throw new Error("user not found")
+
+            case 401:
+                throw new Error("permission denied")
+
+            case 415:
+                throw new Error("invalid id")
         }
     })
     .catch(err => {

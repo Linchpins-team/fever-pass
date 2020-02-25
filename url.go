@@ -6,11 +6,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	"github.com/skip2/go-qrcode"
+)
+
+const (
+	QRcodeDir = "/tmp/fever-pass-qrcodes"
 )
 
 type URL struct {
@@ -65,12 +71,19 @@ func (h Handler) inviteURL(key string) string {
 }
 
 func (h Handler) createQRCode(key string) string {
-	path := fmt.Sprintf("/qrcodes/%s.png", key)
-	err := qrcode.WriteFile(h.inviteURL(key), qrcode.Medium, 256, "static"+path)
+	path := fmt.Sprintf("%s.png", key)
+	prepareTmp()
+	err := qrcode.WriteFile(h.inviteURL(key), qrcode.Medium, 256, QRcodeDir+"/"+path)
 	if err != nil {
 		panic(err)
 	}
-	return h.config.Server.Base + path
+	return h.config.Server.Base + "/qrcodes/" + path
+}
+
+func prepareTmp() {
+	if err := os.MkdirAll(QRcodeDir, 0700); err != nil {
+		panic(err)
+	}
 }
 
 func (h Handler) registerPage(w http.ResponseWriter, r *http.Request) {
@@ -89,4 +102,8 @@ func (h Handler) registerPage(w http.ResponseWriter, r *http.Request) {
 		Key string
 	}{key}
 	h.HTML(w, r, "register.htm", page)
+}
+
+func (h Handler) qrcode(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, QRcodeDir+"/"+mux.Vars(r)["file"])
 }

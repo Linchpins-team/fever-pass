@@ -1,0 +1,40 @@
+{{ define "title" }}帳號管理{{ end }}
+{{ define "content" }}
+<script src="/js/delete.js"></script>
+<script src="/js/update.js"></script>
+<h1>帳號管理</h1>
+<table>
+    <tr>
+        <th>編號</th>
+        <th>名稱</th>
+        <th>權限</th>
+        <th></th>
+        <th></th>
+        <th></th>
+    </tr>
+    <tbody>
+        {{ range . }}
+        <tr>
+            <td>{{ .ID }}</td>
+            <td>{{ .Name }}</td>
+            <td>{{ .Role }}</td>
+            <td>
+                {{ if eq .Role 2 }}
+                <button value="{{ .ID }}" onclick="update(this, 1, '')">設為管理員</button>
+                {{ else if ne .ID 1 }}
+                <button value="{{ .ID }}" onclick="update(this, 2, '')">設為編輯者</button>
+                {{ end }}
+            </td>
+            <td>
+                <button value="{{ .ID }}" onclick="resetPassword(this)">重設密碼</button>
+            </td>
+            <td>
+                {{ if ne .ID 1 }}
+                <button value="{{ .ID }}" onclick="deleteRow(this, 'accounts')">刪除帳號</button>
+                {{ end }}
+            </td>
+        </tr>
+        {{ end }}
+    </tbody>
+</table>
+{{ end }}

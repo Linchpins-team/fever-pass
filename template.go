@@ -16,6 +16,7 @@ func (h *Handler) loadTemplates() {
 	mainTmpl := template.New("main")
 	mainTmpl.Funcs(template.FuncMap{
 		"formatTime": formatTime,
+		"add":        add,
 	})
 	layoutFiles, err := filepath.Glob("templates/layouts/*.htm")
 	if err != nil {
@@ -86,13 +87,13 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 	records := make([]recordT, 0, 20)
 	p, err := strconv.Atoi(r.FormValue("page"))
 	if err != nil {
-		p = 0
+		p = 1
 	}
 	rows, err := h.db.Table("records").Select(
 		"records.id, records.user_id, records.fever, records.time, accounts.name",
 	).Joins(
 		"left join accounts on records.account_id = accounts.id",
-	).Order("id desc").Offset(p * 20).Limit(20).Rows()
+	).Order("id desc").Offset((p - 1) * 20).Limit(20).Rows()
 
 	if err != nil {
 		panic(err)
@@ -102,7 +103,7 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 		var record recordT
 		err := rows.Scan(&record.ID, &record.UserID, &record.Fever, &record.Time, &record.Recorder)
 		if err != nil {
-			panic(err)
+			continue
 		}
 		records = append(records, record)
 	}
@@ -141,4 +142,14 @@ func (h Handler) check(w http.ResponseWriter, r *http.Request) {
 	page.Record = record
 
 	h.HTML(w, r, "check.htm", page)
+}
+
+func (h Handler) listAccounts(w http.ResponseWriter, r *http.Request) {
+	var accounts []Account
+	err := h.db.Find(&accounts).Error
+	if err != nil {
+		panic(err)
+	}
+
+	h.HTML(w, r, "account_list.htm", accounts)
 }

@@ -22,7 +22,7 @@
             <td>{{.UserID}}</td>
             <td>{{if .Fever}}發燒{{else}}正常{{end}}</td>
             <td>{{formatTime .Time}}</td>
-            <td><button value="{{.ID}}" onclick="delRecord(this)">刪除</button></td>
+            <td><button value="{{.ID}}" onclick="deleteRow(this, 'records')">刪除</button></td>
         </tr>
         {{end}}
     </tbody>

@@ -117,7 +117,7 @@ func main() {
 
 	srv := &http.Server{
 		Handler: h.Router(),
-		Addr:    fmt.Sprintf("127.0.0.1:%d", c.Server.Port),
+		Addr:    fmt.Sprintf("0.0.0.0:%d", c.Server.Port),
 		// Good practice: enforce timeouts for servers you create!
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,

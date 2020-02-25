@@ -24,3 +24,7 @@ func parseBool(str string) (bool, error) {
 		return false, fmt.Errorf("'%s' cannot parse to bool", str)
 	}
 }
+
+func add(a, b int) int {
+	return a + b
+}
