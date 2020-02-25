@@ -30,3 +30,9 @@ function update(button, role, password) {
         alert(err)
     })
 }
+
+function resetPassword(button) {
+    let password = prompt("設定新密碼")
+    update(button, 0, password)
+    alert("密碼已更新")
+}

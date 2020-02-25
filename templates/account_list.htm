@@ -10,6 +10,7 @@
         <th>權限</th>
         <th></th>
         <th></th>
+        <th></th>
     </tr>
     <tbody>
         {{ range . }}
@@ -23,6 +24,9 @@
                 {{ else if ne .ID 1 }}
                 <button value="{{ .ID }}" onclick="update(this, 2, '')">設為編輯者</button>
                 {{ end }}
+            </td>
+            <td>
+                <button value="{{ .ID }}" onclick="resetPassword(this)">重設密碼</button>
             </td>
             <td>
                 {{ if ne .ID 1 }}
