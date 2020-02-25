@@ -35,6 +35,8 @@ func NewHandler(db *gorm.DB, config Config) Handler {
 func (h *Handler) newRouter() {
 	r := mux.NewRouter()
 
+	r.Use(h.identify)
+
 	r.HandleFunc("/api/hi", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "hi")
 	})
@@ -63,6 +65,9 @@ func (h *Handler) newRouter() {
 	r.HandleFunc("/logout", logout)
 	r.HandleFunc("/register", h.registerPage)
 	r.HandleFunc("/check", h.check)
+
+	r.HandleFunc("/qrcodes/{file}", h.auth(h.qrcode, Admin))
+
 	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("static"))))
 	h.router = r
 }
