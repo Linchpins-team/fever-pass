@@ -8,12 +8,16 @@ form button {
     cursor: pointer;
 }
 
+footer a {
+    display: block;
+}
+
 form {
     margin: 32px;
 }
 
 button:hover {
-    background-color: #2b6;
+    background-color: #44b;
 }
 
 main {
@@ -21,7 +25,7 @@ main {
 }
 
 #middle {
-    margin: 35vh auto 0;
+    margin: 30vh auto 0;
 }
 
 #login-input {
@@ -43,11 +47,14 @@ input[name="user_id"] {
 }
 
 footer {
+    position: fixed;
+    bottom: 32px;
+    height: 32px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 30%;
-    margin: auto;
+    width: 40%;
+    margin: 0 auto;
 }
 
 table {
