@@ -142,3 +142,13 @@ func (h Handler) check(w http.ResponseWriter, r *http.Request) {
 
 	h.HTML(w, r, "check.htm", page)
 }
+
+func (h Handler) listAccounts(w http.ResponseWriter, r *http.Request) {
+	var accounts []Account
+	err := h.db.Find(&accounts).Error
+	if err != nil {
+		panic(err)
+	}
+
+	h.HTML(w, r, "account_list.htm", accounts)
+}

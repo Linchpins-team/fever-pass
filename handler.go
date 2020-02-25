@@ -45,6 +45,9 @@ func (h *Handler) newRouter() {
 	r.HandleFunc("/api/records", h.auth(h.listRecord, Editor)).Methods("GET")
 	r.HandleFunc("/api/records/{id}", h.auth(h.deleteRecord, Editor)).Methods("DELETE")
 
+	r.HandleFunc("/api/accounts/{id}", h.auth(h.deleteAccount, Admin)).Methods("DELETE")
+	r.HandleFunc("/api/accounts/{id}", h.auth(h.updateAccount, Admin)).Methods("PUT")
+
 	r.HandleFunc("/api/login", h.login)
 	r.HandleFunc("/api/register", h.register).Methods("POST")
 
@@ -53,6 +56,7 @@ func (h *Handler) newRouter() {
 	r.HandleFunc("/admin/new", h.auth(h.newRecordPage, Editor))
 	r.HandleFunc("/admin/list", h.auth(h.listRecordsPage, Editor))
 	r.HandleFunc("/admin/invite", h.auth(h.page("generate_url.htm"), Admin))
+	r.HandleFunc("/admin/accounts", h.auth(h.listAccounts, Admin))
 
 	r.HandleFunc("/", h.page("index.htm"))
 	r.Handle("/login", h.page("login.htm"))

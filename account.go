@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/gorilla/securecookie"
 	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
@@ -20,6 +21,22 @@ const (
 	Editor
 	User
 )
+
+func (r Role) String() string {
+	switch r {
+	case Admin:
+		return "管理員"
+
+	case Editor:
+		return "編輯者"
+
+	case User:
+		return "使用者"
+
+	default:
+		return "未知"
+	}
+}
 
 type Account struct {
 	ID       uint32 `gorm:"primary_key"`
@@ -97,11 +114,7 @@ func (h Handler) register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	password := r.FormValue("password")
-	acct.Password, err = bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		panic(err)
-	}
+	acct.Password = generatePassword(r.FormValue("password"))
 
 	tx := h.db.Begin()
 	url.Last--
@@ -121,6 +134,14 @@ func (h Handler) register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, session(acct.ID))
+}
+
+func generatePassword(password string) []byte {
+	pwd, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		panic(err)
+	}
+	return pwd
 }
 
 func (h Handler) auth(next http.HandlerFunc, role Role) http.HandlerFunc {
@@ -153,5 +174,59 @@ func (h Handler) auth(next http.HandlerFunc, role Role) http.HandlerFunc {
 		} else {
 			http.Error(w, err.Error(), 401)
 		}
+	}
+}
+
+func (h Handler) deleteAccount(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		http.Error(w, err.Error(), 415)
+		return
+	}
+
+	if id == 1 {
+		http.Error(w, "cannot delete admin", 403)
+		return
+	}
+	err = h.db.Delete(&Account{}, "id = ?", id).Error
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+}
+
+func (h Handler) updateAccount(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		http.Error(w, err.Error(), 415)
+		return
+	}
+
+	var acct Account
+	err = h.db.First(&acct, "id = ?", id).Error
+	if gorm.IsRecordNotFoundError(err) {
+		http.Error(w, "user not found", 404)
+		return
+	} else if err != nil {
+		panic(err)
+	}
+
+	role, _ := parseRole(r.FormValue("role"))
+	if role != Unknown {
+		if acct.ID == 1 {
+			http.Error(w, "cannot change admin role", 403)
+			return
+		}
+		acct.Role = role
+	}
+
+	password := r.FormValue("password")
+	if password != "" {
+		acct.Password = generatePassword(password)
+	}
+
+	err = h.db.Save(&acct).Error
+	if err != nil {
+		panic(err)
 	}
 }

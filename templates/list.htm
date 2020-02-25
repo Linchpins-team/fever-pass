@@ -19,7 +19,7 @@
             <td>{{.Fever}}</td>
             <td>{{formatTime .Time}}</td>
             <td>{{if .Recorder.Valid}}{{.Recorder.String}}{{end}}</td>
-            <td><button value="{{.ID}}" onclick="delRecord(this)">刪除</button></td>
+            <td><button value="{{.ID}}" onclick="deleteRow(this, 'records')">刪除</button></td>
         </tr>
         {{end}}
     </tbody>
