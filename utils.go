@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"time"
+	"html/template"
 )
 
 func formatTime(t time.Time) string {
@@ -27,4 +28,37 @@ func parseBool(str string) (bool, error) {
 
 func add(a, b int) int {
 	return a + b
+}
+
+func formatDate(t time.Time) template.HTML {
+	return template.HTML(fmt.Sprintf(`
+	<h1>%s</h1>
+	<h2>%s</h2>
+	`, weekday(t), t.Format("01/02")))
+}
+
+func weekday(t time.Time) string {
+	switch t.Weekday() {
+	case time.Monday:
+		return "星期一"
+
+	case time.Tuesday:
+		return "星期二"
+
+	case time.Wednesday:
+		return "星期三"
+
+	case time.Thursday:
+		return "星期四"
+
+	case time.Friday:
+		return "星期五"
+
+	case time.Saturday:
+		return "星期六"
+
+	case time.Sunday:
+		return "星期天"
+	}
+	return ""
 }

@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
-	"text/template"
+	"html/template"
 
 	"github.com/jinzhu/gorm"
 )
@@ -16,6 +16,7 @@ func (h *Handler) loadTemplates() {
 	mainTmpl := template.New("main")
 	mainTmpl.Funcs(template.FuncMap{
 		"formatTime": formatTime,
+		"formatDate": formatDate,
 		"add":        add,
 	})
 	layoutFiles, err := filepath.Glob("templates/layouts/*.htm")

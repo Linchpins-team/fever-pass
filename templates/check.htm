@@ -1,7 +1,6 @@
 {{ define "title" }}查詢結果{{ end }}
 {{ define "content" }}
 <div id="middle">
-    <h1>查詢結果</h1>
     {{ if .Found }}
     {{ if .Fever }}
     <style>
@@ -16,9 +15,9 @@
         }
     </style>
     {{end}}
+    {{ formatDate .Time }}
     <h1>{{ if .Fever }}發燒{{ else }}正常{{ end }}</h1>
     <h2>{{ .UserID }}</h2>
-    <h3>{{ formatTime .Time }}</h3>
     {{ else }}
     <h1>查無資料</h1>
 </div>

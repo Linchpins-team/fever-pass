@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"text/template"
+	"html/template"
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
