@@ -1,14 +1,11 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/gorilla/securecookie"
 	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -54,128 +51,12 @@ func parseRole(str string) (Role, error) {
 	return Role(role), nil
 }
 
-func session(id uint32) *http.Cookie {
-	s := securecookie.New(hashKey, blockKey)
-	var encoded string
-	var err error
-	if encoded, err = s.Encode("session", id); err != nil {
-		panic(err)
-	}
-	return &http.Cookie{
-		Name:  "session",
-		Value: encoded,
-		Path:  "/",
-	}
-}
-
-func (h Handler) login(w http.ResponseWriter, r *http.Request) {
-	var acct Account
-	acct.Name = r.FormValue("username")
-	err := h.db.Where(acct).First(&acct).Error
-	if gorm.IsRecordNotFoundError(err) {
-		http.Error(w, "user not found", 404)
-		return
-	} else if err != nil {
-		panic(err)
-	}
-	password := r.FormValue("password")
-	if bcrypt.CompareHashAndPassword(acct.Password, []byte(password)) != nil {
-		http.Error(w, "wrong password", 401)
-		return
-	}
-	http.SetCookie(w, session(acct.ID))
-}
-
-func logout(w http.ResponseWriter, r *http.Request) {
-	if cookie, err := r.Cookie("session"); err == nil {
-		cookie.MaxAge = -1
-		http.SetCookie(w, cookie)
-	}
-	http.Redirect(w, r, "/login", 303)
-}
-
-func (h Handler) register(w http.ResponseWriter, r *http.Request) {
-	var err error
-	var url URL
-	key := r.FormValue("key")
-	err = h.db.Where("id = ? and expire_at > ? and last > 0", key, time.Now()).First(&url).Error
-	if gorm.IsRecordNotFoundError(err) {
-		http.Error(w, "invalid key", 404)
-		return
-	} else if err != nil {
-		panic(err)
-	}
-
-	var acct Account
-	acct.Name = r.FormValue("username")
-	acct.Role = Editor
-	if err != nil {
-		http.Error(w, err.Error(), 415)
-		return
-	}
-
-	acct.Password = generatePassword(r.FormValue("password"))
-
-	tx := h.db.Begin()
-	url.Last--
-	if err = tx.Save(&url).Error; err != nil {
-		tx.Rollback()
-		panic(err)
-	}
-
-	if err = tx.Create(&acct).Error; err != nil {
-		tx.Rollback()
-		http.Error(w, "cannot register user "+err.Error(), 500)
-		return
-	}
-
-	if err = tx.Commit().Error; err != nil {
-		panic(err)
-	}
-
-	http.SetCookie(w, session(acct.ID))
-}
-
 func generatePassword(password string) []byte {
 	pwd, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		panic(err)
 	}
 	return pwd
-}
-
-func (h Handler) auth(next http.HandlerFunc, role Role) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if role == Unknown {
-			next.ServeHTTP(w, r)
-		} else if acct, ok := r.Context().Value(KeyAccount).(Account); ok && acct.Role <= role {
-			next.ServeHTTP(w, r)
-		} else {
-			http.Error(w, "permission denied, require "+role.String(), 401)
-		}
-	}
-}
-
-func (h Handler) identify(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		s := securecookie.New(hashKey, blockKey)
-		if cookie, err := r.Cookie("session"); err == nil {
-			var id uint32
-			if err := s.Decode("session", cookie.Value, &id); err == nil {
-				var acct Account
-				if err = h.db.First(&acct, id).Error; err != nil {
-					http.Error(w, "account not found", 401)
-					return
-				}
-				ctx := r.Context()
-				ctx = context.WithValue(ctx, KeyAccount, acct)
-				r = r.WithContext(ctx)
-			} else {
-				logout(w, r)
-			}
-		}
-		next.ServeHTTP(w, r)
-	})
 }
 
 func (h Handler) deleteAccount(w http.ResponseWriter, r *http.Request) {

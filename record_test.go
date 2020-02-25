@@ -94,7 +94,7 @@ func TestNewRecord(t *testing.T) {
 }
 
 func adminSession(r *http.Request) *http.Request {
-	r.AddCookie(session(admin.ID))
+	r.AddCookie(newSession(admin.ID))
 	return r
 }
 
