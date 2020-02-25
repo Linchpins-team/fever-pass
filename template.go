@@ -2,11 +2,11 @@ package main
 
 import (
 	"database/sql"
+	"html/template"
 	"log"
 	"net/http"
 	"path/filepath"
 	"strconv"
-	"html/template"
 
 	"github.com/jinzhu/gorm"
 )
@@ -15,9 +15,10 @@ func (h *Handler) loadTemplates() {
 	h.tpls = make(map[string]*template.Template)
 	mainTmpl := template.New("main")
 	mainTmpl.Funcs(template.FuncMap{
-		"formatTime": formatTime,
-		"formatDate": formatDate,
-		"add":        add,
+		"formatTime":   formatTime,
+		"formatDate":   formatDate,
+		"weekdayColor": weekdayColor,
+		"add":          add,
 	})
 	layoutFiles, err := filepath.Glob("templates/layouts/*.htm")
 	if err != nil {

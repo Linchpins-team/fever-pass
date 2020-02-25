@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"html/template"
+	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
@@ -59,6 +59,8 @@ func (h *Handler) newRouter() {
 	r.HandleFunc("/admin/list", h.auth(h.listRecordsPage, Editor))
 	r.HandleFunc("/admin/invite", h.auth(h.page("generate_url.htm"), Admin))
 	r.HandleFunc("/admin/accounts", h.auth(h.listAccounts, Admin))
+
+	r.HandleFunc("/doc/{title}", h.doc)
 
 	r.HandleFunc("/", h.page("index.htm"))
 	r.Handle("/login", h.page("login.htm"))

@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"time"
 	"html/template"
+	"time"
 )
 
 func formatTime(t time.Time) string {
@@ -59,6 +59,32 @@ func weekday(t time.Time) string {
 
 	case time.Sunday:
 		return "星期天"
+	}
+	return ""
+}
+
+func weekdayColor(t time.Time) string {
+	switch t.Weekday() {
+	case time.Monday:
+		return "red"
+
+	case time.Tuesday:
+		return "orange"
+
+	case time.Wednesday:
+		return "yellow"
+
+	case time.Thursday:
+		return "green"
+
+	case time.Friday:
+		return "blue"
+
+	case time.Saturday:
+		return "indigo"
+
+	case time.Sunday:
+		return "purple"
 	}
 	return ""
 }

@@ -49,7 +49,7 @@ func setupConfig(path string) {
 }
 
 func generateConfig() (c Config) {
-	fmt.Print("server base url (default localhost:8080): ")
+	fmt.Print("server base url (default http://localhost:8080): ")
 	fmt.Scanln(&c.Server.Base)
 	if c.Server.Base == "" {
 		c.Server.Base = "http://localhost:8080"
@@ -74,7 +74,7 @@ func generateConfig() (c Config) {
 			fmt.Scanln(&c.Database.Name)
 			fmt.Print("database user: ")
 			fmt.Scanln(&c.Database.User)
-			fmt.Print("datbase password: ")
+			fmt.Print("database password: ")
 			fmt.Scanln(&c.Database.Password)
 			if db, err := initDB(c); err != nil {
 				fmt.Printf("Cannot connect to database: %s, initial it now? (y/n) ", err)

@@ -10,7 +10,7 @@
     <tr>
         <th>ID</th>
         <th>User</th>
-        <th>通過</th>
+        <th>體溫</th>
         <th>時間</th>
         <th>紀錄者</th>
         <th></th>
@@ -20,7 +20,7 @@
         <tr>
             <td>{{.ID}}</td>
             <td>{{.UserID}}</td>
-            <td>{{.Fever}}</td>
+            <td>{{if .Fever}}發燒{{else}}正常{{end}}</td>
             <td>{{formatTime .Time}}</td>
             <td>{{if .Recorder.Valid}}{{.Recorder.String}}{{end}}</td>
             <td><button value="{{.ID}}" onclick="deleteRow(this, 'records')">刪除</button></td>
