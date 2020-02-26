@@ -5,4 +5,4 @@ go.sum
 cmd
 fever-pass
 static/qrcodes
-config.toml
+*.toml
