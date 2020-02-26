@@ -1,3 +1,7 @@
+body {
+    margin: 0 4px;
+}
+
 form button {
     border: none;
     color: white;
@@ -6,10 +10,39 @@ form button {
     margin-left: 16px;
     font-size: 20px;
     cursor: pointer;
+    transition: all ease 0.2s 0.1s;
 }
 
-footer a {
-    display: block;
+header ,footer {
+    font-size: 16px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 80%;
+    margin: auto;
+}
+
+header {
+    font-size: 20px;
+}
+
+a {
+    color: #000;
+    text-decoration: none;
+    text-align: center;
+    display: inline-block;
+}
+
+a:hover {
+    text-decoration: 3px solid #4b4;
+    transition: all ease 0.2s 0.1s;
+}
+
+.doc {
+    text-align: left;
+    width: 80%;
+    margin: auto;
 }
 
 form {
@@ -17,7 +50,7 @@ form {
 }
 
 button:hover {
-    background-color: #44b;
+    background-color: #4b4;
 }
 
 main {
@@ -25,7 +58,8 @@ main {
 }
 
 #middle {
-    margin: 30vh auto 0;
+    padding: 25vh 0;
+    margin: 0 auto;
 }
 
 #login-input {
@@ -46,28 +80,17 @@ input[name="user_id"] {
     margin: 6px;
 }
 
-footer {
-    position: fixed;
-    bottom: 32px;
-    height: 32px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 40%;
-    margin: 0 auto;
-}
-
 table {
     margin: 0 auto;
     width: 70%;
 }
 
 th {
-    background: #aad;
+    background: #ada;
 }
 
 tr {
-    background: #ddf;
+    background: #dfd;
 }
 
 h1 {
