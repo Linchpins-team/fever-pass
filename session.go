@@ -122,7 +122,7 @@ func (h Handler) register(w http.ResponseWriter, r *http.Request) {
 
 	var acct Account
 	acct.Name = r.FormValue("username")
-	acct.Role = Editor
+	acct.Role = Teacher
 	if err != nil {
 		http.Error(w, err.Error(), 415)
 		return

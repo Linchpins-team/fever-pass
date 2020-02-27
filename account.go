@@ -15,8 +15,8 @@ type Role uint32
 const (
 	Unknown Role = iota
 	Admin
-	Editor
-	User
+	Teacher
+	Student
 )
 
 func (r Role) String() string {
@@ -24,11 +24,11 @@ func (r Role) String() string {
 	case Admin:
 		return "管理員"
 
-	case Editor:
-		return "編輯者"
+	case Teacher:
+		return "老師"
 
-	case User:
-		return "使用者"
+	case Student:
+		return "學生"
 
 	default:
 		return "未知"
@@ -37,8 +37,12 @@ func (r Role) String() string {
 
 type Account struct {
 	ID       uint32 `gorm:"primary_key"`
+	Email    string `gorm:"unique;type:varchar(32)`
 	Name     string `gorm:"unique;type:varchar(32)"`
 	Password []byte
+
+	Class   Class
+	ClassID uint32
 
 	Role Role
 }

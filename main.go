@@ -71,7 +71,7 @@ func initDB(c Config) (db *gorm.DB, err error) {
 }
 
 func migrate(db *gorm.DB) {
-	if err := db.AutoMigrate(&Record{}, &Account{}, &URL{}).Error; err != nil {
+	if err := db.AutoMigrate(&Record{}, &Account{}, &URL{}, &Class{}).Error; err != nil {
 		panic(err)
 	}
 }

@@ -10,7 +10,7 @@ import (
 var (
 	acct = Account{
 		Name: "editor",
-		Role: Editor,
+		Role: Teacher,
 	}
 	password = "my_password"
 )
