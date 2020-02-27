@@ -59,11 +59,10 @@ func (h *Handler) newRouter() {
 
 	r.HandleFunc("/doc/{title}", h.doc)
 
-	r.HandleFunc("/", h.page("index.htm"))
+	r.HandleFunc("/", h.index)
 	r.Handle("/login", h.page("login.htm"))
 	r.HandleFunc("/logout", logout)
 	r.HandleFunc("/register", h.registerPage)
-	r.HandleFunc("/check", h.check)
 
 	r.HandleFunc("/qrcodes/{file}", h.auth(h.qrcode, Admin))
 

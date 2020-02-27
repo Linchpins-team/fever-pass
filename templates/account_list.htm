@@ -7,6 +7,8 @@
     <tr>
         <th>編號</th>
         <th>名稱</th>
+        <th>Email</th>
+        <th>班級</th>
         <th>權限</th>
         <th></th>
         <th></th>
@@ -17,6 +19,8 @@
         <tr>
             <td>{{ .ID }}</td>
             <td>{{ .Name }}</td>
+            <td>{{ .Email }}</td>
+            <td>{{ .Class }}</td>
             <td>{{ .Role }}</td>
             <td>
                 {{ if eq .Role 2 }}

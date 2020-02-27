@@ -14,6 +14,20 @@
         {{ else }}
             <a href="/login">登入</a>
         {{ end }}
+        {{ with .Data }}
+            <table>
+                <tr>
+                    <th>體溫</th>
+                    <th>時間</th>
+                    <th>紀錄者</th>
+                </tr>
+                <tr>
+                    <td>{{ .Temperature }}</td>
+                    <td>{{ formatTime .CreatedAt }}</td>
+                    <td>{{ .RecordedBy }}</td>
+                </tr>
+            </table>
+        {{ end }}
     </div>
 </div>
 <script>
