@@ -15,7 +15,7 @@
             <td>{{ .ID }}</td>
             <td>{{ .Account }}</td>
             <td>{{ .Temperature }}</td>
-            <td>{{ formatTime .Time }}</td>
+            <td>{{ formatTime .CreatedAt }}</td>
             <td>{{ .RecordedBy }}</td>
             <td><button value="{{ .ID }}" onclick="deleteRow(this, 'records')">刪除</button></td>
         </tr>

@@ -41,8 +41,6 @@ func (h *Handler) newRouter() {
 		fmt.Fprint(w, "hi")
 	})
 
-	r.HandleFunc("/api/check", h.findRecord).Methods("GET")
-
 	r.HandleFunc("/api/records", h.auth(h.newRecord, Student)).Methods("POST")
 	r.HandleFunc("/api/records/{id}", h.auth(h.deleteRecord, Student)).Methods("DELETE")
 

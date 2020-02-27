@@ -43,19 +43,6 @@
             }
         ]
     },
-    "update": {
-        "request": {
-            "uri": "/api/records/:id",
-            "method": "PUT",
-            "params": {
-                "account_id": "string",
-                "fever": true,
-                "temperature": 37.5,
-                "time": "2020-02-20T08:04:03"
-            }
-        },
-        "response": [200, 401, 404, 415]
-    },
     "delete": {
         "request": {
             "uri": "/api/records/:id",

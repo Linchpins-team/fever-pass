@@ -65,7 +65,7 @@ func (h Handler) HTML(w http.ResponseWriter, r *http.Request, page string, data 
 func (h Handler) newRecordPage(w http.ResponseWriter, r *http.Request) {
 	var records []Record
 	if acct, ok := r.Context().Value(KeyAccount).(Account); ok {
-		err := h.db.Model(&acct).Set("gorm:auto_preload", true).Order("id desc").Limit(20).Related(&records).Error
+		err := h.listRecord(acct).Limit(20).Find(&records).Error
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return

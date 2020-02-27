@@ -14,6 +14,7 @@ var (
 		`"email","name","password","class"
 "s10512345@st.fcjh.tc.edu.tw","Justin","j_password","207"
 "s10642236@st.fcjh.tc.edu.tw","Kevin","k_pwd","109"
+"s10412556@st.fcjh.tc.edu.tw","Elsa","anna","303"
 "s10443256@st.fcjs.tc.edu.tw","Anna","elsa","303"`,
 	)
 )
@@ -48,8 +49,7 @@ func newAccount(db *gorm.DB, row []string, role Role) (err error) {
 	password := row[2]
 
 	var class Class
-	class.Name = row[3]
-	if err := db.FirstOrCreate(&class).Error; err != nil {
+	if err := db.FirstOrCreate(&class, Class{Name: row[3]}).Error; err != nil {
 		return err
 	}
 	acct.Class = class

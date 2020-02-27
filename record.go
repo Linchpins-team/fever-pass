@@ -2,23 +2,26 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 )
 
-type Record struct {
-	ID uint32 `gorm:"primary_key"`
+var (
+	PermissionDenied = errors.New("permission denied")
+	RecordNotFound   = errors.New("record not found")
+)
 
-	Account   Account
-	AccountID uint32
+type Record struct {
+	gorm.Model
 
 	Temperature float64
-	Time        time.Time
 
+	Account    Account
+	AccountID  uint32
 	RecordedBy Account `gorm:"foreignkey:RecorderID"`
 	RecorderID uint32
 }
@@ -41,7 +44,6 @@ func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "cannot read account from session", 500)
 		return
 	}
-
 	if !permission(acct, account) {
 		http.Error(w, "permission denied", 403)
 		return
@@ -57,8 +59,6 @@ func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 415)
 		return
 	}
-
-	record.Time = time.Now()
 
 	err = h.db.Create(&record).Error
 	if err != nil {
@@ -82,25 +82,6 @@ func permission(a, b Account) bool {
 		return a.ID == b.ID
 	}
 	return false
-}
-
-func (h Handler) findRecord(w http.ResponseWriter, r *http.Request) {
-	userID := r.FormValue("account_id")
-	var record Record
-	err := h.db.Where("account_id = ? and time > ?", userID, today()).Order("id desc").First(&record).Error
-	if gorm.IsRecordNotFoundError(err) {
-		http.Error(w, "record not found", 404)
-		return
-	} else if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-
-	enc := json.NewEncoder(w)
-	if err = enc.Encode(&record); err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
 }
 
 func (h Handler) listRecord(acct Account) (tx *gorm.DB) {
@@ -130,7 +111,21 @@ func (h Handler) deleteRecord(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.db.Delete(&Record{}, "id = ?", id).Error
+	var record Record
+	err = h.db.Preload("Account").First(&record, id).Error
+	if gorm.IsRecordNotFoundError(err) {
+		http.Error(w, RecordNotFound.Error(), 404)
+	} else if err != nil {
+		panic(err)
+	}
+
+	acct := r.Context().Value(KeyAccount).(Account)
+	if !permission(acct, record.Account) {
+		http.Error(w, PermissionDenied.Error(), 403)
+		return
+	}
+
+	err = h.db.Delete(&record).Error
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
