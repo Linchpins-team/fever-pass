@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"html/template"
 	"log"
 	"net/http"
@@ -66,7 +65,7 @@ func (h Handler) HTML(w http.ResponseWriter, r *http.Request, page string, data 
 func (h Handler) newRecordPage(w http.ResponseWriter, r *http.Request) {
 	var records []Record
 	if acct, ok := r.Context().Value(KeyAccount).(Account); ok {
-		err := h.db.Where("account_id = ?", acct.ID).Order("id desc").Limit(20).Find(&records).Error
+		err := h.db.Model(&acct).Set("gorm:auto_preload", true).Order("id desc").Limit(20).Related(&records).Error
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
@@ -82,37 +81,21 @@ func (h Handler) newRecordPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
-	type recordT struct {
-		Record
-		Recorder sql.NullString
-	}
-	records := make([]recordT, 0, 20)
+	records := make([]Record, 0, 20)
 	p, err := strconv.Atoi(r.FormValue("page"))
 	if err != nil {
 		p = 1
 	}
-	rows, err := h.db.Table("records").Select(
-		"records.id, records.user_id, records.fever, records.time, accounts.name",
-	).Joins(
-		"left join accounts on records.account_id = accounts.id",
-	).Order("id desc").Offset((p - 1) * 20).Limit(20).Rows()
-
+	// acct must have value
+	acct := r.Context().Value(KeyAccount).(Account)
+	err = h.listRecord(acct).Offset((p - 1) * 20).Limit(20).Find(&records).Error
 	if err != nil {
 		panic(err)
 	}
 
-	for rows.Next() {
-		var record recordT
-		err := rows.Scan(&record.ID, &record.UserID, &record.Fever, &record.Time, &record.Recorder)
-		if err != nil {
-			continue
-		}
-		records = append(records, record)
-	}
-
 	page := struct {
 		Page    int
-		Records []recordT
+		Records []Record
 	}{p, records}
 	h.HTML(w, r, "list.htm", page)
 }
@@ -124,13 +107,13 @@ func (h Handler) page(path string) http.HandlerFunc {
 }
 
 func (h Handler) check(w http.ResponseWriter, r *http.Request) {
-	userID := r.FormValue("user_id")
+	userID := r.FormValue("account_id")
 	var record Record
 	page := struct {
 		Record
 		Found bool
 	}{}
-	err := h.db.Where("user_id = ? and time > ?", userID, today()).Order("id desc").First(&record).Error
+	err := h.db.Where("account_id = ? and time > ?", userID, today()).Order("id desc").First(&record).Error
 	if gorm.IsRecordNotFoundError(err) {
 		page.Found = false
 		h.HTML(w, r, "check.htm", page)

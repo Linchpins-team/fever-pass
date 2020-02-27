@@ -1,33 +1,14 @@
 {{ define "title" }}紀錄列表{{ end }}
 {{ define "content" }}
-<script src="/js/delete.js"></script>
 <p>第 {{ .Page }} 頁</p>
+
 {{ if gt .Page 1 }}
-<a href="/admin/list?page={{ add .Page -1 }}">前一頁</a>
+    <a href="/admin/list?page={{ add .Page -1 }}">前一頁</a>
 {{ end }}
 {{ if eq 20 (len .Records) }}
-<a href="/admin/list?page={{ add .Page 1}}">下一頁</a>
+    <a href="/admin/list?page={{ add .Page 1}}">下一頁</a>
 {{ end }}
-<table>
-    <tr>
-        <th>ID</th>
-        <th>User</th>
-        <th>體溫</th>
-        <th>時間</th>
-        <th>紀錄者</th>
-        <th></th>
-    </tr>
-    <tbody id="table">
-        {{range .Records}}
-        <tr>
-            <td>{{.ID}}</td>
-            <td>{{.UserID}}</td>
-            <td>{{if .Fever}}發燒{{else}}正常{{end}}</td>
-            <td>{{formatTime .Time}}</td>
-            <td>{{if .Recorder.Valid}}{{.Recorder.String}}{{end}}</td>
-            <td><button value="{{.ID}}" onclick="deleteRow(this, 'records')">刪除</button></td>
-        </tr>
-        {{end}}
-    </tbody>
-</table>
+
+{{ template "list" . }}
+
 {{ end }}

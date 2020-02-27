@@ -4,14 +4,24 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/jinzhu/gorm"
 )
 
-func (h Handler) importAccounts(r io.Reader, role Role) (err error) {
+var (
+	testfile = strings.NewReader(
+		`"email","name","password","class"
+"s10512345@st.fcjh.tc.edu.tw","Justin","j_password","207"
+"s10642236@st.fcjh.tc.edu.tw","Kevin","k_pwd","109"
+"s10443256@st.fcjs.tc.edu.tw","Anna","elsa","303"`,
+	)
+)
+
+func importAccounts(db *gorm.DB, r io.Reader, role Role) (err error) {
 	reader := csv.NewReader(r)
 	reader.Read() // ignore column name
-	tx := h.db.Begin()
+	tx := db.Begin()
 	for {
 		row, err := reader.Read()
 		if err == io.EOF {

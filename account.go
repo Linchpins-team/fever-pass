@@ -37,14 +37,18 @@ func (r Role) String() string {
 
 type Account struct {
 	ID       uint32 `gorm:"primary_key"`
-	Email    string `gorm:"unique;type:varchar(32)`
+	Email    string `gorm:"unique;type:varchar(32)"`
 	Name     string `gorm:"unique;type:varchar(32)"`
-	Password []byte
+	Password []byte `json:"-"`
 
 	Class   Class
 	ClassID uint32
 
 	Role Role
+}
+
+func (a Account) String() string {
+	return a.Name
 }
 
 func parseRole(str string) (Role, error) {

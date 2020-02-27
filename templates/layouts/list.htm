@@ -1,0 +1,25 @@
+{{ define "list" }}
+<script src="/js/delete.js"></script>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>User</th>
+        <th>體溫</th>
+        <th>時間</th>
+        <th>紀錄者</th>
+        <th></th>
+    </tr>
+    <tbody id="table">
+        {{range .Records}}
+        <tr>
+            <td>{{ .ID }}</td>
+            <td>{{ .Account }}</td>
+            <td>{{ .Temperature }}</td>
+            <td>{{ formatTime .Time }}</td>
+            <td>{{ .RecordedBy }}</td>
+            <td><button value="{{ .ID }}" onclick="deleteRow(this, 'records')">刪除</button></td>
+        </tr>
+        {{end}}
+    </tbody>
+</table>
+{{ end }}

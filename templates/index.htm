@@ -1,13 +1,46 @@
 {{ define "title" }}Fever Pass - 量體溫，速通行{{ end }}
-{{ define "content" }}
+{{ define "content-with-session" }}
 <div id="middle">
     <div>
         <h1>Fever Pass</h1>
         <h2>量體溫，速通行</h2>
-        <form action="/check" class="form-container" id="login-form" method="GET">
-            <input name="user_id" placeholder="請輸入學生證ID" id="login-input" required type="text">
-            <button>登入</button>
-        </form>
+        {{ if .Login }}
+            <form action="" id="form">
+                <input type="hidden" name="account_id" value="{{ .Account.ID }}">
+                今日體溫 <input type="number" name="temperature" step="0.1" id="" autofocus autocomplete="false">
+                <input type="submit" value="送出">
+            </form>
+            <p hidden id="result">紀錄成功！</p>
+        {{ else }}
+            <a href="/login">登入</a>
+        {{ end }}
     </div>
 </div>
+<script>
+function newRecord(form) {
+    fetch("/api/records", {
+        method: "POST",
+        credentials: "include",
+        body: new FormData(form),
+    })
+    .then(response => {
+        if (response.status != 200) {
+            return response.text()
+        }
+        document.getElementById("result").hidden = false
+        return ""
+    })
+    .then(err => {
+        if (err != "") {
+            alert(err)
+        }
+    })
+}
+
+var form = document.getElementById("form")
+form.onsubmit = function (ev) {
+    newRecord(form)
+    ev.preventDefault()
+}
+</script>
 {{ end }}

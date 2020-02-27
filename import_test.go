@@ -14,7 +14,7 @@ func TestImport(t *testing.T) {
 "s10642236@st.fcjh.tc.edu.tw","Kevin","k_pwd","109"
 "s10443256@st.fcjs.tc.edu.tw","Anna","elsa","303"`,
 	)
-	err := testH.importAccounts(file, Student)
+	err := importAccounts(testH.db, file, Student)
 	assert.Equal(t, nil, err)
 	var students []Account
 	testH.db.Preload("Class").Find(&students)
@@ -25,6 +25,6 @@ func TestImport(t *testing.T) {
 		"test@email","someone","password"
 		`,
 	)
-	err = testH.importAccounts(file, Student)
+	err = importAccounts(testH.db, file, Student)
 	assert.NotNil(t, err, "err should not be nil")
 }

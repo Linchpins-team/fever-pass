@@ -44,6 +44,7 @@ func (h Handler) identify(next http.Handler) http.Handler {
 				} else {
 					var acct Account
 					if err = h.db.First(&acct, session.ID).Error; err != nil {
+						logout(w, r)
 						http.Error(w, "account not found", 401)
 						return
 					}
