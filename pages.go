@@ -80,18 +80,30 @@ func (h Handler) listAccountsPage(w http.ResponseWriter, r *http.Request) {
 	h.HTML(w, r, "account_list.htm", accounts)
 }
 
+// 今日總覽頁面
 func (h Handler) status(w http.ResponseWriter, r *http.Request) {
 	acct := r.Context().Value(KeyAccount).(Account)
+	tx := h.listAccounts(acct)
+	class := r.FormValue("class")
+	if class != "" {
+		tx = tx.Joins("JOIN classes ON class_id = classes.id").Where("classes.name = ?", class)
+	}
+	if acct.Role == Teacher {
+		class = acct.Class.Name
+	}
+
 	var accounts []Account
-	err := h.listAccounts(acct).Find(&accounts).Error
+	err := tx.Find(&accounts).Error
 	if err != nil {
 		panic(err)
 	}
 
 	page := struct {
+		Class                  string
 		All, Unrecorded, Fever []Account
 	}{
-		All: accounts,
+		Class: class,
+		All:   accounts,
 	}
 	for _, account := range accounts {
 		record, err := h.lastRecord(account)

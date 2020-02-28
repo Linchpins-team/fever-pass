@@ -1,6 +1,20 @@
-{{ define "title" }}今日總覽{{ end }}
-{{ define "content" }}
-<h1>今日總覽</h1>
+{{ define "title" }}
+    {{ with .Class }}
+    {{ . }} 班狀態
+    {{ else }}
+    全校狀態
+    {{ end }}
+{{ end }}
+
+{{ define "content-with-session" }}
+<h1>{{ template "title" .Data }}</h1>
+{{ if eq .Role 1 }}
+<form action="/status" method="get">
+    班級 <input type="text" name="class" id="">
+    <input type="submit" value="查詢">
+</form>
+{{ end }}
+{{ with .Data }}
 <table>
     <tr>
         <th>總人數</th>
@@ -23,6 +37,8 @@
 {{ template "account_list" .Fever }}
 <h2>未登記列表</h2>
 {{ template "account_list" .Unrecorded }}
+{{ end }}
+
 {{ end }}
 
 {{ define "account_list" }}

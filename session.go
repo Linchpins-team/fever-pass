@@ -43,7 +43,7 @@ func (h Handler) identify(next http.Handler) http.Handler {
 					logout(w, r)
 				} else {
 					var acct Account
-					if err = h.db.First(&acct, "id = ?", session.ID).Error; err != nil {
+					if err = h.db.Set("gorm:auto_preload", true).First(&acct, "id = ?", session.ID).Error; err != nil {
 						logout(w, r)
 						http.Error(w, "account not found", 401)
 						return
