@@ -21,8 +21,19 @@ type TempType uint32
 const (
 	UnknownType TempType = iota
 	Ear
-	ForeHead
+	Forehead
 )
+
+func (t TempType) String() string {
+	switch t {
+	case Ear:
+		return "耳溫"
+
+	case Forehead:
+		return "額溫"
+	}
+	return ""
+}
 
 func parseType(str string) (TempType, error) {
 	tempType, err := strconv.Atoi(str)
@@ -46,7 +57,7 @@ type Record struct {
 
 func (r Record) Fever() bool {
 	switch r.Type {
-	case ForeHead:
+	case Forehead:
 		return r.Temperature >= 37.5
 
 	case Ear:
@@ -60,7 +71,12 @@ func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 	var err error
 	var account Account
 
-	err = h.db.First(&account, "id = ?", r.FormValue("account_id")).Error
+	acct := r.Context().Value(KeyAccount).(Account)
+	err = h.db.Joins(
+		"JOIN classes ON class_id = classes.id",
+	).Where(
+		"classes.name = ? and number = ?", r.FormValue("class"), r.FormValue("number"),
+	).First(&account).Error
 	if gorm.IsRecordNotFoundError(err) {
 		http.Error(w, "account not found", 404)
 		return
@@ -68,11 +84,6 @@ func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	acct, ok := r.Context().Value(KeyAccount).(Account)
-	if !ok {
-		http.Error(w, "cannot read account from session", 500)
-		return
-	}
 	if !permission(acct, account) {
 		http.Error(w, "permission denied", 403)
 		return
@@ -165,4 +176,37 @@ func (h Handler) deleteRecord(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
+}
+
+func (h Handler) newSelfRecord(w http.ResponseWriter, r *http.Request) {
+	acct, ok := r.Context().Value(KeyAccount).(Account)
+	if !ok {
+		http.Error(w, "cannot read account from session", 500)
+		return
+	}
+
+	record := Record{
+		Account:    acct,
+		RecordedBy: acct,
+	}
+
+	var err error
+	record.Temperature, err = strconv.ParseFloat(r.FormValue("temperature"), 64)
+	if err != nil {
+		http.Error(w, err.Error(), 415)
+		return
+	}
+
+	record.Type, err = parseType(r.FormValue("type"))
+	if err != nil {
+		http.Error(w, err.Error(), 415)
+		return
+	}
+
+	err = h.db.Create(&record).Error
+	if err != nil {
+		panic(err)
+	}
+
+	h.index(w, r)
 }

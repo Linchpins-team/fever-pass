@@ -2,8 +2,13 @@
 {{ define "content" }}
 <script src="/js/new.js" defer></script>
 <form action="" id="form">
-    帳號 <input type="text" name="account_id" autocomplete="off" autofocus>
-    體溫 <input type="text" name="temperature" id="">
+    班級 <input type="text" name="class" autocomplete="off" autofocus>
+    座號 <input type="text" name="number" id="" autocomplete="off">
+    體溫 <input type="text" name="temperature" id="" autocomplete="off">
+    <select name="type" id="">
+        <option value="1">耳溫</option>
+        <option value="2">額溫</option>
+    </select>
     <input type="submit" value="新增">
 </form>
 {{ template "list" .Records }}
