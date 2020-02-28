@@ -4,19 +4,44 @@
 <table>
     <tr>
         <th>總人數</th>
-        <td>{{ .All }}</td>
+        <td>{{ len .All }}</td>
     </tr>
     <tr>
         <th>已登記人數</th>
-        <td>{{ .Recorded }}</td>
+        <td>{{ sub (len .All) (len .Unrecorded) }}</td>
     </tr>
     <tr>
         <th>未登記人數</th>
-        <td>{{ .Unrecorded }}</td>
+        <td>{{ len .Unrecorded }}</td>
     </tr>
     <tr>
         <th>發燒人數</th>
-        <td>{{ .Fever }}</td>
+        <td>{{ len .Fever }}</td>
     </tr>
+</table>
+<h2>發燒列表</h2>
+{{ template "account_list" .Fever }}
+<h2>未登記列表</h2>
+{{ template "account_list" .Unrecorded }}
+{{ end }}
+
+{{ define "account_list" }}
+<table>
+    <tr>
+        <th>帳號</th>
+        <th>姓名</th>
+        <th>班級</th>
+        <th>座號</th>
+        <th>身份</th>
+    </tr>
+    {{ range . }}
+    <tr>
+        <td>{{ .ID }}</td>
+        <td>{{ .Name }}</td>
+        <td>{{ .Class }}</td>
+        <td>{{ .Number }}</td>
+        <td>{{ .Role }}</td>
+    </tr>
+    {{ end }}
 </table>
 {{ end }}

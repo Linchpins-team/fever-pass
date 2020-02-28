@@ -30,6 +30,10 @@ func add(a, b int) int {
 	return a + b
 }
 
+func sub(a, b int) int {
+	return a - b
+}
+
 func formatDate(t time.Time) template.HTML {
 	return template.HTML(fmt.Sprintf(`
 	<h1>%s</h1>

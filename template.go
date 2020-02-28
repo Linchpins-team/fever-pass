@@ -15,6 +15,7 @@ func (h *Handler) loadTemplates() {
 		"formatDate":   formatDate,
 		"weekdayColor": weekdayColor,
 		"add":          add,
+		"sub":          sub,
 	})
 	layoutFiles, err := filepath.Glob("templates/layouts/*.htm")
 	if err != nil {

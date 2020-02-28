@@ -89,21 +89,20 @@ func (h Handler) status(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page := struct {
-		All, Recorded, Unrecorded, Fever int
+		All, Unrecorded, Fever []Account
 	}{
-		All: len(accounts),
+		All: accounts,
 	}
 	for _, account := range accounts {
 		record, err := h.lastRecord(account)
 		if err == RecordNotFound {
-			page.Unrecorded++
+			page.Unrecorded = append(page.Unrecorded, account)
 			continue
 		}
 
 		if record.Fever() {
-			page.Fever++
+			page.Fever = append(page.Fever, account)
 		}
-		page.Recorded++
 	}
 	h.HTML(w, r, "status.htm", page)
 }
