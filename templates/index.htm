@@ -6,7 +6,8 @@
         <h2>量體溫，速通行</h2>
         {{ if .Login }}
             <form action="/" id="form" method="POST">
-                今日體溫 <input type="number" name="temperature" step="0.1" id="" autofocus autocomplete="off">
+                <label for="temperature">體溫</label>
+                <input type="number" name="temperature" step="0.1" id="" autofocus autocomplete="off">
                 <select name="type" id="">
                     <option value="1">耳溫</option>
                     <option value="2">額溫</option>

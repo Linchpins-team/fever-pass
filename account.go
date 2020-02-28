@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -34,10 +33,6 @@ func (r Role) String() string {
 	default:
 		return "未知"
 	}
-}
-
-func (a Account) MarshalJSON() ([]byte, error) {
-	return json.Marshal(a.Name)
 }
 
 type Account struct {

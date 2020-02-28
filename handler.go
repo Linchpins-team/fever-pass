@@ -56,12 +56,15 @@ func (h *Handler) newRouter() {
 	r.HandleFunc("/list", h.auth(h.listRecordsPage, Student))
 	r.HandleFunc("/invite", h.auth(h.page("generate_url.htm"), Admin))
 	r.HandleFunc("/accounts", h.auth(h.listAccountsPage, Student))
-	r.HandleFunc("/status", h.auth(h.status, Teacher))
+	r.HandleFunc("/stats", h.auth(h.stats, Teacher))
+	r.HandleFunc("/import", h.auth(h.page("import.htm"), Admin)).Methods("GET")
+	r.HandleFunc("/import", h.auth(h.importHandler, Admin)).Methods("POST")
 
 	r.HandleFunc("/doc/{title}", h.doc)
 
 	r.HandleFunc("/", h.index).Methods("GET")
 	r.HandleFunc("/", h.auth(h.newSelfRecord, Student)).Methods("POST")
+	r.Handle("/reset", h.auth(h.page("reset.htm"), Student))
 	r.Handle("/login", h.page("login.htm"))
 	r.HandleFunc("/logout", logout)
 	r.HandleFunc("/register", h.registerPage)

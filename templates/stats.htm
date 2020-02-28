@@ -1,15 +1,11 @@
 {{ define "title" }}
-    {{ with .Class }}
-    {{ . }} 班狀態
-    {{ else }}
-    全校狀態
-    {{ end }}
+    {{ with .Class }}{{ . }}班{{ else }}全校{{ end }}統計
 {{ end }}
 
 {{ define "content-with-session" }}
 <h1>{{ template "title" .Data }}</h1>
 {{ if eq .Role 1 }}
-<form action="/status" method="get">
+<form action="/stats" method="get">
     班級 <input type="text" name="class" id="">
     <input type="submit" value="查詢">
 </form>

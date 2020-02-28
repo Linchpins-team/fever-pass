@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -33,10 +32,6 @@ func (t TempType) String() string {
 		return "額溫"
 	}
 	return ""
-}
-
-func (t TempType) MarshalJSON() ([]byte, error) {
-	return json.Marshal(t.String())
 }
 
 func parseType(str string) (TempType, error) {
@@ -115,9 +110,8 @@ func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	enc := json.NewEncoder(w)
-	if err = enc.Encode(record); err != nil {
-		panic(err)
+	if err = h.tpls["new.htm"].ExecuteTemplate(w, "row", record); err != nil {
+		http.Error(w, err.Error(), 500)
 	}
 }
 

@@ -1,7 +1,7 @@
 {{ define "title" }}
 {{ formatDate .Date }}
 {{ if ne .Account.ID "" }}{{ .Account.Name }}{{ end }}
-紀錄列表
+記錄列表
 {{ end }}
 {{ define "content" }}
 <h1>{{ template "title" . }}</h1>

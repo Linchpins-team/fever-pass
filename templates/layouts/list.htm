@@ -14,6 +14,7 @@
     <tbody id="table">
         {{ range . }}
         <tr>
+        {{ block "row" . }}
             <td>{{ .ID }}</td>
             <td><a href="/list?account_id={{ .Account.ID }}">{{ .Account }}</a></td>
             <td>{{ .Temperature }}</td>
@@ -22,6 +23,7 @@
             <td>{{ formatTime .CreatedAt }}</td>
             <td>{{ .RecordedBy }}</td>
             <td><button value="{{ .ID }}" onclick="deleteRow(this, 'records')">刪除</button></td>
+        {{ end }}
         </tr>
         {{end}}
     </tbody>

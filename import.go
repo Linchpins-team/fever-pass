@@ -6,16 +6,39 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"net/http"
 
 	"github.com/jinzhu/gorm"
 )
+
+func (h Handler) importHandler(w http.ResponseWriter, r *http.Request) {
+	file, _, err := r.FormFile("file")
+	if err != nil {
+		w.WriteHeader(415)
+		h.HTML(w, r, "import.htm", err.Error())
+		return
+	}
+	role, err := parseRole(r.FormValue("role"))
+	if err != nil {
+		w.WriteHeader(415)
+		h.HTML(w, r, "import.htm", err.Error())
+		return
+	}
+	n, err := importAccounts(h.db, file, role)
+	if err != nil {
+		w.WriteHeader(500)
+		h.HTML(w, r, "import.htm", err.Error())
+		return
+	}
+	h.HTML(w, r, "import.htm", fmt.Sprintf("成功匯入%d筆資料", n))
+}
 
 func importTestData(db *gorm.DB) {
 	file, err := os.Open("testdata/teachers.csv")
 	if err != nil {
 		panic(err)
 	}
-	err = importAccounts(db, file, Teacher)
+	_, err = importAccounts(db, file, Teacher)
 	if err != nil {
 		panic(err)
 	}
@@ -23,10 +46,10 @@ func importTestData(db *gorm.DB) {
 	if err != nil {
 		panic(err)
 	}
-	err = importAccounts(db, file, Student)
+	_, err = importAccounts(db, file, Student)
 }
 
-func importAccounts(db *gorm.DB, r io.Reader, role Role) (err error) {
+func importAccounts(db *gorm.DB, r io.Reader, role Role) (n int, err error) {
 	reader := csv.NewReader(r)
 	index, _ := reader.Read() // ignore column name
 	tx := db.Begin()
@@ -35,13 +58,16 @@ func importAccounts(db *gorm.DB, r io.Reader, role Role) (err error) {
 		if err == io.EOF {
 			break
 		}
-		err = parseAccount(tx, parseColumns(index, row), role)
+		added, err := createAccount(tx, parseColumns(index, row), role)
 		if err != nil {
 			tx.Rollback()
-			return err
+			return n, err
+		}
+		if added {
+			n++
 		}
 	}
-	return tx.Commit().Error
+	return n, tx.Commit().Error
 }
 
 func parseColumns(index, row []string) (columns map[string]string) {
@@ -54,10 +80,7 @@ func parseColumns(index, row []string) (columns map[string]string) {
 	return
 }
 
-func parseAccount(db *gorm.DB, columns map[string]string, role Role) (err error) {
-	if len(columns) < 4 {
-		return fmt.Errorf("row doesn't 4 column")
-	}
+func createAccount(db *gorm.DB, columns map[string]string, role Role) (added bool, err error) {
 	acct := Account{
 		ID:   columns["id"],
 		Name: columns["name"],
@@ -65,9 +88,13 @@ func parseAccount(db *gorm.DB, columns map[string]string, role Role) (err error)
 	acct.Role = role
 	password := columns["password"]
 
+	if err := db.First(&acct, "id = ?", acct.ID).Error; !gorm.IsRecordNotFoundError(err) {
+		return false, err 
+	}
+
 	var class Class
 	if err := db.FirstOrCreate(&class, Class{Name: columns["class"]}).Error; err != nil {
-		return err
+		return false, err
 	}
 	acct.Class = class
 
@@ -78,5 +105,5 @@ func parseAccount(db *gorm.DB, columns map[string]string, role Role) (err error)
 
 	acct.Password = generatePassword(password)
 
-	return db.Create(&acct).Error
+	return true, db.Create(&acct).Error
 }

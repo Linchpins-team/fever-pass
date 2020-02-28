@@ -9,7 +9,7 @@
             {{ template "header" . }}
         </header>
         <main>
-            {{ block "content" .Data }} {{ end }}
+            {{ block "content" .Data }}{{ end }}
             {{ block "content-with-session" . }}{{ end }}
         </main>
         <footer>

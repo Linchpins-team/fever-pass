@@ -4,6 +4,10 @@
 <script src="/js/update.js"></script>
 <h1>帳號管理</h1>
 {{ $acct := .Account }}
+{{ if eq $acct.Role 1 }}
+<a href="/invite">邀請</a>
+<a href="/import">匯入</a>
+{{ end }}
 <table>
     <tr>
         <th>帳號</th>

@@ -12,7 +12,7 @@ function newRecord(form) {
     .then(response => {
         switch (response.status) {
             case 200:
-                return response.json()
+                return response.text()
                 break
             case 401:
                 throw response.text()
@@ -25,20 +25,13 @@ function newRecord(form) {
     .then(record => {
         let table = document.getElementById("table")
         let tr = document.createElement("tr")
-        tr.innerHTML = `
-        <td>${record.ID}</td>
-        <td>${record.Account}</td>
-        <td>${record.Temperature}</td>
-        <td>${record.Type}</td>
-        <td>${record.Fever?'發燒':'正常'}</td>
-        <td>${formatTime(record.CreatedAt)}</td>
-        <td>${record.RecordedBy}</td>
-        <td><button value=${record.ID} onclick="delRecord(this)">刪除</button></td>`
+        tr.innerHTML = record
         table.insertBefore(tr, table.firstChild)
         while (table.childElementCount > 20) {
             table.lastChild.remove()
         }
         form.reset()
+        document.getElementsByName("class")[0].focus()
     })
     .catch(error => {
         alert(error)

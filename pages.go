@@ -108,7 +108,7 @@ func (h Handler) listAccountsPage(w http.ResponseWriter, r *http.Request) {
 }
 
 // 今日總覽頁面
-func (h Handler) status(w http.ResponseWriter, r *http.Request) {
+func (h Handler) stats(w http.ResponseWriter, r *http.Request) {
 	acct := r.Context().Value(KeyAccount).(Account)
 	tx := h.listAccounts(acct)
 	class := r.FormValue("class")
@@ -143,5 +143,5 @@ func (h Handler) status(w http.ResponseWriter, r *http.Request) {
 			page.Fever = append(page.Fever, account)
 		}
 	}
-	h.HTML(w, r, "status.htm", page)
+	h.HTML(w, r, "stats.htm", page)
 }
