@@ -1,5 +1,9 @@
-{{ define "title" }}紀錄列表{{ end }}
+{{ define "title" }}
+{{ if ne .Account.ID "" }}{{ .Account.Name }}{{ end }}
+紀錄列表
+{{ end }}
 {{ define "content" }}
+<h1>{{ template "title" . }}</h1>
 <p>第 {{ .Page }} 頁</p>
 
 {{ if gt .Page 1 }}

@@ -57,15 +57,34 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 	}
 	// acct must have value
 	acct := r.Context().Value(KeyAccount).(Account)
-	err = h.listRecord(acct).Offset((p - 1) * 20).Limit(20).Find(&records).Error
+	tx := h.listRecord(acct)
+	id := r.FormValue("account_id")
+	var account Account
+	if id != "" {
+		err = h.db.First(&account, "id = ?", id).Error
+		if gorm.IsRecordNotFoundError(err) {
+			http.Error(w, RecordNotFound.Error(), 404)
+			return
+		} else if err != nil {
+			panic(err)
+		}
+		tx = tx.Where("account_id = ?", id)
+	}
+
+	err = tx.Offset((p - 1) * 20).Limit(20).Find(&records).Error
 	if err != nil {
 		panic(err)
 	}
 
 	page := struct {
 		Page    int
+		Account Account
 		Records []Record
-	}{p, records}
+	}{
+		Page:    p,
+		Account: account,
+		Records: records,
+	}
 	h.HTML(w, r, "list.htm", page)
 }
 

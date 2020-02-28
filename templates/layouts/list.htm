@@ -15,7 +15,7 @@
         {{ range . }}
         <tr>
             <td>{{ .ID }}</td>
-            <td>{{ .Account }}</td>
+            <td><a href="/list?account_id={{ .Account.ID }}">{{ .Account }}</a></td>
             <td>{{ .Temperature }}</td>
             <td>{{ .Type }}</td>
             <td>{{ if .Fever }}發燒{{ else }}正常{{ end }}</td>

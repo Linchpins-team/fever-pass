@@ -53,7 +53,7 @@
     {{ range . }}
     <tr>
         <td>{{ .ID }}</td>
-        <td>{{ .Name }}</td>
+        <td><a href="/list?account_id={{ .ID }}">{{ .Name }}</a></td>
         <td>{{ .Class }}</td>
         <td>{{ .Number }}</td>
         <td>{{ .Role }}</td>
