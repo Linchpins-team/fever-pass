@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -18,19 +19,40 @@ var (
 type TempType uint32
 
 const (
-	EarTemp TempType = iota
+	UnknownType TempType = iota
+	Ear
 	ForeHead
 )
+
+func parseType(str string) (TempType, error) {
+	tempType, err := strconv.Atoi(str)
+	if err != nil || tempType < 0 || tempType > 3 {
+		return UnknownType, fmt.Errorf("Cannot parse '%s' as role", str)
+	}
+	return TempType(tempType), nil
+}
 
 type Record struct {
 	gorm.Model
 
 	Temperature float64
+	Type        TempType
 
 	Account    Account
-	AccountID  uint32
+	AccountID  string
 	RecordedBy Account `gorm:"foreignkey:RecorderID"`
-	RecorderID uint32
+	RecorderID string
+}
+
+func (r Record) Fever() bool {
+	switch r.Type {
+	case ForeHead:
+		return r.Temperature >= 37.5
+
+	case Ear:
+		return r.Temperature >= 38
+	}
+	return false
 }
 
 // insert a new record into database
@@ -62,6 +84,12 @@ func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 	}
 
 	record.Temperature, err = strconv.ParseFloat(r.FormValue("temperature"), 64)
+	if err != nil {
+		http.Error(w, err.Error(), 415)
+		return
+	}
+
+	record.Type, err = parseType(r.FormValue("type"))
 	if err != nil {
 		http.Error(w, err.Error(), 415)
 		return

@@ -10,16 +10,25 @@ import (
 func (h Handler) index(w http.ResponseWriter, r *http.Request) {
 	acct, ok := r.Context().Value(KeyAccount).(Account)
 	if ok {
-		var record Record
-		err := h.db.Preload("RecordedBy").Where("created_at > ?", today()).Order("id desc").First(&record, "account_id = ?", acct.ID).Error
-		if !gorm.IsRecordNotFoundError(err) && err != nil {
-			http.Error(w, err.Error(), 500)
-			return
+		record, err := h.lastRecord(acct)
+		if err == RecordNotFound {
+			h.HTML(w, r, "index.htm", nil)
 		}
 		h.HTML(w, r, "index.htm", record)
 	} else {
 		h.HTML(w, r, "index.htm", nil)
 	}
+}
+
+func (h Handler) lastRecord(account Account) (record Record, err error) {
+	err = h.db.Set("gorm:auto_preload", true).Where("created_at > ?", today()).Order("id desc").First(&record, "account_id = ?", account.ID).Error
+	if gorm.IsRecordNotFoundError(err) {
+		err = RecordNotFound
+		return
+	} else if err != nil {
+		panic(err)
+	}
+	return
 }
 
 func (h Handler) newRecordPage(w http.ResponseWriter, r *http.Request) {
@@ -60,12 +69,41 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 	h.HTML(w, r, "list.htm", page)
 }
 
-func (h Handler) listAccounts(w http.ResponseWriter, r *http.Request) {
+func (h Handler) listAccountsPage(w http.ResponseWriter, r *http.Request) {
+	acct := r.Context().Value(KeyAccount).(Account)
 	var accounts []Account
-	err := h.db.Preload("Class").Find(&accounts).Error
+	err := h.listAccounts(acct).Find(&accounts).Error
 	if err != nil {
 		panic(err)
 	}
 
 	h.HTML(w, r, "account_list.htm", accounts)
+}
+
+func (h Handler) status(w http.ResponseWriter, r *http.Request) {
+	acct := r.Context().Value(KeyAccount).(Account)
+	var accounts []Account
+	err := h.listAccounts(acct).Find(&accounts).Error
+	if err != nil {
+		panic(err)
+	}
+
+	page := struct {
+		All, Recorded, Unrecorded, Fever int
+	}{
+		All: len(accounts),
+	}
+	for _, account := range accounts {
+		record, err := h.lastRecord(account)
+		if err == RecordNotFound {
+			page.Unrecorded++
+			continue
+		}
+
+		if record.Fever() {
+			page.Fever++
+		}
+		page.Recorded++
+	}
+	h.HTML(w, r, "status.htm", page)
 }

@@ -52,10 +52,11 @@ func (h *Handler) newRouter() {
 
 	r.HandleFunc("/api/url", h.auth(h.newURL, Admin)).Methods("POST")
 
-	r.HandleFunc("/admin/new", h.auth(h.newRecordPage, Student))
-	r.HandleFunc("/admin/list", h.auth(h.listRecordsPage, Student))
-	r.HandleFunc("/admin/invite", h.auth(h.page("generate_url.htm"), Admin))
-	r.HandleFunc("/admin/accounts", h.auth(h.listAccounts, Admin))
+	r.HandleFunc("/new", h.auth(h.newRecordPage, Student))
+	r.HandleFunc("/list", h.auth(h.listRecordsPage, Student))
+	r.HandleFunc("/invite", h.auth(h.page("generate_url.htm"), Admin))
+	r.HandleFunc("/accounts", h.auth(h.listAccountsPage, Student))
+	r.HandleFunc("/status", h.auth(h.status, Teacher))
 
 	r.HandleFunc("/doc/{title}", h.doc)
 

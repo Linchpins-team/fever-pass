@@ -113,3 +113,20 @@ func (h Handler) updateAccount(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 }
+
+func (h Handler) listAccounts(acct Account) *gorm.DB {
+	tx := h.db.Preload("Class").Table("accounts")
+	switch acct.Role {
+	case Admin:
+		return tx
+
+	case Teacher:
+		return tx.Where("class_id = ?", acct.ClassID)
+
+	case Student:
+		return tx.Where("id = ?", acct.ID)
+
+	default:
+		return nil
+	}
+}

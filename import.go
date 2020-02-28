@@ -15,12 +15,15 @@ func importTestData(db *gorm.DB) {
 	if err != nil {
 		panic(err)
 	}
-	importAccounts(db, file, Teacher)
+	err = importAccounts(db, file, Teacher)
+	if err != nil {
+		panic(err)
+	}
 	file, err = os.Open("testdata/students.csv")
 	if err != nil {
 		panic(err)
 	}
-	importAccounts(db, file, Student)
+	err = importAccounts(db, file, Student)
 }
 
 func importAccounts(db *gorm.DB, r io.Reader, role Role) (err error) {
@@ -32,7 +35,7 @@ func importAccounts(db *gorm.DB, r io.Reader, role Role) (err error) {
 		if err == io.EOF {
 			break
 		}
-		err = newAccount(tx, parseColumns(index, row), role)
+		err = parseAccount(tx, parseColumns(index, row), role)
 		if err != nil {
 			tx.Rollback()
 			return err
@@ -51,7 +54,7 @@ func parseColumns(index, row []string) (columns map[string]string) {
 	return
 }
 
-func newAccount(db *gorm.DB, columns map[string]string, role Role) (err error) {
+func parseAccount(db *gorm.DB, columns map[string]string, role Role) (err error) {
 	if len(columns) < 4 {
 		return fmt.Errorf("row doesn't 4 column")
 	}
@@ -75,8 +78,5 @@ func newAccount(db *gorm.DB, columns map[string]string, role Role) (err error) {
 
 	acct.Password = generatePassword(password)
 
-	if err := db.Create(&acct).Error; err != nil {
-		return err
-	}
-	return nil
+	return db.Create(&acct).Error
 }

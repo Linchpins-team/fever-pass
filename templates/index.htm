@@ -8,6 +8,10 @@
             <form action="" id="form">
                 <input type="hidden" name="account_id" value="{{ .Account.ID }}">
                 今日體溫 <input type="number" name="temperature" step="0.1" id="" autofocus autocomplete="off">
+                <select name="type" id="">
+                    <option value="1">耳溫</option>
+                    <option value="2">額溫</option>
+                </select>
                 <input type="submit" value="送出">
             </form>
             <p hidden id="result">紀錄成功！</p>
