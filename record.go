@@ -35,6 +35,10 @@ func (t TempType) String() string {
 	return ""
 }
 
+func (t TempType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.String())
+}
+
 func parseType(str string) (TempType, error) {
 	tempType, err := strconv.Atoi(str)
 	if err != nil || tempType < 0 || tempType > 3 {
@@ -112,7 +116,9 @@ func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 	}
 
 	enc := json.NewEncoder(w)
-	enc.Encode(record)
+	if err = enc.Encode(record); err != nil {
+		panic(err)
+	}
 }
 
 // permission return whether A can modify B

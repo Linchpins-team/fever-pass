@@ -1,8 +1,9 @@
 {{ define "title" }}帳號管理{{ end }}
-{{ define "content" }}
+{{ define "content-with-session" }}
 <script src="/js/delete.js"></script>
 <script src="/js/update.js"></script>
 <h1>帳號管理</h1>
+{{ $acct := .Account }}
 <table>
     <tr>
         <th>帳號</th>
@@ -10,18 +11,21 @@
         <th>班級</th>
         <th>座號</th>
         <th>權限</th>
+        {{ if eq $acct.Role 1 }}
         <th></th>
         <th></th>
         <th></th>
+        {{ end }}
     </tr>
     <tbody>
-        {{ range . }}
+        {{ range .Data }}
         <tr>
             <td>{{ .ID }}</td>
             <td>{{ .Name }}</td>
             <td>{{ .Class }}</td>
             <td>{{ .Number }}</td>
             <td>{{ .Role }}</td>
+            {{ if eq $acct.Role 1 }}
             <td>
                 {{ if eq .Role 2 }}
                 <button value="{{ .ID }}" onclick="update(this, 1, '')">設為管理員</button>
@@ -37,6 +41,7 @@
                 <button value="{{ .ID }}" onclick="deleteRow(this, 'accounts')">刪除帳號</button>
                 {{ end }}
             </td>
+            {{ end }} 
         </tr>
         {{ end }}
     </tbody>
