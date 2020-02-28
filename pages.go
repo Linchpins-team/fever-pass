@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/jinzhu/gorm"
 )
@@ -71,6 +72,11 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 		tx = tx.Where("account_id = ?", id)
 	}
 
+	date, err := time.ParseInLocation("2006-01-02", r.FormValue("date"), time.Local)
+	if err == nil {
+		tx = tx.Where("created_at > ? and created_at < ?", date, date.AddDate(0, 0, 1))
+	}
+
 	err = tx.Offset((p - 1) * 20).Limit(20).Find(&records).Error
 	if err != nil {
 		panic(err)
@@ -78,10 +84,12 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 
 	page := struct {
 		Page    int
+		Date    time.Time
 		Account Account
 		Records []Record
 	}{
 		Page:    p,
+		Date:    date,
 		Account: account,
 		Records: records,
 	}

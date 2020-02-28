@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"time"
 )
 
@@ -34,11 +33,11 @@ func sub(a, b int) int {
 	return a - b
 }
 
-func formatDate(t time.Time) template.HTML {
-	return template.HTML(fmt.Sprintf(`
-	<h1>%s</h1>
-	<h2>%s</h2>
-	`, weekday(t), t.Format("01/02")))
+func formatDate(t time.Time) string {
+	if t.IsZero() {
+		return ""
+	}
+	return t.Format("01/02")
 }
 
 func weekday(t time.Time) string {

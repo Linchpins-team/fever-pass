@@ -1,9 +1,17 @@
 {{ define "title" }}
+{{ formatDate .Date }}
 {{ if ne .Account.ID "" }}{{ .Account.Name }}{{ end }}
 紀錄列表
 {{ end }}
 {{ define "content" }}
 <h1>{{ template "title" . }}</h1>
+
+<form action="/list" method="get">
+    帳號 <input type="text" name="account_id" id="">
+    日期 <input type="date" name="date" id="">
+    <input type="submit" value="查詢">
+</form>
+
 <p>第 {{ .Page }} 頁</p>
 
 {{ if gt .Page 1 }}
