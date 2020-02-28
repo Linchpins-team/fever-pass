@@ -7,7 +7,7 @@
         {{ if .Login }}
             <form action="" id="form">
                 <input type="hidden" name="account_id" value="{{ .Account.ID }}">
-                今日體溫 <input type="number" name="temperature" step="0.1" id="" autofocus autocomplete="false">
+                今日體溫 <input type="number" name="temperature" step="0.1" id="" autofocus autocomplete="off">
                 <input type="submit" value="送出">
             </form>
             <p hidden id="result">紀錄成功！</p>
@@ -15,6 +15,7 @@
             <a href="/login">登入</a>
         {{ end }}
         {{ with .Data }}
+        {{ if ne .ID 0 }}
             <table>
                 <tr>
                     <th>體溫</th>
@@ -27,6 +28,7 @@
                     <td>{{ .RecordedBy }}</td>
                 </tr>
             </table>
+        {{ end }}
         {{ end }}
     </div>
 </div>

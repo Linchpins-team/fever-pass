@@ -11,10 +11,8 @@ import (
 	"time"
 
 	"github.com/gorilla/securecookie"
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/joho/godotenv"
-	"golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -52,48 +50,6 @@ func decodeKey(key string) []byte {
 	} else {
 		panic(err)
 	}
-}
-
-func initDB(c Config) (db *gorm.DB, err error) {
-	switch c.Mode {
-	case Debug:
-		db, err = gorm.Open("sqlite3", "/tmp/gorm.sqlite")
-
-	case Release:
-		connection := fmt.Sprintf("%s:%s@/%s?charset=utf8&parseTime=True&loc=Local", c.Database.User, c.Database.Password, c.Database.Name)
-		db, err = gorm.Open("mysql", connection)
-	}
-	if err != nil {
-		return
-	}
-	migrate(db)
-	return
-}
-
-func migrate(db *gorm.DB) {
-	if err := db.AutoMigrate(&Record{}, &Account{}, &URL{}, &Class{}).Error; err != nil {
-		panic(err)
-	}
-}
-
-func setupDB(c Config, db *gorm.DB) {
-	var admin Account
-	err := db.First(&admin, 1).Error
-	if err != nil && !gorm.IsRecordNotFoundError(err) {
-		panic(err)
-	}
-	admin.Name = "admin"
-	admin.Role = Admin
-	password := c.Password
-	admin.Password, err = bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		panic(err)
-	}
-	err = db.Save(&admin).Error
-	if err != nil {
-		panic(err)
-	}
-	importAccounts(db, testfile, Student)
 }
 
 func main() {

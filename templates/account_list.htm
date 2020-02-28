@@ -5,8 +5,8 @@
 <h1>帳號管理</h1>
 <table>
     <tr>
-        <th>編號</th>
-        <th>名稱</th>
+        <th>帳號</th>
+        <th>姓名</th>
         <th>Email</th>
         <th>班級</th>
         <th>權限</th>
@@ -19,13 +19,12 @@
         <tr>
             <td>{{ .ID }}</td>
             <td>{{ .Name }}</td>
-            <td>{{ .Email }}</td>
             <td>{{ .Class }}</td>
             <td>{{ .Role }}</td>
             <td>
                 {{ if eq .Role 2 }}
                 <button value="{{ .ID }}" onclick="update(this, 1, '')">設為管理員</button>
-                {{ else if ne .ID 1 }}
+                {{ else if ne .ID "admin" }}
                 <button value="{{ .ID }}" onclick="update(this, 2, '')">設為編輯者</button>
                 {{ end }}
             </td>
@@ -33,7 +32,7 @@
                 <button value="{{ .ID }}" onclick="resetPassword(this)">重設密碼</button>
             </td>
             <td>
-                {{ if ne .ID 1 }}
+                {{ if ne .ID "admin" }}
                 <button value="{{ .ID }}" onclick="deleteRow(this, 'accounts')">刪除帳號</button>
                 {{ end }}
             </td>

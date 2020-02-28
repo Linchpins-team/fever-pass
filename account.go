@@ -36,13 +36,13 @@ func (r Role) String() string {
 }
 
 type Account struct {
-	ID       uint32 `gorm:"primary_key"`
-	Email    string `gorm:"unique;type:varchar(32)"`
-	Name     string `gorm:"unique;type:varchar(32)"`
+	ID       string `gorm:"primary_key;type:varchar(32)"`
+	Name     string `gorm:"type:varchar(32)"`
 	Password []byte `json:"-"`
 
 	Class   Class
 	ClassID uint32
+	Number  int
 
 	Role Role
 }
@@ -68,17 +68,14 @@ func generatePassword(password string) []byte {
 }
 
 func (h Handler) deleteAccount(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(mux.Vars(r)["id"])
-	if err != nil {
-		http.Error(w, err.Error(), 415)
-		return
-	}
+	id := mux.Vars(r)["id"]
 
-	if id == 1 {
+	if id == "admin" {
 		http.Error(w, "cannot delete admin", 403)
 		return
 	}
-	err = h.db.Delete(&Account{}, "id = ?", id).Error
+
+	err := h.db.Delete(&Account{}, "id = ?", id).Error
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -86,14 +83,10 @@ func (h Handler) deleteAccount(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h Handler) updateAccount(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(mux.Vars(r)["id"])
-	if err != nil {
-		http.Error(w, err.Error(), 415)
-		return
-	}
+	id := mux.Vars(r)["id"]
 
 	var acct Account
-	err = h.db.First(&acct, "id = ?", id).Error
+	err := h.db.First(&acct, "id = ?", id).Error
 	if gorm.IsRecordNotFoundError(err) {
 		http.Error(w, "user not found", 404)
 		return
@@ -103,7 +96,7 @@ func (h Handler) updateAccount(w http.ResponseWriter, r *http.Request) {
 
 	role, _ := parseRole(r.FormValue("role"))
 	if role != Unknown {
-		if acct.ID == 1 {
+		if acct.ID == "admin" {
 			http.Error(w, "cannot change admin role", 403)
 			return
 		}

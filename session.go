@@ -12,7 +12,7 @@ import (
 )
 
 type Session struct {
-	ID       uint32
+	ID       string
 	ExpireAt time.Time
 }
 
@@ -43,7 +43,7 @@ func (h Handler) identify(next http.Handler) http.Handler {
 					logout(w, r)
 				} else {
 					var acct Account
-					if err = h.db.First(&acct, session.ID).Error; err != nil {
+					if err = h.db.First(&acct, "id = ?", session.ID).Error; err != nil {
 						logout(w, r)
 						http.Error(w, "account not found", 401)
 						return
@@ -60,7 +60,7 @@ func (h Handler) identify(next http.Handler) http.Handler {
 	})
 }
 
-func newSession(id uint32) *http.Cookie {
+func newSession(id string) *http.Cookie {
 	s := securecookie.New(hashKey, blockKey)
 	var encoded string
 	var err error
@@ -85,8 +85,7 @@ func expire() time.Time {
 
 func (h Handler) login(w http.ResponseWriter, r *http.Request) {
 	var acct Account
-	acct.Name = r.FormValue("username")
-	err := h.db.Where(acct).First(&acct).Error
+	err := h.db.First(&acct, "id = ?", r.FormValue("username")).Error
 	if gorm.IsRecordNotFoundError(err) {
 		http.Error(w, "user not found", 404)
 		return

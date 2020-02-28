@@ -9,7 +9,6 @@ import (
 	"os"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
@@ -48,17 +47,14 @@ var (
 		Record{
 			AccountID:   1,
 			Temperature: 36.8,
-			Time:        time.Now().Add(-10 * time.Minute),
 		},
 		Record{
 			AccountID:   2,
 			Temperature: 37.9,
-			Time:        time.Now().Add(-5 * time.Minute),
 		},
 		Record{
 			AccountID:   3,
 			Temperature: 38.1,
-			Time:        today().Add(-1 * time.Hour),
 		},
 	}
 	testH Handler

@@ -15,6 +15,13 @@ var (
 	RecordNotFound   = errors.New("record not found")
 )
 
+type TempType uint32
+
+const (
+	EarTemp TempType = iota
+	ForeHead
+)
+
 type Record struct {
 	gorm.Model
 

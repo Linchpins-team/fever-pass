@@ -26,15 +26,12 @@ func (h *Handler) loadTemplates() {
 		panic(err)
 	}
 
-	log.Println(includeFiles)
-	log.Println(layoutFiles)
 	for _, file := range includeFiles {
 		fileName := filepath.Base(file)
 		files := append(layoutFiles, file)
 		tpl := template.Must(mainTmpl.Clone())
 		h.tpls[fileName] = template.Must(tpl.ParseFiles(files...))
 	}
-	log.Println(h.tpls)
 }
 
 func (h Handler) HTML(w http.ResponseWriter, r *http.Request, page string, data interface{}) {

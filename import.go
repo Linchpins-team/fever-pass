@@ -4,31 +4,35 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
-	"strings"
+	"os"
+	"strconv"
 
 	"github.com/jinzhu/gorm"
 )
 
-var (
-	testfile = strings.NewReader(
-		`"email","name","password","class"
-"s10512345@st.fcjh.tc.edu.tw","Justin","j_password","207"
-"s10642236@st.fcjh.tc.edu.tw","Kevin","k_pwd","109"
-"s10412556@st.fcjh.tc.edu.tw","Elsa","anna","303"
-"s10443256@st.fcjs.tc.edu.tw","Anna","elsa","303"`,
-	)
-)
+func importTestData(db *gorm.DB) {
+	file, err := os.Open("testdata/teachers.csv")
+	if err != nil {
+		panic(err)
+	}
+	importAccounts(db, file, Teacher)
+	file, err = os.Open("testdata/students.csv")
+	if err != nil {
+		panic(err)
+	}
+	importAccounts(db, file, Student)
+}
 
 func importAccounts(db *gorm.DB, r io.Reader, role Role) (err error) {
 	reader := csv.NewReader(r)
-	reader.Read() // ignore column name
+	index, _ := reader.Read() // ignore column name
 	tx := db.Begin()
 	for {
 		row, err := reader.Read()
 		if err == io.EOF {
 			break
 		}
-		err = newAccount(tx, row, role)
+		err = newAccount(tx, parseColumns(index, row), role)
 		if err != nil {
 			tx.Rollback()
 			return err
@@ -37,22 +41,37 @@ func importAccounts(db *gorm.DB, r io.Reader, role Role) (err error) {
 	return tx.Commit().Error
 }
 
-func newAccount(db *gorm.DB, row []string, role Role) (err error) {
-	if len(row) < 4 {
+func parseColumns(index, row []string) (columns map[string]string) {
+	columns = make(map[string]string)
+	for i, v := range index {
+		if len(row) > i {
+			columns[v] = row[i]
+		}
+	}
+	return
+}
+
+func newAccount(db *gorm.DB, columns map[string]string, role Role) (err error) {
+	if len(columns) < 4 {
 		return fmt.Errorf("row doesn't 4 column")
 	}
 	acct := Account{
-		Name:  row[1],
-		Email: row[0],
+		ID:   columns["id"],
+		Name: columns["name"],
 	}
 	acct.Role = role
-	password := row[2]
+	password := columns["password"]
 
 	var class Class
-	if err := db.FirstOrCreate(&class, Class{Name: row[3]}).Error; err != nil {
+	if err := db.FirstOrCreate(&class, Class{Name: columns["class"]}).Error; err != nil {
 		return err
 	}
 	acct.Class = class
+
+	acct.Number, err = strconv.Atoi(columns["number"])
+	if err != nil {
+		acct.Number = 0
+	}
 
 	acct.Password = generatePassword(password)
 

@@ -1,0 +1,22 @@
+{{ define "title" }}今日總覽{{ end }}
+{{ define "content" }}
+<h1>今日總覽</h1>
+<table>
+    <tr>
+        <th>總人數</th>
+        <td>{{ .All }}</td>
+    </tr>
+    <tr>
+        <th>已登記人數</th>
+        <td>{{ .Recorded }}</td>
+    </tr>
+    <tr>
+        <th>未登記人數</th>
+        <td>{{ .Unrecorded }}</td>
+    </tr>
+    <tr>
+        <th>發燒人數</th>
+        <td>{{ .Fever }}</td>
+    </tr>
+</table>
+{{ end }}
