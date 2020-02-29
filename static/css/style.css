@@ -1,5 +1,42 @@
+:root {
+    --main: #2a6;
+}
+
 body {
-    margin: 0 4px;
+    margin: 0;
+    height: 100%;
+}
+
+#logo {
+    height: 44px;
+    width: 44px;
+}
+
+form input {
+    padding: 4px;
+    margin: 8px;
+    width: 80px;
+    font-size: 16px;
+}
+
+header {
+    height: 64px;
+    width: 100%;
+}
+
+footer {
+    background: var(--main);
+    height: 40px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+header a, footer a {
+    color: #eee;
 }
 
 form button {
@@ -11,30 +48,20 @@ form button {
     font-size: 20px;
     cursor: pointer;
     transition: all ease 0.2s 0.1s;
-}
-
-header ,footer {
-    font-size: 16px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    width: 80%;
-    margin: auto;
-}
-
-header {
-    font-size: 20px;
+    -webkit-transition: all ease 0.2s 0.1s;
+    -moz-transition: all ease 0.2s 0.1s;
+    -ms-transition: all ease 0.2s 0.1s;
+    -o-transition: all ease 0.2s 0.1s;
 }
 
 a {
+    text-decoration: none;
     text-align: center;
     display: inline-block;
 }
 
-a:hover {
-    text-decoration: 3px solid #4b4;
-    transition: all ease 0.2s 0.1s;
+header a:hover, footer a:hover {
+    color: #fff;
 }
 
 .doc {
@@ -56,19 +83,18 @@ main {
     margin: 0 auto;
 }
 
-form input {
-    padding: 4px;
-    margin: 8px;
-    font-size: 16px;
-}
-
 input:focus {
-    background-color: #eef;
+    background-color: #efe;
 }
 
 input[type="checkbox"] {
     height: 16px;
     width: 16px;
+}
+
+input[type="date"] {
+    font-size: 14px;
+    width: 120px;
 }
 
 input[name="account_id"] {
@@ -77,6 +103,7 @@ input[name="account_id"] {
 
 select {
     padding: 8px;
+    font-size: 14px;
 }
 
 table {
@@ -93,7 +120,7 @@ tr {
 }
 
 h1 {
-    font-size: 72px;
+    font-size: 48px;
     margin-top: 0;
 }
 
@@ -104,4 +131,67 @@ h2 {
 
 img {
     width: 100%;
+}
+
+nav {
+    float: right;
+}
+
+nav * {
+    color: #fff;
+    background: var(--main);
+    padding: 14px 16px;
+    margin: -3px;
+}
+
+nav span {
+    padding: 18px 15px 15px;
+}
+
+#filler {
+    height: 80px;
+}
+
+#menu {
+    display: none;
+}
+
+@media(max-width:800px) {
+    nav {
+        position: fixed;
+        top: 46px;
+        right: 0;
+        overflow-x: hidden;
+        height: 0;
+        transition: 0.3s ease-in-out;
+        -webkit-transition: 0.3s ease-in-out;
+        -moz-transition: 0.3s ease-in-out;
+        -ms-transition: 0.3s ease-in-out;
+        -o-transition: 0.3s ease-in-out;
+    }
+    nav a {
+        display: block;
+        width: 100vw;
+        box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.2);
+        padding: 12px;
+        transition: 0.2s;
+        -webkit-transition: 0.2s;
+        -moz-transition: 0.2s;
+        -ms-transition: 0.2s;
+        -o-transition: 0.2s;
+    }
+    #menu {
+        margin: -8px -8px 0 0;
+        display: block;
+        box-shadow: none;
+        padding: 16px;
+        position: fixed;
+        height: 16px;
+        width: 16px;
+        top: 8px;
+        right: 8px;
+    }
+    table {
+        width: 100%;
+    }
 }

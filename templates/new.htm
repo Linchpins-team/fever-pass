@@ -2,9 +2,12 @@
 {{ define "content" }}
 <script src="/js/new.js" defer></script>
 <form action="" id="form">
-    班級 <input type="text" name="class" autocomplete="off" autofocus>
-    座號 <input type="text" name="number" id="" autocomplete="off">
-    體溫 <input type="text" name="temperature" id="" autocomplete="off">
+    <label for="class">班級</label> 
+    <input type="text" name="class" autocomplete="off" autofocus required value="{{ .Class }}">
+    <label for="number">座號</label>
+    <input type="text" name="number" id="" autocomplete="off" required>
+    <label for="temperature">體溫</label>
+    <input type="number" name="temperature" id="" autocomplete="off" min="34" max="41" required>
     <select name="type" id="">
         <option value="2">額溫</option>
         <option value="1">耳溫</option>

@@ -3,39 +3,42 @@ form.onsubmit = function (ev) {
     newRecord(form)
     ev.preventDefault()
 }
-function newRecord(form) {
-    fetch("/api/records", {
+async function newRecord(form) {
+    let response = await fetch("/api/records", {
         credentials: "include",
         method: "post",
         body: new FormData(form),
     })
-    .then(response => {
-        switch (response.status) {
-            case 200:
-                return response.text()
-                break
-            case 401:
-                throw response.text()
-                break
-            case 415:
-                throw response.text()
-                break
-        }
-    })
-    .then(record => {
-        let table = document.getElementById("table")
-        let tr = document.createElement("tr")
-        tr.innerHTML = record
-        table.insertBefore(tr, table.firstChild)
-        while (table.childElementCount > 20) {
-            table.lastChild.remove()
-        }
-        form.reset()
-        document.getElementsByName("class")[0].focus()
-    })
-    .catch(error => {
-        alert(error)
-    })
+    switch (response.status) {
+        case 200:
+            let text = await response.text()
+            let table = document.getElementById("table")
+            let tr = document.createElement("tr")
+            tr.innerHTML = text
+            table.insertBefore(tr, table.firstChild)
+            while (table.childElementCount > 20) {
+                table.lastChild.remove()
+            }
+            form.reset()
+            document.getElementsByName("class")[0].focus()
+            break
+
+        case 401:
+            alert("需要登入")
+            break
+
+        case 415:
+            alert("無效的資料")
+            break
+
+        case 403:
+            alert("你沒有權限")
+            break
+
+        case 404:
+            alert("找不到此帳號")
+            break
+    }
 }
 
 function formatTime(t) {

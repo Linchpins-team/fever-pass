@@ -36,7 +36,8 @@ func (h Handler) lastRecord(account Account) (record Record, err error) {
 
 func (h Handler) newRecordPage(w http.ResponseWriter, r *http.Request) {
 	var records []Record
-	if acct, ok := r.Context().Value(KeyAccount).(Account); ok {
+	acct, ok := r.Context().Value(KeyAccount).(Account)
+	if ok {
 		err := h.listRecord(acct).Limit(20).Find(&records).Error
 		if err != nil {
 			http.Error(w, err.Error(), 500)
@@ -46,9 +47,16 @@ func (h Handler) newRecordPage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "cannot read account from session", 500)
 		return
 	}
+
+	class := ""
+	if acct.Role == Teacher {
+		class = acct.Class.Name
+	}
+
 	page := struct {
+		Class string
 		Records []Record
-	}{records}
+	}{class, records}
 	h.HTML(w, r, "new.htm", page)
 }
 

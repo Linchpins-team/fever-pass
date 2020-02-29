@@ -6,8 +6,8 @@
         <h2>體溫登記系統</h2>
         {{ if .Login }}
             <form action="/" id="form" method="POST">
-                <label for="temperature">體溫</label>
-                <input type="number" name="temperature" step="0.1" id="" autofocus autocomplete="off">
+                <label for="temperature">體溫（℃）</label>
+                <input type="number" name="temperature" step="0.1" id="" autofocus autocomplete="off" min="34" max="41">
                 <select name="type" id="">
                     <option value="1">耳溫</option>
                     <option value="2">額溫</option>
@@ -18,9 +18,9 @@
         {{ else }}
             <script src="/js/login.js" defer></script>
             <form action="" id="form">
-                <label for="username">帳號</label><br>
+                <label for="username">帳號</label>
                 <input type="text" name="username" id=""><br>
-                <label for="password">密碼</label><br>
+                <label for="password">密碼</label>
                 <input type="password" name="password" id=""><br>
                 <input type="submit" value="登入">
                 <p hidden id="msg"></p>
@@ -32,14 +32,14 @@
                 <tr>
                     <th>體溫</th>
                     <th>發燒</th>
+                    <th>類型</th>
                     <th>時間</th>
-                    <th>記錄者</th>
                 </tr>
                 <tr>
                     <td>{{ .Temperature }}</td>
                     <td>{{ if .Fever }}發燒{{ else }}正常{{ end }}</td>
+                    <td>{{ .Type }}</td>
                     <td>{{ formatTime .CreatedAt }}</td>
-                    <td>{{ .RecordedBy }}</td>
                 </tr>
             </table>
         {{ end }}

@@ -2,20 +2,18 @@
 <script src="/js/delete.js"></script>
 <table>
     <tr>
-        <th>ID</th>
-        <th>User</th>
-        <th>體溫</th>
+        <th>姓名</th>
+        <th>體溫（℃）</th>
         <th>類型</th>
         <th>發燒</th>
         <th>時間</th>
-        <th>紀錄者</th>
+        <th>記錄者</th>
         <th></th>
     </tr>
     <tbody id="table">
         {{ range . }}
         <tr>
         {{ block "row" . }}
-            <td>{{ .ID }}</td>
             <td><a href="/list?account_id={{ .Account.ID }}">{{ .Account }}</a></td>
             <td>{{ .Temperature }}</td>
             <td>{{ .Type }}</td>

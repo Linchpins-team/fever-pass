@@ -9,7 +9,7 @@
 <body>
     <header>
         {{ template "header" . }}
-        <nav>
+        <nav id="nav">
             {{ template "nav" .}}
         </nav>
     </header>
@@ -18,6 +18,7 @@
         {{ block "content" .Data }}{{ end }}
         {{ block "content-with-session" . }}{{ end }}
     </main>
+    <div id="filler"></div>
     <footer>
         {{ template "footer" . }}
     </footer>
@@ -31,13 +32,5 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fever Pass - {{ block "title" . }} {{ end }}</title>
 <link rel="stylesheet" href="/css/style.css">
-<script>
-    function openMenu() {
-        document.getElementById("nav").style.width = "350px";
-    }
-
-    function closeMenu() {
-        document.getElementById("nav").style.width = "0";
-    }
-</script>
+<script src="/js/nav.js"></script>
 {{ end }}
