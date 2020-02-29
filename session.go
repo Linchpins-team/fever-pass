@@ -105,7 +105,7 @@ func logout(w http.ResponseWriter, r *http.Request) {
 		cookie.MaxAge = -1
 		http.SetCookie(w, cookie)
 	}
-	http.Redirect(w, r, "/login", 303)
+	http.Redirect(w, r, "/", 303)
 }
 
 func (h Handler) register(w http.ResponseWriter, r *http.Request) {

@@ -13,7 +13,7 @@ func (h Handler) index(w http.ResponseWriter, r *http.Request) {
 	acct, ok := r.Context().Value(KeyAccount).(Account)
 	if ok {
 		record, err := h.lastRecord(acct)
-		if err != nil {
+		if err == nil {
 			h.HTML(w, r, "index.htm", record)
 			return
 		}

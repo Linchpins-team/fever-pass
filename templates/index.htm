@@ -3,7 +3,7 @@
 <div id="middle">
     <div>
         <h1>Fever Pass</h1>
-        <h2>量體溫，速通行</h2>
+        <h2>體溫登記系統</h2>
         {{ if .Login }}
             <form action="/" id="form" method="POST">
                 <label for="temperature">體溫</label>
@@ -16,18 +16,28 @@
             </form>
             <p hidden id="result">紀錄成功！</p>
         {{ else }}
-            <a href="/login">登入</a>
+            <script src="/js/login.js" defer></script>
+            <form action="" id="form">
+                <label for="username">帳號</label><br>
+                <input type="text" name="username" id=""><br>
+                <label for="password">密碼</label><br>
+                <input type="password" name="password" id=""><br>
+                <input type="submit" value="登入">
+                <p hidden id="msg"></p>
+            </form>
         {{ end }}
         {{ with .Data }}
         {{ if ne .ID 0 }}
             <table>
                 <tr>
                     <th>體溫</th>
+                    <th>發燒</th>
                     <th>時間</th>
                     <th>紀錄者</th>
                 </tr>
                 <tr>
                     <td>{{ .Temperature }}</td>
+                    <td>{{ if .Fever }}發燒{{ else }}正常{{ end }}</td>
                     <td>{{ formatTime .CreatedAt }}</td>
                     <td>{{ .RecordedBy }}</td>
                 </tr>

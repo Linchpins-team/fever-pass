@@ -12,7 +12,7 @@ function login(form) {
     .then(response => {
         switch (response.status) {
             case 200:
-                window.location = "/new"
+                window.location = "/"
                 break
             
             case 401:
