@@ -22,6 +22,7 @@ func (h Handler) index(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// get the last record today of the account
 func (h Handler) lastRecord(account Account) (record Record, err error) {
 	err = h.db.Set("gorm:auto_preload", true).Where("created_at > ?", today()).Order("id desc").First(&record, "account_id = ?", account.ID).Error
 	if gorm.IsRecordNotFoundError(err) {
@@ -161,7 +162,7 @@ func (h Handler) resetPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !permission(acct, account) {
-		msg = "您沒有權限改變"+account.Name+"的密碼"
+		msg = "您沒有權限改變" + account.Name + "的密碼"
 	}
 
 	page := struct {

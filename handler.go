@@ -60,6 +60,7 @@ func (h *Handler) newRouter() {
 	r.HandleFunc("/stats", h.auth(h.stats, Teacher))
 	r.HandleFunc("/import", h.auth(h.page("import.htm"), Admin)).Methods("GET")
 	r.HandleFunc("/import", h.auth(h.importHandler, Admin)).Methods("POST")
+	r.HandleFunc("/export", h.auth(h.exportCSV, Teacher))
 
 	r.HandleFunc("/doc/{title}", h.doc)
 
