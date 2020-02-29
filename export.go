@@ -7,14 +7,13 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/jinzhu/gorm"
 )
 
-func (h Handler) export(w io.Writer) (err error) {
+func (h Handler) export(tx *gorm.DB, w io.Writer) (err error) {
 	enc := csv.NewWriter(w)
 	var accounts []Account
-	tx := h.db.Joins("JOIN classes ON classes.id = class_id")
-	tx = tx.Order("classes.name asc").Order("number asc")
-	tx = tx.Preload("Class").Where("role = ?", Student)
 	if err = tx.Find(&accounts).Error; err != nil {
 		return
 	}
@@ -67,7 +66,9 @@ func (h Handler) exportCSV(w http.ResponseWriter, r *http.Request) {
 	filename := time.Now().Format("fever-pass-2006-01-02_03-04-export.csv")
 	w.Header().Set("Content-Type", "text/x-csv")
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
-	err := h.export(w)
+	acct := r.Context().Value(KeyAccount).(Account)
+	tx := h.listAccounts(acct).Where("role = ?", Student)
+	err := h.export(tx, w)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
