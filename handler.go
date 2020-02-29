@@ -64,7 +64,8 @@ func (h *Handler) newRouter() {
 
 	r.HandleFunc("/", h.index).Methods("GET")
 	r.HandleFunc("/", h.auth(h.newSelfRecord, Student)).Methods("POST")
-	r.Handle("/reset", h.auth(h.page("reset.htm"), Student))
+	r.Handle("/reset", h.auth(h.page("reset.htm"), Student)).Methods("GET")
+	r.Handle("/reset", h.auth(h.resetPassword, Student)).Methods("POST")
 	r.Handle("/login", h.page("login.htm"))
 	r.HandleFunc("/logout", logout)
 	r.HandleFunc("/register", h.registerPage)

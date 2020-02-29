@@ -1,13 +1,14 @@
-{{ define "title" }}重設密碼{{ end }}
+{{ define "title" }}
+重設密碼
+{{ end }}
 {{ define "content" }}
-<script src="/js/login.js" defer></script>
-<h1>重設密碼</h1>
-<form action="" id="form">
-    <label for="current-passwd">原密碼</label>
-    <input type="text" name="current-password" id=""><br>
-    <label for="new-password">新密碼</label>
-    <input type="password" name="new-password" id=""><br>
+<h1>{{ template "title" . }}</h1>
+<form action="/reset" method="POST">
+    <label for="current_passwd">原密碼</label>
+    <input type="password" name="current_password" id="" autofocus><br>
+    <label for="new_password">新密碼</label>
+    <input type="password" name="new_password" id=""><br>
     <input type="submit" value="重設">
-    <p hidden id="msg"></p>
+    <p id="msg">{{ . }}</p>
 </form>
 {{ end }}

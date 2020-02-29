@@ -1,6 +1,7 @@
 package main
 
 import (
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"strconv"
 	"time"
@@ -12,13 +13,13 @@ func (h Handler) index(w http.ResponseWriter, r *http.Request) {
 	acct, ok := r.Context().Value(KeyAccount).(Account)
 	if ok {
 		record, err := h.lastRecord(acct)
-		if err == RecordNotFound {
-			h.HTML(w, r, "index.htm", nil)
+		if err != nil {
+			h.HTML(w, r, "index.htm", record)
+			return
 		}
-		h.HTML(w, r, "index.htm", record)
-	} else {
-		h.HTML(w, r, "index.htm", nil)
 	}
+	h.HTML(w, r, "index.htm", nil)
+
 }
 
 func (h Handler) lastRecord(account Account) (record Record, err error) {
@@ -144,4 +145,24 @@ func (h Handler) stats(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	h.HTML(w, r, "stats.htm", page)
+}
+
+func (h Handler) resetPassword(w http.ResponseWriter, r *http.Request) {
+	current := r.FormValue("current_password")
+	acct := r.Context().Value(KeyAccount).(Account)
+	if bcrypt.CompareHashAndPassword(acct.Password, []byte(current)) != nil {
+		w.WriteHeader(403)
+		h.HTML(w, r, "reset.htm", "密碼錯誤")
+		return
+	}
+
+	acct.Password = generatePassword(r.FormValue("new_password"))
+
+	if err := h.db.Save(&acct).Error; err != nil {
+		w.WriteHeader(500)
+		h.HTML(w, r, "reset.htm", err.Error())
+		return
+	}
+
+	h.HTML(w, r, "reset.htm", "已重設密碼")
 }

@@ -4,9 +4,9 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"strconv"
-	"net/http"
 
 	"github.com/jinzhu/gorm"
 )
@@ -89,7 +89,7 @@ func createAccount(db *gorm.DB, columns map[string]string, role Role) (added boo
 	password := columns["password"]
 
 	if err := db.First(&acct, "id = ?", acct.ID).Error; !gorm.IsRecordNotFoundError(err) {
-		return false, err 
+		return false, err
 	}
 
 	var class Class

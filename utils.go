@@ -6,7 +6,7 @@ import (
 )
 
 func formatTime(t time.Time) string {
-	return t.Format("01-02 15:04")
+	return t.Format("01/02 15:04 ") + weekday(t)
 }
 
 func today() time.Time {
