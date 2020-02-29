@@ -1,7 +1,7 @@
 {{ define "title" }}
 {{ formatDate .Date }}
 {{ if ne .Account.ID "" }}{{ .Account.Name }}{{ end }}
-體溫記錄
+體溫歷史記錄
 {{ end }}
 {{ define "content" }}
 <h1>{{ template "title" . }}</h1>

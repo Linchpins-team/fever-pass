@@ -20,6 +20,7 @@ type ContextKey uint32
 
 const (
 	KeyAccount ContextKey = iota
+	KeyMessage
 )
 
 func NewHandler(db *gorm.DB, config Config) Handler {
@@ -64,7 +65,7 @@ func (h *Handler) newRouter() {
 
 	r.HandleFunc("/", h.index).Methods("GET")
 	r.HandleFunc("/", h.auth(h.newSelfRecord, Student)).Methods("POST")
-	r.Handle("/reset", h.auth(h.page("reset.htm"), Student)).Methods("GET")
+	r.Handle("/reset", h.auth(h.resetPage, Student)).Methods("GET")
 	r.Handle("/reset", h.auth(h.resetPassword, Student)).Methods("POST")
 	r.HandleFunc("/logout", logout)
 	r.HandleFunc("/register", h.registerPage)

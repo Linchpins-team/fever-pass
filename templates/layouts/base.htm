@@ -1,27 +1,43 @@
 {{ define "main" }}
 <!DOCTYPE html>
 <html>
-    <head>
-        {{ template "head" .Data }}
-    </head>
-    <body>
-        <header>
-            {{ template "header" . }}
-        </header>
-        <main>
-            {{ block "content" .Data }}{{ end }}
-            {{ block "content-with-session" . }}{{ end }}
-        </main>
-        <footer>
-            {{ template "footer" . }}
-        </footer>
-    </body>
+
+<head>
+    {{ template "head" .Data }}
+</head>
+
+<body>
+    <header>
+        {{ template "header" . }}
+        <nav>
+            {{ template "nav" .}}
+        </nav>
+    </header>
+    
+    <main>
+        {{ block "content" .Data }}{{ end }}
+        {{ block "content-with-session" . }}{{ end }}
+    </main>
+    <footer>
+        {{ template "footer" . }}
+    </footer>
+</body>
+
 </html>
 {{ end }}
 
 {{ define "head" }}
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{{ block "title" . }} {{ end }}</title>
+<title>Fever Pass - {{ block "title" . }} {{ end }}</title>
 <link rel="stylesheet" href="/css/style.css">
+<script>
+    function openMenu() {
+        document.getElementById("nav").style.width = "350px";
+    }
+
+    function closeMenu() {
+        document.getElementById("nav").style.width = "0";
+    }
+</script>
 {{ end }}

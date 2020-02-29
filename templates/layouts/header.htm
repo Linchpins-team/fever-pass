@@ -1,17 +1,4 @@
 {{ define "header" }}
 
 <a href="/">首頁</a>
-{{ if .Login }}
-<a href="/list">體溫歷史記錄</a>
-<a href="/accounts">帳號管理</a>
-{{ if le .Role 2 }}
-<a href="/new">新增</a>
-<a href="/stats">統計</a>
-{{ end }}
-{{ .Account.Name }}
-<a href="/logout">登出</a>
-{{ else }}
-<a href="/login">登入</a>
-{{ end }}
-
 {{ end }}

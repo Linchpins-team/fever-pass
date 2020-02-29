@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -8,6 +9,10 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
+)
+
+var (
+	AccountNotFound = errors.New("account not found")
 )
 
 type Role uint32
@@ -83,15 +88,10 @@ func (h Handler) deleteAccount(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h Handler) updateAccount(w http.ResponseWriter, r *http.Request) {
-	id := mux.Vars(r)["id"]
-
-	var acct Account
-	err := h.db.First(&acct, "id = ?", id).Error
-	if gorm.IsRecordNotFoundError(err) {
-		http.Error(w, "user not found", 404)
+	acct, err := h.getAccount(mux.Vars(r)["id"])
+	if err == AccountNotFound {
+		http.Error(w, err.Error(), 404)
 		return
-	} else if err != nil {
-		panic(err)
 	}
 
 	role, _ := parseRole(r.FormValue("role"))
@@ -115,7 +115,7 @@ func (h Handler) updateAccount(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h Handler) listAccounts(acct Account) *gorm.DB {
-	tx := h.db.Preload("Class").Table("accounts")
+	tx := h.db.Preload("Class").Table("accounts").Order("role asc").Order("id asc")
 	switch acct.Role {
 	case Admin:
 		return tx
@@ -129,4 +129,47 @@ func (h Handler) listAccounts(acct Account) *gorm.DB {
 	default:
 		return nil
 	}
+}
+
+func (h Handler) getAccount(id string) (acct Account, err error) {
+	err = h.db.First(&acct, "id = ?", id).Error
+	if gorm.IsRecordNotFoundError(err) {
+		err = AccountNotFound
+		return
+	} else if err != nil {
+		panic(err)
+	}
+	return
+}
+
+// 重設密碼
+func (h Handler) resetPassword(w http.ResponseWriter, r *http.Request) {
+	acct := r.Context().Value(KeyAccount).(Account)
+	account, err := h.getAccount(r.FormValue("account_id"))
+	if err == AccountNotFound {
+		account = acct
+	}
+
+	if !permission(acct, account) {
+		w.WriteHeader(403)
+		h.resetPage(w, addMessage(r, "您沒有權限改變"+account.Name+"的密碼"))
+		return
+	}
+
+	current := r.FormValue("current_password")
+	if bcrypt.CompareHashAndPassword(acct.Password, []byte(current)) != nil {
+		w.WriteHeader(403)
+		h.resetPage(w, addMessage(r, "密碼錯誤"))
+		return
+	}
+
+	account.Password = generatePassword(r.FormValue("new_password"))
+
+	if err := h.db.Save(&account).Error; err != nil {
+		w.WriteHeader(500)
+		h.resetPage(w, addMessage(r, err.Error()))
+		return
+	}
+
+	h.resetPage(w, addMessage(r, "已重設"+account.Name+"密碼"))
 }

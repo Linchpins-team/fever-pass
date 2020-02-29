@@ -1,7 +1,7 @@
 package main
 
 import (
-	"golang.org/x/crypto/bcrypt"
+	"context"
 	"net/http"
 	"strconv"
 	"time"
@@ -147,22 +147,35 @@ func (h Handler) stats(w http.ResponseWriter, r *http.Request) {
 	h.HTML(w, r, "stats.htm", page)
 }
 
-func (h Handler) resetPassword(w http.ResponseWriter, r *http.Request) {
-	current := r.FormValue("current_password")
+func (h Handler) resetPage(w http.ResponseWriter, r *http.Request) {
 	acct := r.Context().Value(KeyAccount).(Account)
-	if bcrypt.CompareHashAndPassword(acct.Password, []byte(current)) != nil {
-		w.WriteHeader(403)
-		h.HTML(w, r, "reset.htm", "密碼錯誤")
-		return
+	account, err := h.getAccount(r.FormValue("account_id"))
+	if err == AccountNotFound {
+		account = acct
 	}
 
-	acct.Password = generatePassword(r.FormValue("new_password"))
-
-	if err := h.db.Save(&acct).Error; err != nil {
-		w.WriteHeader(500)
-		h.HTML(w, r, "reset.htm", err.Error())
-		return
+	msg, ok := r.Context().Value(KeyMessage).(string)
+	if !ok {
+		msg = ""
 	}
 
-	h.HTML(w, r, "reset.htm", "已重設密碼")
+	if !permission(acct, account) {
+		msg = "您沒有權限改變"+account.Name+"的密碼"
+	}
+
+	page := struct {
+		Account
+		Message string
+	}{
+		Account: account,
+		Message: msg,
+	}
+
+	h.HTML(w, r, "reset.htm", page)
+}
+
+func addMessage(r *http.Request, msg string) *http.Request {
+	ctx := r.Context()
+	ctx = context.WithValue(ctx, KeyMessage, msg)
+	return r.WithContext(ctx)
 }

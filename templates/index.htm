@@ -1,4 +1,4 @@
-{{ define "title" }}Fever Pass - 量體溫，速通行{{ end }}
+{{ define "title" }}體溫登記系統{{ end }}
 {{ define "content-with-session" }}
 <div id="middle">
     <div>
@@ -14,7 +14,7 @@
                 </select>
                 <input type="submit" value="送出">
             </form>
-            <p hidden id="result">紀錄成功！</p>
+            <p hidden id="result">登記成功</p>
         {{ else }}
             <script src="/js/login.js" defer></script>
             <form action="" id="form">
