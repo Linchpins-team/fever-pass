@@ -119,6 +119,7 @@ func (h Handler) stats(w http.ResponseWriter, r *http.Request) {
 	if acct.Role == Teacher {
 		class = acct.Class.Name
 	}
+	tx = tx.Where("role = ?", Student)
 
 	var accounts []Account
 	err := tx.Find(&accounts).Error
