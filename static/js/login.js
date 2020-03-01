@@ -4,25 +4,27 @@ form.onsubmit = ev => {
     ev.preventDefault()
 }
 
-function login(form) {
-    fetch("/api/login", {
+async function login(form) {
+    let response = await fetch("/api/login", {
         method: "POST",
         body: new FormData(form),
     })
-    .then(response => {
-        switch (response.status) {
-            case 200:
-                window.location = "/"
-                break
-            
-            case 401:
-                throw new Error("密碼錯誤")
+    switch (response.status) {
+        case 200:
+            window.location = "/"
+            break
+        
+        case 404:
+            form.reset()
+            errorMessage(await response.text())
+            break
 
-            case 404:
-                throw new Error("找不到此帳號")
-        }
-    })
-    .catch(err => {
-        document.getElementById("msg").innerHTML = err
-    })
+        case 403:
+            errorMessage(await response.text())
+            break
+    }
 }
+
+function errorMessage(msg) {
+    document.getElementById("msg").innerHTML = msg
+} 

@@ -9,7 +9,7 @@
   {{ if le .Role 2 }}
   <a href="/stats">統計資料</a>
   {{ end }}
-  <a>帳號名稱：{{ .Account.Name }}</a>
+  <a>{{ .Role }}：{{ .Account.Name }}</a>
   <a href="/logout">登出</a>
   <div id="menu" onclick="nav()">☰</div>
   {{ end }}

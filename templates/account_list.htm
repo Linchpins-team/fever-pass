@@ -5,6 +5,7 @@
 <h1>帳號資訊</h1>
 {{ $acct := .Account }}
 {{ if eq $acct.Role 1 }}
+<a href="/register">新增使用者</a>
 <a href="/import">匯入帳號資料 (.csv 檔)</a>
 {{ end }}
 <table>
@@ -16,6 +17,7 @@
         <th>權限</th>
         <th></th>
         {{ if eq $acct.Role 1 }}
+        <th></th>
         <th></th>
         {{ end }}
     </tr>
@@ -37,6 +39,9 @@
                 {{ else if and (eq .Role 1) (ne .ID "admin") }}
                 <button value="{{ .ID }}" onclick="update(this, 2, '')">設為編輯者</button>
                 {{ end }}
+            </td>
+            <td>
+                <button value="{{ .ID }}" onclick="deleteAccount(this)">刪除帳號</button>
             </td>
             {{ end }} 
         </tr>

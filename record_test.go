@@ -97,7 +97,7 @@ func TestNewRecord(t *testing.T) {
 		Temperature: 37.2,
 	}
 
-	body := fmt.Sprintf("account_id=%s&temperature=%f", record.AccountID, record.Temperature)
+	body := fmt.Sprintf("account_id=%s&temperature=%f&type=%d", record.AccountID, record.Temperature, Forehead)
 	rr := testHandler("POST", "/api/records", body)
 	if rr.Code != 200 {
 		t.Errorf("status code is not 200, got %d\n%s\n", rr.Code, rr.Body.String())

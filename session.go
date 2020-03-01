@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/gob"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -10,6 +11,12 @@ import (
 	"github.com/gorilla/securecookie"
 	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
+)
+
+var (
+	UserNotFound        = errors.New("找不到此帳號")
+	WrongPassword       = errors.New("密碼錯誤")
+	AccountAlreadyExist = errors.New("帳號已經存在")
 )
 
 type Session struct {
@@ -28,7 +35,7 @@ func (h Handler) auth(next http.HandlerFunc, role Role) http.HandlerFunc {
 		} else if acct, ok := r.Context().Value(KeyAccount).(Account); ok && acct.Role <= role {
 			next.ServeHTTP(w, r)
 		} else {
-			http.Error(w, "permission denied, require "+role.String(), 401)
+			h.errorPage(w, r, 401, "權限不足", "您的權限不足，需要"+role.String()+"權限")
 		}
 	}
 }
@@ -86,16 +93,17 @@ func expire() time.Time {
 
 func (h Handler) login(w http.ResponseWriter, r *http.Request) {
 	var acct Account
-	err := h.db.First(&acct, "id = ?", r.FormValue("username")).Error
+	fmt.Println("username:", r.FormValue("username"))
+	err := h.db.Where("id = ?", r.FormValue("username")).First(&acct).Error
 	if gorm.IsRecordNotFoundError(err) {
-		http.Error(w, "user not found", 404)
+		http.Error(w, UserNotFound.Error(), 404)
 		return
 	} else if err != nil {
 		panic(err)
 	}
 	password := r.FormValue("password")
 	if bcrypt.CompareHashAndPassword(acct.Password, []byte(password)) != nil {
-		http.Error(w, "wrong password", 401)
+		http.Error(w, WrongPassword.Error(), 403)
 		return
 	}
 	http.SetCookie(w, newSession(acct.ID))
@@ -114,7 +122,7 @@ func (h Handler) register(w http.ResponseWriter, r *http.Request) {
 	var acct Account
 	acct.ID = r.FormValue("account_id")
 	if err = h.db.First(&acct, "id = ?", acct.ID).Error; !gorm.IsRecordNotFoundError(err) {
-		h.HTML(w, r, "register.htm", "使用者帳號已經存在")
+		h.HTML(w, r, "register.htm", AccountAlreadyExist)
 		return
 	}
 	acct.Name = r.FormValue("name")

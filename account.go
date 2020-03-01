@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
@@ -48,6 +49,9 @@ type Account struct {
 	Class   Class
 	ClassID uint32
 	Number  int
+
+	CreatedAt time.Time
+	DeletedAt *time.Time
 
 	Role Role
 }

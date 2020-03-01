@@ -6,7 +6,7 @@
 body {
     margin: 0;
     height: 100%;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-family: -apple-system, Verdana, Geneva, Tahoma, sans-serif;
 }
 
 main {
@@ -149,7 +149,7 @@ input[name="account_id"] {
 }
 
 table {
-    margin: 0 auto;
+    margin: 12px auto 0;
     width: 70%;
 }
 
@@ -198,7 +198,7 @@ nav * {
     display: none;
 }
 
-.msg {
+#msg {
     color: red;
 }
 
@@ -248,14 +248,18 @@ nav * {
     }
     #menu {
         margin: -8px -8px 0 0;
+        background: #000;
         display: block;
         box-shadow: none;
         padding: 18px;
         position: fixed;
-        height: 16px;
-        width: 16px;
+        height: 160px;
+        width: 160px;
         top: 8px;
         right: 8px;
+    }
+    .middle {
+        padding: 8vh 0;        
     }
 }
 
