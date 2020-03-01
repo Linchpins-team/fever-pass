@@ -5,15 +5,15 @@
         <th>姓名</th>
         <th>體溫（℃）</th>
         <th>類型</th>
-        <th>發燒</th>
+        <th>狀態</th>
         <th>時間</th>
         <th>記錄者</th>
         <th></th>
     </tr>
     <tbody id="table">
         {{ range . }}
-        <tr>
         {{ block "row" . }}
+        <tr {{ if .Fever }}class="fever"{{ end }}>
             <td><a href="/list?account_id={{ .Account.ID }}">{{ .Account }}</a></td>
             <td>{{ .Temperature }}</td>
             <td>{{ .Type }}</td>
@@ -21,8 +21,8 @@
             <td>{{ formatTime .CreatedAt }}</td>
             <td>{{ .RecordedBy }}</td>
             <td><button value="{{ .ID }}" onclick="deleteRow(this, 'records')">刪除</button></td>
-        {{ end }}
         </tr>
+        {{ end }}
         {{end}}
     </tbody>
 </table>

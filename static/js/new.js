@@ -13,9 +13,7 @@ async function newRecord(form) {
         case 200:
             let text = await response.text()
             let table = document.getElementById("table")
-            let tr = document.createElement("tr")
-            tr.innerHTML = text
-            table.insertBefore(tr, table.firstChild)
+            table.insertAdjacentHTML("afterbegin", text)
             while (table.childElementCount > 20) {
                 table.lastChild.remove()
             }
@@ -32,7 +30,7 @@ async function newRecord(form) {
             break
 
         case 403:
-            alert("你沒有權限")
+            alert("沒有權限進行此操作")
             break
 
         case 404:
