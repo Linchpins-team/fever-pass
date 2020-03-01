@@ -54,7 +54,7 @@ func (h Handler) newRecordPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page := struct {
-		Class string
+		Class   string
 		Records []Record
 	}{class, records}
 	h.HTML(w, r, "new.htm", page)
@@ -84,7 +84,7 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 
 	date, err := time.ParseInLocation("2006-01-02", r.FormValue("date"), time.Local)
 	if err == nil {
-		tx = tx.Where("created_at > ? and created_at < ?", date, date.AddDate(0, 0, 1))
+		tx = tx.Where("records.created_at > ? and records.created_at < ?", date, date.AddDate(0, 0, 1))
 	}
 
 	err = tx.Offset((p - 1) * 20).Limit(20).Find(&records).Error
