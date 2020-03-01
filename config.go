@@ -32,20 +32,38 @@ type Config struct {
 	Password string `toml:"-"`
 }
 
+func parseYN(str string) bool {
+	switch str {
+	case "y", "Y":
+		return true
+
+	default:
+		return false
+	}
+}
+
 func setupConfig(path string) {
 	var ok string
-	fmt.Print("This will overwrite your existing setting, continue? (y/n) ")
+	fmt.Print("Do you want to create a new setting? (y/n) ")
 	fmt.Scanln(&ok)
-	if ok != "y" && ok != "Y" {
-		return
+	var c Config
+	if parseYN(ok) {
+		c = generateConfig()
+	} else {
+		c = loadConfig(path)
 	}
-	c := generateConfig()
+
+	fmt.Print("admin password: ")
+	fmt.Scanln(&c.Password)
+
 	db, err := initDB(c)
 	if err != nil {
 		panic(err)
 	}
 	setupDB(c, db)
-	writeConfig(c, path)
+	if parseYN(ok) {
+		writeConfig(c, path)
+	}
 }
 
 func generateConfig() (c Config) {
@@ -80,7 +98,7 @@ func generateConfig() (c Config) {
 				fmt.Printf("Cannot connect to database: %s, initial it now? (y/n) ", err)
 				var ans string
 				fmt.Scanln(&ans)
-				if ans == "y" {
+				if parseYN(ans) {
 					createMySQLDatabase(c)
 					break
 				} else {
@@ -92,9 +110,6 @@ func generateConfig() (c Config) {
 			}
 		}
 	}
-
-	fmt.Print("admin password: ")
-	fmt.Scanln(&c.Password)
 
 	return
 }
@@ -125,11 +140,12 @@ func loadConfig(path string) (c Config) {
 func createMySQLDatabase(c Config) {
 	cmd := exec.Command("/bin/sh", "-c", "sudo mysql")
 	cmd.Stdin = strings.NewReader(fmt.Sprintf(`
-	CREATE DATABASE IF NOT EXISTS %s ;\n
-	CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'; \n
-	GRANT ALL PRIVILEGES ON %s . * TO '%s'@'localhost'; \n
+	CREATE DATABASE IF NOT EXISTS %s ;
+	DELETE FROM mysql.user WHERE User = '%s';
+	CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'; 
+	GRANT ALL PRIVILEGES ON %s . * TO '%s'@'localhost'; 
 	FLUSH PRIVILEGES;
-	`, c.Database.Name, c.Database.User, c.Database.Password, c.Database.Name, c.Database.User))
+	`, c.Database.Name, c.Database.User, c.Database.User, c.Database.Password, c.Database.Name, c.Database.User))
 	err := cmd.Run()
 	if err != nil {
 		panic(err)
