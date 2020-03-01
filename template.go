@@ -11,11 +11,10 @@ func (h *Handler) loadTemplates() {
 	h.tpls = make(map[string]*template.Template)
 	mainTmpl := template.New("main")
 	mainTmpl.Funcs(template.FuncMap{
-		"formatTime":   formatTime,
-		"formatDate":   formatDate,
-		"weekdayColor": weekdayColor,
-		"add":          add,
-		"sub":          sub,
+		"formatTime": formatTime,
+		"formatDate": formatDate,
+		"add":        add,
+		"sub":        sub,
 	})
 	layoutFiles, err := filepath.Glob("templates/layouts/*.htm")
 	if err != nil {
@@ -61,4 +60,11 @@ func (h Handler) page(path string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		h.HTML(w, r, path, nil)
 	}
+}
+
+func (h Handler) errorPage(w http.ResponseWriter, r *http.Request, code int, title, msg string) {
+	w.WriteHeader(code)
+	h.HTML(w, r, "error.htm", struct {
+		Title, Message string
+	}{title, msg})
 }

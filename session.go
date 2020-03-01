@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/gob"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -110,42 +111,25 @@ func logout(w http.ResponseWriter, r *http.Request) {
 
 func (h Handler) register(w http.ResponseWriter, r *http.Request) {
 	var err error
-	var url URL
-	key := r.FormValue("key")
-	err = h.db.Where("id = ? and expire_at > ? and last > 0", key, time.Now()).First(&url).Error
-	if gorm.IsRecordNotFoundError(err) {
-		http.Error(w, "invalid key", 404)
-		return
-	} else if err != nil {
-		panic(err)
-	}
-
 	var acct Account
-	acct.Name = r.FormValue("username")
-	acct.Role = Teacher
+	acct.ID = r.FormValue("account_id")
+	if err = h.db.First(&acct, "id = ?", acct.ID).Error; !gorm.IsRecordNotFoundError(err) {
+		h.HTML(w, r, "register.htm", "使用者帳號已經存在")
+		return
+	}
+	acct.Name = r.FormValue("name")
+	acct.Role, err = parseRole(r.FormValue("role"))
 	if err != nil {
-		http.Error(w, err.Error(), 415)
+		h.errorPage(w, r, 415, "無效的身份", fmt.Sprintf("身份 '%s' 無法被解析", r.FormValue("role")))
 		return
 	}
 
 	acct.Password = generatePassword(r.FormValue("password"))
 
-	tx := h.db.Begin()
-	url.Last--
-	if err = tx.Save(&url).Error; err != nil {
-		tx.Rollback()
-		panic(err)
-	}
-
-	if err = tx.Create(&acct).Error; err != nil {
-		tx.Rollback()
-		http.Error(w, "cannot register user "+err.Error(), 500)
+	if err = h.db.Create(&acct).Error; err != nil {
+		h.HTML(w, r, "register.htm", "無法註冊使用者："+err.Error())
 		return
 	}
 
-	if err = tx.Commit().Error; err != nil {
-		panic(err)
-	}
-
-	http.SetCookie(w, newSession(acct.ID))
+	h.HTML(w, r, "register.htm", "成功註冊"+acct.Name)
 }

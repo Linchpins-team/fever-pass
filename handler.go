@@ -49,13 +49,9 @@ func (h *Handler) newRouter() {
 	r.HandleFunc("/api/accounts/{id}", h.auth(h.updateAccount, Admin)).Methods("PUT")
 
 	r.HandleFunc("/api/login", h.login)
-	r.HandleFunc("/api/register", h.register).Methods("POST")
-
-	r.HandleFunc("/api/url", h.auth(h.newURL, Admin)).Methods("POST")
 
 	r.HandleFunc("/new", h.auth(h.newRecordPage, Teacher))
 	r.HandleFunc("/list", h.auth(h.listRecordsPage, Student))
-	r.HandleFunc("/invite", h.auth(h.page("generate_url.htm"), Admin))
 	r.HandleFunc("/accounts", h.auth(h.listAccountsPage, Student))
 	r.HandleFunc("/stats", h.auth(h.stats, Teacher))
 	r.HandleFunc("/import", h.auth(h.page("import.htm"), Admin)).Methods("GET")
@@ -69,9 +65,8 @@ func (h *Handler) newRouter() {
 	r.Handle("/reset", h.auth(h.resetPage, Student)).Methods("GET")
 	r.Handle("/reset", h.auth(h.resetPassword, Student)).Methods("POST")
 	r.HandleFunc("/logout", logout)
-	r.HandleFunc("/register", h.registerPage)
-
-	r.HandleFunc("/qrcodes/{file}", h.auth(h.qrcode, Admin))
+	r.HandleFunc("/register", h.auth(h.page("register.htm"), Admin)).Methods("GET")
+	r.HandleFunc("/register", h.auth(h.register, Admin)).Methods("POST")
 
 	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("static"))))
 	h.router = r
