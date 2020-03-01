@@ -10,7 +10,7 @@
     <input type="submit" value="查詢">
 </form>
 {{ end }}
-<a href="/export">匯出今日資料</a>
+<a href="/export">下載本日資料 (.csv)</a>
 {{ with .Data }}
 <table>
     <tr>
@@ -18,11 +18,11 @@
         <td>{{ len .All }}</td>
     </tr>
     <tr>
-        <th>已登記人數</th>
+        <th>已記錄人數</th>
         <td>{{ sub (len .All) (len .Unrecorded) }}</td>
     </tr>
     <tr>
-        <th>未登記人數</th>
+        <th>未記錄人數</th>
         <td>{{ len .Unrecorded }}</td>
     </tr>
     <tr>
@@ -32,7 +32,7 @@
 </table>
 <h2>發燒列表</h2>
 {{ template "account_list" .Fever }}
-<h2>未登記列表</h2>
+<h2>未記錄列表</h2>
 {{ template "account_list" .Unrecorded }}
 {{ end }}
 

@@ -80,7 +80,7 @@ func main() {
 		ReadTimeout:  15 * time.Second,
 	}
 
-	log.Printf("Server is listen on %s", c.Server.Base)
+	log.Printf("Server is listening on %s", c.Server.Base)
 
 	log.Fatal(srv.ListenAndServe())
 }

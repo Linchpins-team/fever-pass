@@ -13,12 +13,11 @@
             {{ template "nav" .}}
         </nav>
     </header>
-    
     <main>
+        <div id="header-filler"></div>
         {{ block "content" .Data }}{{ end }}
         {{ block "content-with-session" . }}{{ end }}
     </main>
-    <div id="filler"></div>
     <footer>
         {{ template "footer" . }}
     </footer>
@@ -32,5 +31,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fever Pass - {{ block "title" . }} {{ end }}</title>
 <link rel="stylesheet" href="/css/style.css">
+<link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
+<link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
 <script src="/js/nav.js"></script>
 {{ end }}

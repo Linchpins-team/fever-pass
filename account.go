@@ -152,7 +152,7 @@ func (h Handler) resetPassword(w http.ResponseWriter, r *http.Request) {
 
 	if !permission(acct, account) {
 		w.WriteHeader(403)
-		h.resetPage(w, addMessage(r, "您沒有權限改變"+account.Name+"的密碼"))
+		h.resetPage(w, addMessage(r, "您沒有權限變更 "+account.Name+" 的密碼"))
 		return
 	}
 
@@ -171,5 +171,5 @@ func (h Handler) resetPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.resetPage(w, addMessage(r, "已重設"+account.Name+"密碼"))
+	h.resetPage(w, addMessage(r, "已重設 "+account.Name+" 的密碼"))
 }

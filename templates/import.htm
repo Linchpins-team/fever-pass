@@ -1,16 +1,19 @@
 {{ define "title" }}匯入帳號{{ end }}
 {{ define "content" }}
-<h1>匯入帳號</h1>
-<a href="/example.csv">模板</a>
-<form action="/import" method="post" enctype="multipart/form-data">
-    選取檔案 <input type="file" name="file" id="">
-    <select name="role" id="">
-        <option value="3">學生</option>
-        <option value="2">教師</option>
-        <option value="1">管理員</option>
-    </select>
-    <input type="submit" value="匯入">
-</form>
+<div class="middle">
+    <h1>匯入帳號資料</h1>
+    <form action="/import" method="post" enctype="multipart/form-data">
+        <label for="file">上傳 .csv 檔</label>
+        <input type="file" name="file" id="">
+        <select name="role" id="">
+            <option value="3">學生</option>
+            <option value="2">教師</option>
+            <option value="1">管理員</option>
+        </select>
+        <input type="submit" value="匯入"><br>
+        <a href="/example.csv">下載 .csv 檔模板</a>
+    </form>
+</div>
 {{ with . }}
 <p>{{ . }}</p>
 {{ end }}

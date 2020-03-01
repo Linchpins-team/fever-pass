@@ -1,4 +1,4 @@
-let form = document.getElementById("form")
+let form = document.getElementById("home-form")
 form.onsubmit = ev => {
     login(form)
     ev.preventDefault()
@@ -16,15 +16,13 @@ function login(form) {
                 break
             
             case 401:
-                throw new Error("wrong password")
-                break
+                throw new Error("密碼錯誤")
 
             case 404:
-                throw new Error("user not found")
-                break
+                throw new Error("找不到此帳號")
         }
     })
     .catch(err => {
-        alert(err)
+        document.getElementById("msg").innerHTML = err
     })
 }

@@ -45,15 +45,15 @@ var (
 	}
 	mockRecords = []Record{
 		Record{
-			AccountID:   1,
+			AccountID:   "1",
 			Temperature: 36.8,
 		},
 		Record{
-			AccountID:   2,
+			AccountID:   "2",
 			Temperature: 37.9,
 		},
 		Record{
-			AccountID:   3,
+			AccountID:   "3",
 			Temperature: 38.1,
 		},
 	}
@@ -93,11 +93,11 @@ func insertMockData(db *gorm.DB) {
 
 func TestNewRecord(t *testing.T) {
 	record := Record{
-		AccountID:   2,
+		AccountID:   "2",
 		Temperature: 37.2,
 	}
 
-	body := fmt.Sprintf("account_id=%d&temperature=%f", record.AccountID, record.Temperature)
+	body := fmt.Sprintf("account_id=%s&temperature=%f", record.AccountID, record.Temperature)
 	rr := testHandler("POST", "/api/records", body)
 	if rr.Code != 200 {
 		t.Errorf("status code is not 200, got %d\n%s\n", rr.Code, rr.Body.String())

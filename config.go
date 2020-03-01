@@ -70,11 +70,11 @@ func generateConfig() (c Config) {
 	if c.Mode == Release {
 		fmt.Println("MySQL database setup. Please create database before configuration")
 		for {
-			fmt.Print("database name: ")
+			fmt.Print("Database name: ")
 			fmt.Scanln(&c.Database.Name)
-			fmt.Print("database user: ")
+			fmt.Print("Database user: ")
 			fmt.Scanln(&c.Database.User)
-			fmt.Print("database password: ")
+			fmt.Print("Database password: ")
 			fmt.Scanln(&c.Database.Password)
 			if db, err := initDB(c); err != nil {
 				fmt.Printf("Cannot connect to database: %s, initial it now? (y/n) ", err)
@@ -112,7 +112,7 @@ func writeConfig(c Config, path string) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("configurations has generated at config.toml")
+	fmt.Println("Configurations has been generated at config.toml")
 }
 
 func loadConfig(path string) (c Config) {

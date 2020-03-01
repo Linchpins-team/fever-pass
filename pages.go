@@ -170,7 +170,7 @@ func (h Handler) resetPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !permission(acct, account) {
-		msg = "您沒有權限改變" + account.Name + "的密碼"
+		msg = "您沒有權限變更" + account.Name + "的密碼"
 	}
 
 	page := struct {

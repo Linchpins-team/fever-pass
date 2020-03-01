@@ -6,7 +6,7 @@ import (
 )
 
 func formatTime(t time.Time) string {
-	return t.Format("01/02 15:04 ") + weekday(t)
+	return fmt.Sprintf("%s%s%s", t.Format("01/02"), weekday(t), t.Format("15:04"))
 }
 
 func today() time.Time {
@@ -43,51 +43,25 @@ func formatDate(t time.Time) string {
 func weekday(t time.Time) string {
 	switch t.Weekday() {
 	case time.Monday:
-		return "星期一"
+		return "（一）"
 
 	case time.Tuesday:
-		return "星期二"
+		return "（二）"
 
 	case time.Wednesday:
-		return "星期三"
+		return "（三）"
 
 	case time.Thursday:
-		return "星期四"
+		return "（四）"
 
 	case time.Friday:
-		return "星期五"
+		return "（五）"
 
 	case time.Saturday:
-		return "星期六"
+		return "（六）"
 
 	case time.Sunday:
-		return "星期天"
-	}
-	return ""
-}
-
-func weekdayColor(t time.Time) string {
-	switch t.Weekday() {
-	case time.Monday:
-		return "red"
-
-	case time.Tuesday:
-		return "orange"
-
-	case time.Wednesday:
-		return "yellow"
-
-	case time.Thursday:
-		return "green"
-
-	case time.Friday:
-		return "blue"
-
-	case time.Saturday:
-		return "indigo"
-
-	case time.Sunday:
-		return "purple"
+		return "（日）"
 	}
 	return ""
 }

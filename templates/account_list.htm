@@ -1,19 +1,18 @@
-{{ define "title" }}帳號管理{{ end }}
+{{ define "title" }}帳號資訊{{ end }}
 {{ define "content-with-session" }}
 <script src="/js/delete.js"></script>
 <script src="/js/update.js"></script>
-<h1>帳號管理</h1>
+<h1>帳號資訊</h1>
 {{ $acct := .Account }}
 {{ if eq $acct.Role 1 }}
-<a href="/invite">邀請</a>
-<a href="/import">匯入</a>
+<a href="/import">匯入帳號資料 (.csv 檔)</a>
 {{ end }}
 <table>
     <tr>
         <th>帳號</th>
-        <th>姓名</th>
         <th>班級</th>
         <th>座號</th>
+        <th>姓名</th>
         <th>權限</th>
         <th></th>
         {{ if eq $acct.Role 1 }}
@@ -24,12 +23,12 @@
         {{ range .Data }}
         <tr>
             <td>{{ .ID }}</td>
-            <td>{{ .Name }}</td>
             <td>{{ .Class }}</td>
             <td>{{ .Number }}</td>
+            <td>{{ .Name }}</td>
             <td>{{ .Role }}</td>
             <td>
-                <a href="/reset?account_id={{ .ID }}">重設密碼</a>
+                <button><a href="/reset?account_id={{ .ID }}">重設密碼</a></button>
             </td>
             {{ if eq $acct.Role 1 }}
             <td>

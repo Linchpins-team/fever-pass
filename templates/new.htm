@@ -1,13 +1,14 @@
-{{ define "title" }}新增紀錄{{ end }}
+{{ define "title" }}新增體溫記錄{{ end }}
 {{ define "content" }}
 <script src="/js/new.js" defer></script>
+<h1>新增體溫記錄</h1>
 <form action="" id="form">
     <label for="class">班級</label> 
-    <input type="text" name="class" autocomplete="off" autofocus required value="{{ .Class }}">
+    <input type="text" name="class" autocomplete="off" autofocus required value="{{ .Class }}"><br class="mobile-br">
     <label for="number">座號</label>
-    <input type="text" name="number" id="" autocomplete="off" required>
+    <input type="text" name="number" id="" autocomplete="off" required><br class="mobile-br">
     <label for="temperature">體溫</label>
-    <input type="number" name="temperature" id="" autocomplete="off" min="34" max="41" required>
+    <input type="number" name="temperature" id="" autocomplete="off" min="34" max="40" step="0.1" required><br class="mobile-br">
     <select name="type" id="">
         <option value="2">額溫</option>
         <option value="1">耳溫</option>

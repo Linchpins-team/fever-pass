@@ -1,41 +1,77 @@
 :root {
-    --main: #2a6;
+    --main: #1b8;
+    --secondary: #196;
 }
 
 body {
     margin: 0;
     height: 100%;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+main {
+    min-height: calc(100vh - 60px);
+    box-sizing: border-box;
 }
 
 #logo {
-    height: 44px;
-    width: 44px;
+    background: var(--main);
+    height: 54px;
+    width: 54px;
+    top: 0;
 }
 
-form input {
+button a {
+    color: #000;
+}
+
+input {
     padding: 4px;
     margin: 8px;
     width: 80px;
+    height: 24px;
     font-size: 16px;
 }
 
+input[type="submit"] {
+    height: auto;
+}
+
+select {
+    text-align-last: center;
+    -moz-text-align-last: center;
+    -ms-text-align-last: center;
+    height: 36px;
+    width: 68px;
+}
+
+button:hover, input[type="submit"]:hover {
+    color: var(--secondary);
+}
+
 header {
-    height: 64px;
-    width: 100%;
+    position: fixed;
+    height: 54px;
+    top: 0;
+    left: 10%;
+    background: var(--main);
+    font-weight: 600;
+    width: 80%;
+    margin: auto;
 }
 
 footer {
-    background: var(--main);
-    height: 40px;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
+    font-weight: 600;
+    height: 54px;
+    width: 80%;
+    margin: auto;
     display: flex;
     align-items: center;
+    border-top: 3px solid var(--main);
     justify-content: space-around;
 }
 
-header a, footer a {
+header a {
     color: #eee;
 }
 
@@ -55,12 +91,17 @@ form button {
 }
 
 a {
+    color: var(--secondary);
     text-decoration: none;
     text-align: center;
     display: inline-block;
 }
 
-header a:hover, footer a:hover {
+a:hover {
+    color: var(--main);
+}
+
+header a:hover {
     color: #fff;
 }
 
@@ -71,25 +112,24 @@ header a:hover, footer a:hover {
 }
 
 form {
-    margin: 32px;
+    margin: 16px;
 }
 
 main {
     text-align: center;
 }
 
-#middle {
-    padding: 20vh 0;
+.middle {
+    padding: 25vh 0;
     margin: 0 auto;
+}
+
+a[href="/import"] {
+    margin: 8px;
 }
 
 input:focus {
     background-color: #efe;
-}
-
-input[type="checkbox"] {
-    height: 16px;
-    width: 16px;
 }
 
 input[type="date"] {
@@ -101,9 +141,11 @@ input[name="account_id"] {
     margin: 6px;
 }
 
-select {
-    padding: 8px;
-    font-size: 14px;
+#fever-pass {
+    position: relative;
+    font-size: 16px;
+    left: 10px;
+    bottom: 20px;
 }
 
 table {
@@ -111,22 +153,26 @@ table {
     width: 70%;
 }
 
+#header-filler {
+    height: 72px;
+}
+
 th {
-    background: #ada;
+    background: var(--main);
 }
 
 tr {
-    background: #dfd;
+    background: #cfd;
 }
 
 h1 {
     font-size: 48px;
-    margin-top: 0;
+    margin: 0;
 }
 
 h2 {
     font-size: 32px;
-    margin-bottom: 0;
+    margin-bottom: 18px;
 }
 
 img {
@@ -140,26 +186,46 @@ nav {
 nav * {
     color: #fff;
     background: var(--main);
-    padding: 14px 16px;
-    margin: -3px;
+    padding: 16px 22px;
+    margin: -2px;
 }
 
-nav span {
-    padding: 18px 15px 15px;
-}
-
-#filler {
-    height: 80px;
+#home-form {
+    margin-top: 24px;
 }
 
 #menu {
     display: none;
 }
 
+.msg {
+    color: red;
+}
+
+.fever {
+    background-color: #fcd;
+}
+
+.mobile-br {
+    display: none;
+}
+
+@media(max-width:1040px) {
+    header, footer {
+        width: 100%;
+    }
+    header {
+        left: 0;
+    }
+    table {
+        width: 100%;
+    }
+}
+
 @media(max-width:800px) {
     nav {
         position: fixed;
-        top: 46px;
+        top: 54px;
         right: 0;
         overflow-x: hidden;
         height: 0;
@@ -184,14 +250,20 @@ nav span {
         margin: -8px -8px 0 0;
         display: block;
         box-shadow: none;
-        padding: 16px;
+        padding: 18px;
         position: fixed;
         height: 16px;
         width: 16px;
         top: 8px;
         right: 8px;
     }
-    table {
-        width: 100%;
+}
+
+@media(max-width:600px) {
+    tr {
+        font-size: 11px;
+    }
+    .mobile-br {
+        display: block;
     }
 }
