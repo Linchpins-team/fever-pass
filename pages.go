@@ -19,7 +19,6 @@ func (h Handler) index(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	h.HTML(w, r, "index.htm", nil)
-
 }
 
 // get the last record today of the account

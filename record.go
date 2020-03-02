@@ -179,11 +179,7 @@ func (h Handler) deleteRecord(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h Handler) newSelfRecord(w http.ResponseWriter, r *http.Request) {
-	acct, ok := r.Context().Value(KeyAccount).(Account)
-	if !ok {
-		http.Error(w, "cannot read account from session", 500)
-		return
-	}
+	acct := r.Context().Value(KeyAccount).(Account)
 
 	record := Record{
 		Account:    acct,
@@ -192,14 +188,16 @@ func (h Handler) newSelfRecord(w http.ResponseWriter, r *http.Request) {
 
 	var err error
 	record.Temperature, err = strconv.ParseFloat(r.FormValue("temperature"), 64)
-	if err != nil {
-		http.Error(w, err.Error(), 415)
+	if err != nil || record.Temperature > 41 || record.Temperature < 34 {
+		r = addMessage(r, "無效體溫資料")
+		h.index(w, r)
 		return
 	}
 
 	record.Type, err = parseType(r.FormValue("type"))
 	if err != nil {
-		http.Error(w, err.Error(), 415)
+		r = addMessage(r, "無效體溫類別")
+		h.index(w, r)
 		return
 	}
 
@@ -207,6 +205,5 @@ func (h Handler) newSelfRecord(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-
 	h.index(w, r)
 }

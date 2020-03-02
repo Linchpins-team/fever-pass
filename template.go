@@ -35,16 +35,21 @@ func (h *Handler) loadTemplates() {
 }
 
 func (h Handler) HTML(w http.ResponseWriter, r *http.Request, page string, data interface{}) {
-	log.Println(page)
 	acct, ok := r.Context().Value(KeyAccount).(Account)
 	pageData := struct {
 		Data  interface{}
 		Login bool
 		Account
+		Message string
 	}{
 		data,
 		ok,
 		acct,
+		"",
+	}
+	if msg, ok := r.Context().Value(KeyMessage).(string); ok {
+		pageData.Message = msg
+		log.Println(msg)
 	}
 	if tpl, ok := h.tpls[page]; ok {
 		if err := tpl.ExecuteTemplate(w, "main", pageData); err != nil {

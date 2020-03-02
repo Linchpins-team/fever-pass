@@ -7,14 +7,14 @@
         {{ if .Login }}
             <form action="/" id="home-form" method="POST">
                 <label for="temperature">體溫（℃）</label>
-                <input type="number" name="temperature" step="0.1" id="" autofocus autocomplete="off" min="34" max="41">
+                <input type="number" name="temperature" step="0.1" id="" required autofocus autocomplete="off" min="34" max="41">
                 <select name="type" id="">
                     <option value="1">耳溫</option>
                     <option value="2">額溫</option>
                 </select>
                 <input type="submit" value="記錄">
             </form>
-            <p hidden id="result">記錄成功</p>
+            <p id="result">{{ .Message }}</p>
         {{ else }}
             <script src="/js/login.js" defer></script>
             <form action="" id="home-form">

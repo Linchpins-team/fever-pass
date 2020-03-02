@@ -18,7 +18,7 @@ func (h Handler) export(tx *gorm.DB, w io.Writer) (err error) {
 		return
 	}
 
-	columns := []string{"班級", "座號", "姓名", "體溫", "類型", "發燒", "時間", "紀錄者"}
+	columns := []string{"班級", "座號", "姓名", "體溫", "類型", "發燒", "時間", "記錄者"}
 	err = enc.Write(columns)
 	if err != nil {
 		panic(err)
