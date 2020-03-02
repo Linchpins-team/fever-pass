@@ -14,11 +14,18 @@ main {
     box-sizing: border-box;
 }
 
+img {
+    border: 3px #000 solid;
+    width: 90%;
+    margin: 0 auto;
+}
+
 #logo {
     background: var(--main);
     height: 54px;
     width: 54px;
     top: 0;
+    border: none;
 }
 
 button a {
@@ -67,7 +74,7 @@ footer {
     margin: auto;
     display: flex;
     align-items: center;
-    border-top: 3px solid var(--main);
+    border-top: 2px solid var(--main);
     justify-content: space-around;
 }
 
@@ -101,6 +108,10 @@ a:hover {
     color: var(--main);
 }
 
+nav a:hover {
+    background: var(--secondary);
+}
+
 header a:hover {
     color: #fff;
 }
@@ -120,8 +131,7 @@ main {
 }
 
 .middle {
-    padding: 25vh 0;
-    margin: 0 auto;
+    margin: calc(50vh - 154px) auto 0;
 }
 
 a[href="/import"] {
@@ -145,7 +155,7 @@ input[name="account_id"] {
     position: relative;
     font-size: 16px;
     left: 10px;
-    bottom: 20px;
+    bottom: 22px;
 }
 
 table {
@@ -175,19 +185,17 @@ h2 {
     margin-bottom: 18px;
 }
 
-img {
-    width: 100%;
-}
-
 nav {
+    height: 54px;
     float: right;
 }
 
-nav * {
-    color: #fff;
+nav a {
+    color: #eee;
     background: var(--main);
-    padding: 16px 22px;
-    margin: -2px;
+    height: 24px;
+    padding: 15px 20px;
+    line-height: 24px;
 }
 
 #home-form {
@@ -210,7 +218,10 @@ nav * {
     display: none;
 }
 
-@media(max-width:1040px) {
+@media(max-width:1080px) {
+    nav a {
+        padding: 15px 10px;
+    }
     header, footer {
         width: 100%;
     }
@@ -222,7 +233,7 @@ nav * {
     }
 }
 
-@media(max-width:800px) {
+@media(max-width:860px) {
     nav {
         position: fixed;
         top: 54px;
@@ -240,26 +251,27 @@ nav * {
         width: 100vw;
         box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.2);
         padding: 12px;
-        transition: 0.2s;
-        -webkit-transition: 0.2s;
-        -moz-transition: 0.2s;
-        -ms-transition: 0.2s;
-        -o-transition: 0.2s;
-    }
+        transition: 0.5s ease-in-out;
+        -webkit-transition: 0.5s ease-in-out;
+        -moz-transition: 0.5s ease-in-out;
+        -ms-transition: 0.5s ease-in-out;
+        -o-transition: 0.5s ease-in-out;
+}
     #menu {
+        color: #eee;
+        font-size: 32px;
         margin: -8px -8px 0 0;
-        background: #000;
         display: block;
         box-shadow: none;
-        padding: 18px;
+        padding: 12px;
         position: fixed;
-        height: 160px;
-        width: 160px;
-        top: 8px;
-        right: 8px;
+        height: 32px;
+        width: 24px;
+        top: 2px;
+        right: 12px;
     }
-    .middle {
-        padding: 8vh 0;        
+    td button {
+        font-size: 9px;
     }
 }
 
