@@ -7,17 +7,25 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/jinzhu/gorm"
 )
 
 func (h Handler) importHandler(w http.ResponseWriter, r *http.Request) {
-	file, _, err := r.FormFile("file")
+	file, header, err := r.FormFile("file")
 	if err != nil {
 		w.WriteHeader(415)
 		h.HTML(w, r, "import.htm", err.Error())
 		return
 	}
+
+	if !strings.HasSuffix(header.Filename, ".csv") {
+		w.WriteHeader(415)
+		h.HTML(w, r, "import.htm", "請上傳 CSV 檔案")
+		return
+	}
+
 	role, err := parseRole(r.FormValue("role"))
 	if err != nil {
 		w.WriteHeader(415)
