@@ -36,7 +36,7 @@ func (h Handler) auth(next http.HandlerFunc, role Role) http.HandlerFunc {
 		} else if acct, ok := r.Context().Value(KeyAccount).(Account); ok && acct.Role <= role {
 			next.ServeHTTP(w, r)
 		} else {
-			h.errorPage(w, r, 401, "權限不足", "您的權限不足，需要"+role.String()+"權限")
+			h.errorPage(w, r, "權限不足", "您的權限不足，需要"+role.String()+"權限")
 		}
 	}
 }

@@ -3,6 +3,7 @@
 {{ end }}
 
 {{ define "content-with-session" }}
+<script src="/js/load_account_list.js"></script>
 <h1>{{ template "title" .Data }}</h1>
 {{ if eq .Role 1 }}
 <form action="/stats" method="get">
@@ -11,30 +12,37 @@
 </form>
 {{ end }}
 <a href="/export">下載本日資料 (.csv)</a>
-{{ with .Data }}
-<table>
-    <tr>
-        <th>總人數</th>
-        <td>{{ len .All }}</td>
-    </tr>
-    <tr>
-        <th>已記錄人數</th>
-        <td>{{ sub (len .All) (len .Unrecorded) }}</td>
-    </tr>
-    <tr>
-        <th>未記錄人數</th>
-        <td>{{ len .Unrecorded }}</td>
-    </tr>
-    <tr>
-        <th>發燒人數</th>
-        <td>{{ len .Fever }}</td>
-    </tr>
-</table>
-<h2>發燒列表</h2>
-{{ template "account_list" .Fever }}
-<h2>未記錄列表</h2>
-{{ template "account_list" .Unrecorded }}
-{{ end }}
+
+    {{ with .Data }}
+    <table>
+        <tr>
+            <th>總人數</th>
+            <td>{{ .All }}</td>
+        </tr>
+        <tr>
+            <th>已記錄人數</th>
+            <td>{{ sub (.All) (.Unrecorded) }}</td>
+        </tr>
+        <tr>
+            <th>未記錄人數</th>
+            <td>{{ .Unrecorded }}</td>
+        </tr>
+        <tr>
+            <th>發燒人數</th>
+            <td>{{ .Fever }}</td>
+        </tr>
+    </table>
+    <select name="list_type" id="select_type" onchange="loadAccountList(this)">
+        <option value="2" selected>未紀錄</option>
+        <option value="1">已紀錄</option> 
+        <option value="3">發燒</option>
+    </select>
+    <div id="list"></div>
+    <script>
+        let select = document.getElementById("select_type")
+        loadAccountList(select)
+    </script>
+    {{ end }}
 
 {{ end }}
 
