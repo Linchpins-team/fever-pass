@@ -26,7 +26,7 @@ async function newRecord(form) {
             break
 
         case 415:
-            alert("無效的資料")
+            alert("資料無效")
             break
 
         case 403:

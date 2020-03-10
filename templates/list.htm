@@ -3,15 +3,18 @@
 {{ if ne .Account.ID "" }}{{ .Account.Name }}{{ end }}
 體溫歷史記錄
 {{ end }}
-{{ define "content" }}
-<h1>{{ template "title" . }}</h1>
+{{ define "content-with-session" }}
+<h1>{{ template "title" .Data }}</h1>
 
 <form action="/list" method="get">
-    帳號 <input type="text" name="account_id" id="">
-    日期 <input type="date" name="date" id="">
+    {{ if lt .Role 3 }}
+    帳號 <input type="text" name="account_id">
+    {{ end }}
+    日期 <input type="date" name="date">
     <input type="submit" value="查詢">
 </form>
 
+{{ with .Data }}
 <p>第 {{ .Page }} 頁</p>
 
 {{ if gt .Page 1 }}
@@ -23,4 +26,5 @@
 
 {{ template "list" .Records }}
 
+{{ end }}
 {{ end }}

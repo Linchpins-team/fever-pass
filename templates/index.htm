@@ -8,7 +8,7 @@
             <form action="/" id="home-form" method="POST">
                 <label for="temperature">體溫（℃）</label>
                 <input type="number" name="temperature" required autofocus autocomplete="off" min="34" max="41" step="0.1">
-                <select name="type" id="">
+                <select name="type">
                     <option value="1">耳溫</option>
                     <option value="2">額溫</option>
                 </select>
@@ -30,7 +30,7 @@
         {{ if ne .ID 0 }}
             <table>
                 <tr>
-                    <th>體溫（℃）</th>
+                    <th>最新體溫記錄（℃）</th>
                     <th>狀態</th>
                     <th>類型</th>
                     <th>時間</th>

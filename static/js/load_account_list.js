@@ -1,5 +1,5 @@
-async function loadAccountList(select) {
-    response = await fetch(`/api/stats?type=${select.value}`, {
+async function loadAccountList(select, class_name) {
+    response = await fetch(`/api/stats?type=${select.value}&class=${class_name}`, {
         method: "get",
     })
     if (response.status != 200) {

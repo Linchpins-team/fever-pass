@@ -9,6 +9,9 @@
   {{ if le .Role 2 }}
   <a href="/stats">統計資料</a>
   {{ end }}
+  {{ if le .Role 3}}
+  <a href="/reset">重設密碼</a>
+  {{ end }}
   <a href="/list?account_id={{ .Account.ID }}">{{ .Role }}：{{ .Account.Name }}</a>
   <a href="/logout">登出</a>
   {{ end }}

@@ -10,9 +10,9 @@
     <form action="/import" method="post" enctype="multipart/form-data">
         <label for="file">上傳 .csv 檔</label>
         <input type="file" name="file" onchange="updateFileName(this)">
-        <select name="role" id="">
+        <select name="role">
             <option value="3">學生</option>
-            <option value="2">教師</option>
+            <option value="2">老師</option>
             <option value="1">管理員</option>
         </select>
         <input type="submit" value="匯入"><br>

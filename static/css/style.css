@@ -64,17 +64,15 @@ header {
     position: fixed;
     height: 54px;
     top: 0;
-    left: 10%;
     background: var(--main);
     font-weight: 600;
-    width: 80%;
+    width: 100%;
     margin: auto;
 }
 
 footer {
     font-weight: 600;
     height: 54px;
-    width: 80%;
     margin: auto;
     display: flex;
     align-items: center;
@@ -241,12 +239,9 @@ nav a {
     display: none;
 }
 
-@media(max-width:1100px) {
+@media(max-width:1210px) {
     nav a {
         padding: 15px 10px;
-    }
-    header, footer {
-        width: 100%;
     }
     header {
         left: 0;
@@ -263,12 +258,12 @@ nav a {
         right: 0;
         overflow-x: hidden;
         height: 0;
-        transition: 0.3s ease-in-out;
-        -webkit-transition: 0.3s ease-in-out;
-        -moz-transition: 0.3s ease-in-out;
-        -ms-transition: 0.3s ease-in-out;
-        -o-transition: 0.3s ease-in-out;
-    }
+        transition: 0.2s ease-in-out;
+        -webkit-transition: 0.2s ease-in-out;
+        -moz-transition: 0.2s ease-in-out;
+        -ms-transition: 0.2s ease-in-out;
+        -o-transition: 0.2s ease-in-out;
+}
     nav a {
         display: block;
         width: 100vw;

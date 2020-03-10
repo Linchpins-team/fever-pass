@@ -1,5 +1,5 @@
 {{ define "title" }}
-    {{ with .Class }}{{ . }}班{{ else }}全校{{ end }}統計
+    {{ with .Class }}{{ . }}班{{ else }}全校{{ end }}的統計
 {{ end }}
 
 {{ define "content-with-session" }}
@@ -8,7 +8,7 @@
 {{ if eq .Role 1 }}
 <form action="/stats" method="get">
     <label for="class">班級</label>
-    <input type="text" name="class" id="">
+    <input type="text" name="class">
     <input type="submit" value="查詢">
 </form>
 {{ end }}
@@ -21,17 +21,22 @@
         <th>未記錄人數</th>
         <th>發燒人數</th>
     </tr>
+    <tr>
+        <td>{{ .All }}</td>
+        <td>{{ sub .All .Unrecorded }}</td>
+        <td>{{ .Unrecorded }}</td>
+        <td>{{ .Fever }}</td>
+    </tr>
 </table>
-
-<select name="list_type" id="select_type" onchange="loadAccountList(this)">
-    <option value="2" selected>未紀錄</option>
-    <option value="1">已紀錄</option> 
+<select name="list_type" id="select_type" onchange="loadAccountList(this, '{{ .Class }}')">
+    <option value="2" selected>未記錄</option>
+    <option value="1">已記錄</option> 
     <option value="3">發燒</option>
 </select>
 <div id="list"></div>
 <script>
     let select = document.getElementById("select_type")
-    loadAccountList(select)
+    loadAccountList(select, '{{ .Class }}')
 </script>
 {{ end }}
 

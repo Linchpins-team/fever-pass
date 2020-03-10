@@ -37,11 +37,13 @@
                 {{ if eq .Role 2 }}
                 <button value="{{ .ID }}" onclick="update(this, 1, '')">設為管理員</button>
                 {{ else if and (eq .Role 1) (ne .ID "admin") }}
-                <button value="{{ .ID }}" onclick="update(this, 2, '')">設為編輯者</button>
+                <button value="{{ .ID }}" onclick="update(this, 2, '')">設為老師</button>
                 {{ end }}
             </td>
             <td>
+                {{ if ne .ID "admin" }}
                 <button value="{{ .ID }}" onclick="deleteAccount(this)">刪除帳號</button>
+                {{ end }}
             </td>
             {{ end }} 
         </tr>
