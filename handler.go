@@ -20,6 +20,7 @@ type ContextKey uint32
 
 const (
 	KeyAccount ContextKey = iota
+	KeyMessage
 )
 
 func NewHandler(db *gorm.DB, config Config) Handler {
@@ -41,34 +42,32 @@ func (h *Handler) newRouter() {
 		fmt.Fprint(w, "hi")
 	})
 
-	r.HandleFunc("/api/check", h.findRecord).Methods("GET")
-
-	r.HandleFunc("/api/records", h.auth(h.newRecord, Editor)).Methods("POST")
-	r.HandleFunc("/api/records", h.auth(h.listRecord, Editor)).Methods("GET")
-	r.HandleFunc("/api/records/{id}", h.auth(h.deleteRecord, Editor)).Methods("DELETE")
+	r.HandleFunc("/api/records", h.auth(h.newRecord, Student)).Methods("POST")
+	r.HandleFunc("/api/records/{id}", h.auth(h.deleteRecord, Student)).Methods("DELETE")
 
 	r.HandleFunc("/api/accounts/{id}", h.auth(h.deleteAccount, Admin)).Methods("DELETE")
 	r.HandleFunc("/api/accounts/{id}", h.auth(h.updateAccount, Admin)).Methods("PUT")
+	r.HandleFunc("/api/stats", h.auth(h.statsList, Teacher))
 
 	r.HandleFunc("/api/login", h.login)
-	r.HandleFunc("/api/register", h.register).Methods("POST")
 
-	r.HandleFunc("/api/url", h.auth(h.newURL, Admin)).Methods("POST")
-
-	r.HandleFunc("/admin/new", h.auth(h.newRecordPage, Editor))
-	r.HandleFunc("/admin/list", h.auth(h.listRecordsPage, Editor))
-	r.HandleFunc("/admin/invite", h.auth(h.page("generate_url.htm"), Admin))
-	r.HandleFunc("/admin/accounts", h.auth(h.listAccounts, Admin))
+	r.HandleFunc("/new", h.auth(h.newRecordPage, Teacher))
+	r.HandleFunc("/list", h.auth(h.listRecordsPage, Student))
+	r.HandleFunc("/accounts", h.auth(h.listAccountsPage, Student))
+	r.HandleFunc("/stats", h.auth(h.stats, Teacher))
+	r.HandleFunc("/import", h.auth(h.page("import.htm"), Admin)).Methods("GET")
+	r.HandleFunc("/import", h.auth(h.importHandler, Admin)).Methods("POST")
+	r.HandleFunc("/export", h.auth(h.exportCSV, Teacher))
 
 	r.HandleFunc("/doc/{title}", h.doc)
 
-	r.HandleFunc("/", h.page("index.htm"))
-	r.Handle("/login", h.page("login.htm"))
+	r.HandleFunc("/", h.index).Methods("GET")
+	r.HandleFunc("/", h.auth(h.newSelfRecord, Student)).Methods("POST")
+	r.Handle("/reset", h.auth(h.resetPage, Student)).Methods("GET")
+	r.Handle("/reset", h.auth(h.resetPassword, Student)).Methods("POST")
 	r.HandleFunc("/logout", logout)
-	r.HandleFunc("/register", h.registerPage)
-	r.HandleFunc("/check", h.check)
-
-	r.HandleFunc("/qrcodes/{file}", h.auth(h.qrcode, Admin))
+	r.HandleFunc("/register", h.auth(h.page("register.htm"), Admin)).Methods("GET")
+	r.HandleFunc("/register", h.auth(h.register, Admin)).Methods("POST")
 
 	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("static"))))
 	h.router = r

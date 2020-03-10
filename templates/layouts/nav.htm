@@ -1,0 +1,16 @@
+{{ define "nav" }}
+
+  {{ if .Login }}
+  {{ if le .Role 2 }}
+  <a href="/new">新增體溫資料</a>
+  {{ end }}
+  <a href="/list">體溫歷史記錄</a>
+  <a href="/accounts">帳號資訊</a>
+  {{ if le .Role 2 }}
+  <a href="/stats">統計資料</a>
+  {{ end }}
+  <a href="/list?account_id={{ .Account.ID }}">{{ .Role }}：{{ .Account.Name }}</a>
+  <a href="/logout">登出</a>
+  {{ end }}
+
+{{ end }}

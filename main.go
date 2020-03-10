@@ -11,14 +11,18 @@ import (
 	"time"
 
 	"github.com/gorilla/securecookie"
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/joho/godotenv"
-	"golang.org/x/crypto/bcrypt"
 )
 
 var (
 	hashKey, blockKey []byte
+)
+
+var (
+	ConfPath    string
+	Init        bool
+	UseTestData bool
 )
 
 func init() {
@@ -30,6 +34,11 @@ func init() {
 	defer file.Close()
 	hashKey = loadKey("HASH_KEY", file)
 	blockKey = loadKey("BLOCK_KEY", file)
+
+	flag.BoolVar(&Init, "init", false, "init configuration")
+	flag.StringVar(&ConfPath, "conf", "config.toml", "configuration file path")
+	flag.BoolVar(&UseTestData, "t", false, "use -t to import test data")
+	flag.Parse()
 }
 
 func loadKey(name string, w io.Writer) (key []byte) {
@@ -54,60 +63,13 @@ func decodeKey(key string) []byte {
 	}
 }
 
-func initDB(c Config) (db *gorm.DB, err error) {
-	switch c.Mode {
-	case Debug:
-		db, err = gorm.Open("sqlite3", "/tmp/gorm.sqlite")
-
-	case Release:
-		connection := fmt.Sprintf("%s:%s@/%s?charset=utf8&parseTime=True&loc=Local", c.Database.User, c.Database.Password, c.Database.Name)
-		db, err = gorm.Open("mysql", connection)
-	}
-	if err != nil {
-		return
-	}
-	migrate(db)
-	return
-}
-
-func migrate(db *gorm.DB) {
-	if err := db.AutoMigrate(&Record{}, &Account{}, &URL{}).Error; err != nil {
-		panic(err)
-	}
-}
-
-func setupDB(c Config, db *gorm.DB) {
-	var admin Account
-	err := db.First(&admin, 1).Error
-	if err != nil && !gorm.IsRecordNotFoundError(err) {
-		panic(err)
-	}
-	admin.Name = "admin"
-	admin.Role = Admin
-	password := c.Password
-	admin.Password, err = bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		panic(err)
-	}
-	err = db.Save(&admin).Error
-	if err != nil {
-		panic(err)
-	}
-}
-
 func main() {
-	var init bool
-	var confPath string
-	flag.BoolVar(&init, "init", false, "init configuration")
-	flag.StringVar(&confPath, "conf", "config.toml", "configuration file path")
-	flag.Parse()
-
-	if init {
-		setupConfig(confPath)
+	if Init {
+		setupConfig()
 		return
 	}
 
-	c := loadConfig(confPath)
+	c := loadConfig()
 	db, err := initDB(c)
 	if err != nil {
 		panic(err)
@@ -123,7 +85,7 @@ func main() {
 		ReadTimeout:  15 * time.Second,
 	}
 
-	log.Printf("Server is listen on %s", c.Server.Base)
+	log.Printf("Server is listening on %s", c.Server.Base)
 
 	log.Fatal(srv.ListenAndServe())
 }

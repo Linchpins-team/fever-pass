@@ -1,13 +1,19 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
+)
+
+var (
+	AccountNotFound = errors.New("account not found")
 )
 
 type Role uint32
@@ -15,8 +21,8 @@ type Role uint32
 const (
 	Unknown Role = iota
 	Admin
-	Editor
-	User
+	Teacher
+	Student
 )
 
 func (r Role) String() string {
@@ -24,11 +30,11 @@ func (r Role) String() string {
 	case Admin:
 		return "管理員"
 
-	case Editor:
-		return "編輯者"
+	case Teacher:
+		return "老師"
 
-	case User:
-		return "使用者"
+	case Student:
+		return "學生"
 
 	default:
 		return "未知"
@@ -36,11 +42,22 @@ func (r Role) String() string {
 }
 
 type Account struct {
-	ID       uint32 `gorm:"primary_key"`
-	Name     string `gorm:"unique;type:varchar(32)"`
-	Password []byte
+	ID       string `gorm:"primary_key;type:varchar(32)"`
+	Name     string `gorm:"type:varchar(32)"`
+	Password []byte `json:"-"`
+
+	Class   Class
+	ClassID uint32
+	Number  int
+
+	CreatedAt time.Time
+	DeletedAt *time.Time
 
 	Role Role
+}
+
+func (a Account) String() string {
+	return a.Name
 }
 
 func parseRole(str string) (Role, error) {
@@ -60,17 +77,14 @@ func generatePassword(password string) []byte {
 }
 
 func (h Handler) deleteAccount(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(mux.Vars(r)["id"])
-	if err != nil {
-		http.Error(w, err.Error(), 415)
-		return
-	}
+	id := mux.Vars(r)["id"]
 
-	if id == 1 {
+	if id == "admin" {
 		http.Error(w, "cannot delete admin", 403)
 		return
 	}
-	err = h.db.Delete(&Account{}, "id = ?", id).Error
+
+	err := h.db.Delete(&Account{}, "id = ?", id).Error
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -78,24 +92,15 @@ func (h Handler) deleteAccount(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h Handler) updateAccount(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(mux.Vars(r)["id"])
-	if err != nil {
-		http.Error(w, err.Error(), 415)
+	acct, err := h.getAccount(mux.Vars(r)["id"])
+	if err == AccountNotFound {
+		http.Error(w, err.Error(), 404)
 		return
-	}
-
-	var acct Account
-	err = h.db.First(&acct, "id = ?", id).Error
-	if gorm.IsRecordNotFoundError(err) {
-		http.Error(w, "user not found", 404)
-		return
-	} else if err != nil {
-		panic(err)
 	}
 
 	role, _ := parseRole(r.FormValue("role"))
 	if role != Unknown {
-		if acct.ID == 1 {
+		if acct.ID == "admin" {
 			http.Error(w, "cannot change admin role", 403)
 			return
 		}
@@ -111,4 +116,64 @@ func (h Handler) updateAccount(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func (h Handler) listAccounts(acct Account) *gorm.DB {
+	tx := h.db.Preload("Class").Table("accounts").Order("role asc").Order("id asc")
+	switch acct.Role {
+	case Admin:
+		return tx
+
+	case Teacher:
+		return tx.Where("class_id = ?", acct.ClassID)
+
+	case Student:
+		return tx.Where("id = ?", acct.ID)
+
+	default:
+		return nil
+	}
+}
+
+func (h Handler) getAccount(id string) (acct Account, err error) {
+	err = h.db.First(&acct, "id = ?", id).Error
+	if gorm.IsRecordNotFoundError(err) {
+		err = AccountNotFound
+		return
+	} else if err != nil {
+		panic(err)
+	}
+	return
+}
+
+// 重設密碼
+func (h Handler) resetPassword(w http.ResponseWriter, r *http.Request) {
+	acct := r.Context().Value(KeyAccount).(Account)
+	account, err := h.getAccount(r.FormValue("account_id"))
+	if err == AccountNotFound {
+		account = acct
+	}
+
+	if !permission(acct, account) {
+		w.WriteHeader(403)
+		h.resetPage(w, addMessage(r, "您沒有權限變更 "+account.Name+" 的密碼"))
+		return
+	}
+
+	current := r.FormValue("current_password")
+	if bcrypt.CompareHashAndPassword(acct.Password, []byte(current)) != nil {
+		w.WriteHeader(403)
+		h.resetPage(w, addMessage(r, "密碼錯誤"))
+		return
+	}
+
+	account.Password = generatePassword(r.FormValue("new_password"))
+
+	if err := h.db.Save(&account).Error; err != nil {
+		w.WriteHeader(500)
+		h.resetPage(w, addMessage(r, err.Error()))
+		return
+	}
+
+	h.resetPage(w, addMessage(r, "已重設 "+account.Name+" 的密碼"))
 }

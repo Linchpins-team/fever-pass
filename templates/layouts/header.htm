@@ -1,17 +1,3 @@
 {{ define "header" }}
-
-<a href="/">首頁</a>
-{{ if .Login }}
-<a href="/admin/new">新增</a>
-<a href="/admin/list">列表</a>
-{{ if eq .Role 1 }}
-<a href="/admin/invite">邀請</a>
-<a href="/admin/accounts">帳號管理</a>
-{{ end }}
-{{ .Account.Name }}
-<a href="/logout">登出</a>
-{{ else }}
-<a href="/login">登入</a>
-{{ end }}
-
+<a href="/"><img src="/img/logo.png" alt="Fever Pass" id="logo"><span id="fever-pass">Fever Pass</span></a>
 {{ end }}

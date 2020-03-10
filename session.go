@@ -3,7 +3,10 @@ package main
 import (
 	"context"
 	"encoding/gob"
+	"errors"
+	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gorilla/securecookie"
@@ -11,8 +14,14 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var (
+	UserNotFound        = errors.New("找不到此帳號")
+	WrongPassword       = errors.New("密碼錯誤")
+	AccountAlreadyExist = errors.New("帳號已經存在")
+)
+
 type Session struct {
-	ID       uint32
+	ID       string
 	ExpireAt time.Time
 }
 
@@ -27,7 +36,7 @@ func (h Handler) auth(next http.HandlerFunc, role Role) http.HandlerFunc {
 		} else if acct, ok := r.Context().Value(KeyAccount).(Account); ok && acct.Role <= role {
 			next.ServeHTTP(w, r)
 		} else {
-			http.Error(w, "permission denied, require "+role.String(), 401)
+			h.errorPage(w, r, "權限不足", "您的權限不足，需要"+role.String()+"權限")
 		}
 	}
 }
@@ -35,31 +44,37 @@ func (h Handler) auth(next http.HandlerFunc, role Role) http.HandlerFunc {
 func (h Handler) identify(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		s := securecookie.New(hashKey, blockKey)
-		if cookie, err := r.Cookie("session"); err == nil {
-			var session Session
-			if err := s.Decode("session", cookie.Value, &session); err == nil {
-				if time.Now().After(session.ExpireAt) {
-					// session expire
-					logout(w, r)
-				} else {
-					var acct Account
-					if err = h.db.First(&acct, session.ID).Error; err != nil {
-						http.Error(w, "account not found", 401)
-						return
-					}
-					ctx := r.Context()
-					ctx = context.WithValue(ctx, KeyAccount, acct)
-					r = r.WithContext(ctx)
-				}
-			} else {
-				logout(w, r)
-			}
+		cookie, err := r.Cookie("session")
+		if err != nil {
+			next.ServeHTTP(w, r)
+			return
 		}
+		var session Session
+		if err = s.Decode("session", cookie.Value, &session); err != nil {
+			logout(w, r)
+			next.ServeHTTP(w, r)
+			return
+		}
+		if time.Now().After(session.ExpireAt) {
+			// session expire
+			logout(w, r)
+			next.ServeHTTP(w, r)
+			return
+		}
+		var acct Account
+		if err = h.db.Set("gorm:auto_preload", true).First(&acct, "id = ?", session.ID).Error; err != nil {
+			logout(w, r)
+			next.ServeHTTP(w, r)
+			return
+		}
+		ctx := r.Context()
+		ctx = context.WithValue(ctx, KeyAccount, acct)
+		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r)
 	})
 }
 
-func newSession(id uint32) *http.Cookie {
+func newSession(id string) *http.Cookie {
 	s := securecookie.New(hashKey, blockKey)
 	var encoded string
 	var err error
@@ -84,17 +99,17 @@ func expire() time.Time {
 
 func (h Handler) login(w http.ResponseWriter, r *http.Request) {
 	var acct Account
-	acct.Name = r.FormValue("username")
-	err := h.db.Where(acct).First(&acct).Error
+	fmt.Println("username:", r.FormValue("username"))
+	err := h.db.Where("id = ?", r.FormValue("username")).First(&acct).Error
 	if gorm.IsRecordNotFoundError(err) {
-		http.Error(w, "user not found", 404)
+		http.Error(w, UserNotFound.Error(), 404)
 		return
 	} else if err != nil {
 		panic(err)
 	}
 	password := r.FormValue("password")
 	if bcrypt.CompareHashAndPassword(acct.Password, []byte(password)) != nil {
-		http.Error(w, "wrong password", 401)
+		http.Error(w, WrongPassword.Error(), 403)
 		return
 	}
 	http.SetCookie(w, newSession(acct.ID))
@@ -105,47 +120,49 @@ func logout(w http.ResponseWriter, r *http.Request) {
 		cookie.MaxAge = -1
 		http.SetCookie(w, cookie)
 	}
-	http.Redirect(w, r, "/login", 303)
+	http.Redirect(w, r, "/", 303)
 }
 
 func (h Handler) register(w http.ResponseWriter, r *http.Request) {
-	var err error
-	var url URL
-	key := r.FormValue("key")
-	err = h.db.Where("id = ? and expire_at > ? and last > 0", key, time.Now()).First(&url).Error
-	if gorm.IsRecordNotFoundError(err) {
-		http.Error(w, "invalid key", 404)
-		return
-	} else if err != nil {
-		panic(err)
+	next := func(msg string) {
+		h.HTML(w, r, "register.htm", msg)
 	}
 
+	var err error
 	var acct Account
-	acct.Name = r.FormValue("username")
-	acct.Role = Editor
-	if err != nil {
-		http.Error(w, err.Error(), 415)
+	acct.ID = r.FormValue("account_id")
+	if err = h.db.First(&acct, "id = ?", acct.ID).Error; !gorm.IsRecordNotFoundError(err) {
+		next(AccountAlreadyExist.Error())
 		return
+	}
+	acct.Name = r.FormValue("name")
+	acct.Role, err = parseRole(r.FormValue("role"))
+	if err != nil {
+		next(fmt.Sprintf("身份 '%s' 無法被解析", r.FormValue("role")))
+		return
+	}
+
+	var class Class
+	if err = h.db.FirstOrCreate(&class, Class{Name: r.FormValue("class")}).Error; err != nil {
+		next("無法建立班級：" + err.Error())
+		return
+	}
+	acct.Class = class
+
+	if acct.Role == Student {
+		acct.Number, err = strconv.Atoi(r.FormValue("number"))
+		if err != nil {
+			next("座號不是數字")
+			return
+		}
 	}
 
 	acct.Password = generatePassword(r.FormValue("password"))
 
-	tx := h.db.Begin()
-	url.Last--
-	if err = tx.Save(&url).Error; err != nil {
-		tx.Rollback()
-		panic(err)
-	}
-
-	if err = tx.Create(&acct).Error; err != nil {
-		tx.Rollback()
-		http.Error(w, "cannot register user "+err.Error(), 500)
+	if err = h.db.Create(&acct).Error; err != nil {
+		next("無法註冊使用者：" + err.Error())
 		return
 	}
 
-	if err = tx.Commit().Error; err != nil {
-		panic(err)
-	}
-
-	http.SetCookie(w, newSession(acct.ID))
+	next("成功註冊" + acct.Name)
 }

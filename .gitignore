@@ -6,3 +6,4 @@ cmd
 fever-pass
 static/qrcodes
 *.toml
+*.sqlite

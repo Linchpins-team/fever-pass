@@ -1,30 +1,30 @@
-let form = document.getElementById("form")
+let form = document.getElementById("home-form")
 form.onsubmit = ev => {
     login(form)
     ev.preventDefault()
 }
 
-function login(form) {
-    fetch("/api/login", {
+async function login(form) {
+    let response = await fetch("/api/login", {
         method: "POST",
         body: new FormData(form),
     })
-    .then(response => {
-        switch (response.status) {
-            case 200:
-                window.location = "/admin/new"
-                break
-            
-            case 401:
-                throw new Error("wrong password")
-                break
+    switch (response.status) {
+        case 200:
+            window.location = "/"
+            break
+        
+        case 404:
+            form.reset()
+            errorMessage(await response.text())
+            break
 
-            case 404:
-                throw new Error("user not found")
-                break
-        }
-    })
-    .catch(err => {
-        alert(err)
-    })
+        case 403:
+            errorMessage(await response.text())
+            break
+    }
 }
+
+function errorMessage(msg) {
+    document.getElementById("msg").innerHTML = msg
+} 

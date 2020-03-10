@@ -9,7 +9,6 @@ import (
 	"os"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/stretchr/testify/assert"
@@ -22,21 +21,40 @@ var (
 		Name:     "admin",
 		Password: []byte{},
 	}
-	mockData = []Record{
+	mockAccounts = []Account{
+		Account{
+			Name: "小明",
+			Class: Class{
+				Name: "103",
+			},
+			Role: Student,
+		},
+		Account{
+			Name: "小美",
+			Class: Class{
+				Name: "103",
+			},
+			Role: Student,
+		},
+		Account{
+			Name: "陳老師",
+			Class: Class{
+				Name: "103",
+			},
+		},
+	}
+	mockRecords = []Record{
 		Record{
-			UserID: "109123456",
-			Fever:  true,
-			Time:   time.Now().Add(-10 * time.Minute),
+			AccountID:   "1",
+			Temperature: 36.8,
 		},
 		Record{
-			UserID: "108234567",
-			Fever:  false,
-			Time:   time.Now().Add(-5 * time.Minute),
+			AccountID:   "2",
+			Temperature: 37.9,
 		},
 		Record{
-			UserID: "108114256",
-			Fever:  true,
-			Time:   today().Add(-1 * time.Hour),
+			AccountID:   "3",
+			Temperature: 38.1,
 		},
 	}
 	testH Handler
@@ -64,7 +82,7 @@ func insertMockData(db *gorm.DB) {
 	if err != nil {
 		panic(err)
 	}
-	for _, record := range mockData {
+	for _, record := range mockRecords {
 		record.RecordedBy = admin
 		err := db.Create(&record).Error
 		if err != nil {
@@ -75,22 +93,24 @@ func insertMockData(db *gorm.DB) {
 
 func TestNewRecord(t *testing.T) {
 	record := Record{
-		UserID: "108222333",
-		Fever:  true,
+		AccountID:   "2",
+		Temperature: 37.2,
 	}
 
-	body := fmt.Sprintf("user_id=%s&pass=%t", record.UserID, record.Fever)
+	body := fmt.Sprintf("account_id=%s&temperature=%f&type=%d", record.AccountID, record.Temperature, Forehead)
 	rr := testHandler("POST", "/api/records", body)
 	if rr.Code != 200 {
 		t.Errorf("status code is not 200, got %d\n%s\n", rr.Code, rr.Body.String())
 	}
+	err := json.Unmarshal(rr.Body.Bytes(), &record)
+	assert.Equal(t, nil, err)
 
 	var r Record
-	err := testH.db.Where("user_id = ?", record.UserID).First(&r).Error
+	err = testH.db.Where("id = ?", record.ID).First(&r).Error
 	if err != nil {
 		t.Error(err)
 	}
-	assert.Equal(t, record.Fever, r.Fever)
+	assert.Equal(t, record.Temperature, r.Temperature)
 }
 
 func adminSession(r *http.Request) *http.Request {
@@ -119,45 +139,8 @@ func testHandler(method, url, body string) *httptest.ResponseRecorder {
 	return rr
 }
 
-func TestFindRecord(t *testing.T) {
-	url := fmt.Sprintf("/api/check?user_id=%s", mockData[0].UserID)
-	rr := testHandler("GET", url, "")
-	if rr.Code != 200 {
-		t.Errorf("status code is not 200, got %d\n%s\n", rr.Code, rr.Body.String())
-	}
-	t.Log(rr.Body.String())
-
-	url = fmt.Sprintf("/api/check?user_id=%s", mockData[1].UserID)
-	rr = testHandler("GET", url, "")
-	if rr.Code != 200 {
-		t.Errorf("status code is not 200, got %d\n%s\n", rr.Code, rr.Body.String())
-	}
-	t.Log(rr.Body.String())
-}
-
-func TestListRecord(t *testing.T) {
-	rr := testHandler("GET", "/api/records", "")
-	if rr.Code != 200 {
-		t.Errorf("status code is not 200, got %d\n%s\n", rr.Code, rr.Body.String())
-	}
-
-	var records []Record
-	dec := json.NewDecoder(rr.Body)
-	if err := dec.Decode(&records); err != nil {
-		t.Error(err)
-	}
-
-	for _, record := range records {
-		switch record.ID {
-		case mockData[2].ID:
-			t.Error("expired record should not exist")
-		}
-	}
-	t.Log(records)
-}
-
 func TestDeleteRecord(t *testing.T) {
-	id := mockData[0].ID
+	id := mockRecords[0].ID
 	url := fmt.Sprintf("/api/records/%d", id)
 	rr := testHandler("DELETE", url, "")
 	if rr.Code != 200 {

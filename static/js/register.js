@@ -12,7 +12,7 @@ function register(form) {
     .then(response => {
         switch (response.status) {
             case 200:
-                window.location = "/admin/new"
+                window.location = "/new"
                 break
             
             case 401:

@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/gorilla/mux"
 	"github.com/russross/blackfriday"
-	"io/ioutil"
 	"html/template"
+	"io/ioutil"
 
 	"net/http"
 )
