@@ -9,7 +9,7 @@
   {{ if le .Role 2 }}
   <a href="/stats">統計資料</a>
   {{ end }}
-  <a>{{ .Role }}：{{ .Account.Name }}</a>
+  <a href="/list?account_id={{ .Account.ID }}">{{ .Role }}：{{ .Account.Name }}</a>
   <a href="/logout">登出</a>
   {{ end }}
 

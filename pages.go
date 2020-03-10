@@ -122,6 +122,13 @@ func (h Handler) stats(w http.ResponseWriter, r *http.Request) {
 	tx := h.listAccounts(acct)
 	class := r.FormValue("class")
 	if class != "" {
+		err := h.db.First(&Class{}, "name = ?", class).Error
+		if gorm.IsRecordNotFoundError(err) {
+			h.errorPage(w, r, 200, "找不到此班級", "找不到班級："+class)
+			return
+		} else if err != nil {
+			panic(err)
+		}
 		tx = tx.Joins("JOIN classes ON class_id = classes.id").Where("classes.name = ?", class)
 	}
 	if acct.Role == Teacher {
