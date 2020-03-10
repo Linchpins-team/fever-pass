@@ -1,6 +1,6 @@
 :root {
     --main: #1b8;
-    --secondary: #196;
+    --secondary: #195;
 }
 
 body {
@@ -21,10 +21,10 @@ img {
 }
 
 #logo {
-    background: var(--main);
+    position: relative;
     height: 54px;
     width: 54px;
-    top: 0;
+    right: 10px;
     border: none;
 }
 
@@ -33,15 +33,19 @@ button a {
 }
 
 input {
-    padding: 4px;
-    margin: 8px;
-    width: 80px;
-    height: 24px;
-    font-size: 16px;
+    padding: 2px;
+    margin: 8px 16px;
+    height: 20px;
+    font-size: 14px;
 }
 
 input[type="submit"] {
-    height: auto;
+    height: 36px;
+    width: 64px;
+}
+
+#home-form input {
+    width: 72px;
 }
 
 select {
@@ -49,7 +53,7 @@ select {
     -moz-text-align-last: center;
     -ms-text-align-last: center;
     height: 36px;
-    width: 68px;
+    width: 72px;
 }
 
 button:hover, input[type="submit"]:hover {
@@ -134,6 +138,15 @@ main {
     margin: calc(50vh - 210px) auto 0;
 }
 
+a[href="/"] {
+    height: 54px;
+    width: 176px;
+}
+
+a[href="/"]:hover {
+    background: var(--secondary);
+}
+
 a[href="/import"] {
     margin: 8px;
 }
@@ -142,19 +155,27 @@ input:focus {
     background-color: #efe;
 }
 
+input[type="number"] {
+    width: 48px;
+}
+
 input[type="date"] {
     font-size: 14px;
     width: 120px;
 }
 
-input[name="account_id"] {
-    margin: 6px;
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
 }
 
 #fever-pass {
     position: relative;
     font-size: 18px;
-    left: 10px;
     bottom: 21px;
 }
 
@@ -168,6 +189,7 @@ table {
 }
 
 th {
+    color: #fafafa;
     background: var(--main);
 }
 
@@ -176,12 +198,12 @@ tr {
 }
 
 h1 {
-    font-size: 48px;
+    font-size: 44px;
     margin: 0;
 }
 
 h2 {
-    font-size: 32px;
+    font-size: 28px;
     margin-bottom: 18px;
 }
 
@@ -196,6 +218,7 @@ nav a {
     height: 24px;
     padding: 15px 20px;
     line-height: 24px;
+    margin: 0 -2px;
 }
 
 #home-form {
@@ -218,7 +241,7 @@ nav a {
     display: none;
 }
 
-@media(max-width:1080px) {
+@media(max-width:1100px) {
     nav a {
         padding: 15px 10px;
     }

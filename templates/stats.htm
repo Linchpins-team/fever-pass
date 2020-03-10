@@ -6,7 +6,8 @@
 <h1>{{ template "title" .Data }}</h1>
 {{ if eq .Role 1 }}
 <form action="/stats" method="get">
-    班級 <input type="text" name="class" id="">
+    <label for="class">班級</label>
+    <input type="text" name="class" id="">
     <input type="submit" value="查詢">
 </form>
 {{ end }}
@@ -15,18 +16,14 @@
 <table>
     <tr>
         <th>總人數</th>
-        <td>{{ len .All }}</td>
-    </tr>
-    <tr>
         <th>已記錄人數</th>
-        <td>{{ sub (len .All) (len .Unrecorded) }}</td>
-    </tr>
-    <tr>
         <th>未記錄人數</th>
-        <td>{{ len .Unrecorded }}</td>
+        <th>發燒人數</th>
     </tr>
     <tr>
-        <th>發燒人數</th>
+        <td>{{ len .All }}</td>
+        <td>{{ sub (len .All) (len .Unrecorded) }}</td>
+        <td>{{ len .Unrecorded }}</td>
         <td>{{ len .Fever }}</td>
     </tr>
 </table>
