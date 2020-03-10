@@ -19,6 +19,12 @@ var (
 	hashKey, blockKey []byte
 )
 
+var (
+	ConfPath    string
+	Init        bool
+	UseTestData bool
+)
+
 func init() {
 	godotenv.Load()
 	file, err := os.OpenFile(".env", os.O_WRONLY|os.O_CREATE, 0644)
@@ -28,6 +34,11 @@ func init() {
 	defer file.Close()
 	hashKey = loadKey("HASH_KEY", file)
 	blockKey = loadKey("BLOCK_KEY", file)
+
+	flag.BoolVar(&Init, "init", false, "init configuration")
+	flag.StringVar(&ConfPath, "conf", "config.toml", "configuration file path")
+	flag.BoolVar(&UseTestData, "t", false, "use -t to import test data")
+	flag.Parse()
 }
 
 func loadKey(name string, w io.Writer) (key []byte) {
@@ -53,18 +64,12 @@ func decodeKey(key string) []byte {
 }
 
 func main() {
-	var init bool
-	var confPath string
-	flag.BoolVar(&init, "init", false, "init configuration")
-	flag.StringVar(&confPath, "conf", "config.toml", "configuration file path")
-	flag.Parse()
-
-	if init {
-		setupConfig(confPath)
+	if Init {
+		setupConfig()
 		return
 	}
 
-	c := loadConfig(confPath)
+	c := loadConfig()
 	db, err := initDB(c)
 	if err != nil {
 		panic(err)
