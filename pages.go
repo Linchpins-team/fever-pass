@@ -116,53 +116,6 @@ func (h Handler) listAccountsPage(w http.ResponseWriter, r *http.Request) {
 	h.HTML(w, r, "account_list.htm", accounts)
 }
 
-// 今日總覽頁面
-func (h Handler) stats(w http.ResponseWriter, r *http.Request) {
-	acct := r.Context().Value(KeyAccount).(Account)
-	tx := h.listAccounts(acct)
-	class := r.FormValue("class")
-	if class != "" {
-		err := h.db.First(&Class{}, "name = ?", class).Error
-		if gorm.IsRecordNotFoundError(err) {
-			h.errorPage(w, r, 200, "找不到此班級", "找不到班級："+class)
-			return
-		} else if err != nil {
-			panic(err)
-		}
-		tx = tx.Joins("JOIN classes ON class_id = classes.id").Where("classes.name = ?", class)
-	}
-	if acct.Role == Teacher {
-		class = acct.Class.Name
-	}
-	tx = tx.Where("role = ?", Student)
-
-	var accounts []Account
-	err := tx.Find(&accounts).Error
-	if err != nil {
-		panic(err)
-	}
-
-	page := struct {
-		Class                  string
-		All, Unrecorded, Fever []Account
-	}{
-		Class: class,
-		All:   accounts,
-	}
-	for _, account := range accounts {
-		record, err := h.lastRecord(account)
-		if err == RecordNotFound {
-			page.Unrecorded = append(page.Unrecorded, account)
-			continue
-		}
-
-		if record.Fever() {
-			page.Fever = append(page.Fever, account)
-		}
-	}
-	h.HTML(w, r, "stats.htm", page)
-}
-
 func (h Handler) resetPage(w http.ResponseWriter, r *http.Request) {
 	acct := r.Context().Value(KeyAccount).(Account)
 	account, err := h.getAccount(r.FormValue("account_id"))

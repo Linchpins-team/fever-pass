@@ -3,6 +3,7 @@
 {{ end }}
 
 {{ define "content-with-session" }}
+<script src="/js/load_account_list.js"></script>
 <h1>{{ template "title" .Data }}</h1>
 {{ if eq .Role 1 }}
 <form action="/stats" method="get">
@@ -20,17 +21,18 @@
         <th>未記錄人數</th>
         <th>發燒人數</th>
     </tr>
-    <tr>
-        <td>{{ len .All }}</td>
-        <td>{{ sub (len .All) (len .Unrecorded) }}</td>
-        <td>{{ len .Unrecorded }}</td>
-        <td>{{ len .Fever }}</td>
-    </tr>
 </table>
-<h2>發燒列表</h2>
-{{ template "account_list" .Fever }}
-<h2>未記錄列表</h2>
-{{ template "account_list" .Unrecorded }}
+
+<select name="list_type" id="select_type" onchange="loadAccountList(this)">
+    <option value="2" selected>未紀錄</option>
+    <option value="1">已紀錄</option> 
+    <option value="3">發燒</option>
+</select>
+<div id="list"></div>
+<script>
+    let select = document.getElementById("select_type")
+    loadAccountList(select)
+</script>
 {{ end }}
 
 {{ end }}

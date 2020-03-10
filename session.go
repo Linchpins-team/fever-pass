@@ -36,7 +36,7 @@ func (h Handler) auth(next http.HandlerFunc, role Role) http.HandlerFunc {
 		} else if acct, ok := r.Context().Value(KeyAccount).(Account); ok && acct.Role <= role {
 			next.ServeHTTP(w, r)
 		} else {
-			h.errorPage(w, r, 401, "權限不足", "您的權限不足，需要"+role.String()+"權限")
+			h.errorPage(w, r, "權限不足", "您的權限不足，需要"+role.String()+"權限")
 		}
 	}
 }
@@ -44,27 +44,32 @@ func (h Handler) auth(next http.HandlerFunc, role Role) http.HandlerFunc {
 func (h Handler) identify(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		s := securecookie.New(hashKey, blockKey)
-		if cookie, err := r.Cookie("session"); err == nil {
-			var session Session
-			if err := s.Decode("session", cookie.Value, &session); err == nil {
-				if time.Now().After(session.ExpireAt) {
-					// session expire
-					logout(w, r)
-				} else {
-					var acct Account
-					if err = h.db.Set("gorm:auto_preload", true).First(&acct, "id = ?", session.ID).Error; err != nil {
-						logout(w, r)
-						http.Error(w, "account not found", 401)
-						return
-					}
-					ctx := r.Context()
-					ctx = context.WithValue(ctx, KeyAccount, acct)
-					r = r.WithContext(ctx)
-				}
-			} else {
-				logout(w, r)
-			}
+		cookie, err := r.Cookie("session")
+		if err != nil {
+			next.ServeHTTP(w, r)
+			return
 		}
+		var session Session
+		if err = s.Decode("session", cookie.Value, &session); err != nil {
+			logout(w, r)
+			next.ServeHTTP(w, r)
+			return
+		}
+		if time.Now().After(session.ExpireAt) {
+			// session expire
+			logout(w, r)
+			next.ServeHTTP(w, r)
+			return
+		}
+		var acct Account
+		if err = h.db.Set("gorm:auto_preload", true).First(&acct, "id = ?", session.ID).Error; err != nil {
+			logout(w, r)
+			next.ServeHTTP(w, r)
+			return
+		}
+		ctx := r.Context()
+		ctx = context.WithValue(ctx, KeyAccount, acct)
+		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r)
 	})
 }

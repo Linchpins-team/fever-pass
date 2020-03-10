@@ -47,5 +47,7 @@ func setupDB(c Config, db *gorm.DB) {
 	if err != nil {
 		panic(err)
 	}
-	// importTestData(db)
+	if UseTestData {
+		importTestData(db)
+	}
 }

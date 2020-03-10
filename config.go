@@ -42,7 +42,7 @@ func parseYN(str string) bool {
 	}
 }
 
-func setupConfig(path string) {
+func setupConfig() {
 	var ok string
 	fmt.Print("Do you want to create a new setting? (y/n) ")
 	fmt.Scanln(&ok)
@@ -50,7 +50,7 @@ func setupConfig(path string) {
 	if parseYN(ok) {
 		c = generateConfig()
 	} else {
-		c = loadConfig(path)
+		c = loadConfig()
 	}
 
 	fmt.Print("admin password: ")
@@ -62,7 +62,7 @@ func setupConfig(path string) {
 	}
 	setupDB(c, db)
 	if parseYN(ok) {
-		writeConfig(c, path)
+		writeConfig(c, ConfPath)
 	}
 }
 
@@ -130,8 +130,8 @@ func writeConfig(c Config, path string) {
 	fmt.Println("Configurations has been generated at config.toml")
 }
 
-func loadConfig(path string) (c Config) {
-	if _, err := toml.DecodeFile(path, &c); err != nil {
+func loadConfig() (c Config) {
+	if _, err := toml.DecodeFile(ConfPath, &c); err != nil {
 		log.Fatalln("No configuration file")
 	}
 	return
@@ -141,7 +141,7 @@ func createMySQLDatabase(c Config) {
 	cmd := exec.Command("/bin/sh", "-c", "sudo mysql")
 	cmd.Stdin = strings.NewReader(fmt.Sprintf(`
 	CREATE DATABASE IF NOT EXISTS %s ;
-	DELETE FROM mysql.user WHERE User = '%s';
+	DROP USER %s;
 	CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'; 
 	GRANT ALL PRIVILEGES ON %s . * TO '%s'@'localhost'; 
 	FLUSH PRIVILEGES;

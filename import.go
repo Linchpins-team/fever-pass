@@ -12,6 +12,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// Handle the upload file request
 func (h Handler) importHandler(w http.ResponseWriter, r *http.Request) {
 	file, header, err := r.FormFile("file")
 	if err != nil {
@@ -42,7 +43,7 @@ func (h Handler) importHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func importTestData(db *gorm.DB) {
-	file, err := os.Open("testdata/teachers.csv")
+	file, err := os.Open("testdata/test-teachers.csv")
 	if err != nil {
 		panic(err)
 	}
@@ -50,7 +51,7 @@ func importTestData(db *gorm.DB) {
 	if err != nil {
 		panic(err)
 	}
-	file, err = os.Open("testdata/students.csv")
+	file, err = os.Open("testdata/test-students.csv")
 	if err != nil {
 		panic(err)
 	}
