@@ -102,7 +102,11 @@ func createAccount(db *gorm.DB, columns map[string]string, role Role) (added boo
 	}
 
 	var class Class
-	if err := db.FirstOrCreate(&class, Class{Name: columns["class"]}).Error; err != nil {
+	className := columns["class"]
+	if className == "" {
+		className = "T"
+	}
+	if err := db.FirstOrCreate(&class, Class{Name: className}).Error; err != nil {
 		return false, err
 	}
 	acct.Class = class

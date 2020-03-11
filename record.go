@@ -71,9 +71,7 @@ func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 	var account Account
 
 	acct := r.Context().Value(KeyAccount).(Account)
-	err = h.db.Joins(
-		"JOIN classes ON class_id = classes.id",
-	).Where(
+	err = joinClasses(h.db).Where(
 		"classes.name = ? and number = ?", r.FormValue("class"), r.FormValue("number"),
 	).First(&account).Error
 	if gorm.IsRecordNotFoundError(err) {

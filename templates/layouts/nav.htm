@@ -5,8 +5,8 @@
   <a href="/new">新增體溫記錄</a>
   {{ end }}
   <a href="/list">體溫歷史記錄</a>
-  <a href="/accounts">帳號管理</a>
   {{ if le .Role 2 }}
+  <a href="/accounts">帳號管理</a>
   <a href="/stats">統計資料</a>
   {{ end }}
   <a href="/reset">重設密碼</a>

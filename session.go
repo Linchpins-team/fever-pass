@@ -143,7 +143,11 @@ func (h Handler) register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var class Class
-	if err = h.db.FirstOrCreate(&class, Class{Name: r.FormValue("class")}).Error; err != nil {
+	className := r.FormValue("class")
+	if className == "" {
+		className = "T"
+	}
+	if err = h.db.FirstOrCreate(&class, Class{Name: className}).Error; err != nil {
 		next("無法建立班級：" + err.Error())
 		return
 	}

@@ -23,7 +23,7 @@ func (h Handler) findStudents(acct Account, class string) (accounts []Account, e
 		if err != nil {
 			return
 		}
-		tx = tx.Joins("JOIN classes ON class_id = classes.id").Where("classes.name = ?", class)
+		tx = joinClasses(tx).Where("classes.name = ?", class)
 	}
 	if acct.Role == Teacher {
 		class = acct.Class.Name

@@ -235,19 +235,7 @@ nav a {
     display: none;
 }
 
-@media(max-width:1210px) {
-    nav a {
-        padding: 15px 10px;
-    }
-    header {
-        left: 0;
-    }
-    table {
-        width: 100%;
-    }
-}
-
-@media(max-width:860px) {
+@media(max-width:1100px) {
     nav {
         position: fixed;
         top: 54px;
@@ -286,6 +274,9 @@ nav a {
     }
     td button {
         font-size: 9px;
+    }
+    table {
+        width: 100%;
     }
 }
 

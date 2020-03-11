@@ -118,8 +118,12 @@ func (h Handler) updateAccount(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func joinClasses(tx *gorm.DB) *gorm.DB {
+	return tx.Table("accounts").Joins("JOIN classes ON class_id = classes.id")
+}
+
 func (h Handler) listAccounts(acct Account) *gorm.DB {
-	tx := h.db.Preload("Class").Table("accounts").Order("role asc").Order("id asc")
+	tx := joinClasses(h.db).Preload("Class").Order("role asc").Order("classes.name, number asc")
 	switch acct.Role {
 	case Admin:
 		return tx

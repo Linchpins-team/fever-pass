@@ -38,6 +38,16 @@ func setupDB(c Config, db *gorm.DB) {
 	admin.ID = "admin"
 	admin.Name = "admin"
 	admin.Role = Admin
+
+	class := Class{
+		Name: "T",
+	}
+	err = db.FirstOrCreate(&class, class).Error
+	if err != nil {
+		panic(err)
+	}
+	admin.Class = class
+
 	password := c.Password
 	admin.Password, err = bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
