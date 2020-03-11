@@ -44,10 +44,6 @@ input[type="submit"] {
     width: 64px;
 }
 
-#home-form input {
-    width: 72px;
-}
-
 select {
     text-align-last: center;
     -moz-text-align-last: center;
@@ -153,8 +149,8 @@ input:focus {
     background-color: #efe;
 }
 
-input[type="number"] {
-    width: 48px;
+input[type="number"], input[type="text"], input[type="password"] {
+    width: 72px;
 }
 
 input[type="date"] {
@@ -267,7 +263,7 @@ nav a {
     nav a {
         display: block;
         width: 100vw;
-        box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.2);
+        box-shadow: 0 6px 12px 0 rgba(253, 209, 209, 0.2);
         padding: 12px;
         transition: 0.5s ease-in-out;
         -webkit-transition: 0.5s ease-in-out;

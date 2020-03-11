@@ -12,8 +12,9 @@
         <nav id="nav">
             {{ template "nav" .}}
         </nav>
-
+        {{ if .Login }}
         <div id="menu" onclick="nav()">≡</div>
+        {{ end }}
     </header>
     <main>
         <div id="header-filler"></div>

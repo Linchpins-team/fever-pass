@@ -1,8 +1,8 @@
-{{ define "title" }}帳號資訊{{ end }}
+{{ define "title" }}帳號管理{{ end }}
 {{ define "content-with-session" }}
 <script src="/js/delete.js"></script>
 <script src="/js/update.js"></script>
-<h1>帳號資訊</h1>
+<h1>帳號管理</h1>
 {{ $acct := .Account }}
 {{ if eq $acct.Role 1 }}
 <a href="/register">新增使用者</a>

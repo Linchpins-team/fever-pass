@@ -8,7 +8,8 @@
 
 <form action="/list" method="get">
     {{ if lt .Role 3 }}
-    帳號 <input type="text" name="account_id">
+    <label>帳號</label>
+    <input type="text" name="account_id">
     {{ end }}
     日期 <input type="date" name="date">
     <input type="submit" value="查詢">
@@ -18,10 +19,10 @@
 <p>第 {{ .Page }} 頁</p>
 
 {{ if gt .Page 1 }}
-    <a href="/list?page={{ add .Page -1 }}">上一頁</a>
+<a href="/list?page={{ add .Page -1 }}">上一頁</a>
 {{ end }}
 {{ if eq 20 (len .Records) }}
-    <a href="/list?page={{ add .Page 1}}">下一頁</a>
+<a href="/list?page={{ add .Page 1}}">下一頁</a>
 {{ end }}
 
 {{ template "list" .Records }}

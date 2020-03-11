@@ -1,8 +1,8 @@
 {{ define "title" }}
-<div class="middle">
-重設{{ .Name }}密碼
+重設{{ .Name }}的密碼
 {{ end }}
 {{ define "content" }}
+<div class="middle">
 <h1>{{ template "title" . }}</h1>
 <form action="/reset" method="POST">
     <input type="hidden" name="account_id" value="{{ .ID }}">
