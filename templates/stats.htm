@@ -22,16 +22,16 @@
         <th>發燒人數</th>
     </tr>
     <tr>
-        <td>{{ .All }}</td>
-        <td>{{ sub .All .Unrecorded }}</td>
+        <td>{{ add .Recorded .Unrecorded }}</td>
+        <td>{{ .Recorded }}</td>
         <td>{{ .Unrecorded }}</td>
-        <td>{{ .Fever }}</td>
+        <td>{{ .Fevered }}</td>
     </tr>
 </table>
 <select name="list_type" id="select_type" onchange="loadAccountList(this, '{{ .Class }}')">
-    <option value="2" selected>未記錄</option>
+    <option value="2">未記錄</option>
     <option value="1">已記錄</option> 
-    <option value="3">發燒</option>
+    <option value="3" selected>發燒</option>
 </select>
 <div id="list"></div>
 <script>
