@@ -73,7 +73,7 @@ func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 	acct := r.Context().Value(KeyAccount).(Account)
 	err = joinClasses(h.db).Where(
 		"classes.name = ? and number = ?", r.FormValue("class"), r.FormValue("number"),
-	).First(&account).Error
+	).Set("gorm:auto_preload", true).First(&account).Error
 	if gorm.IsRecordNotFoundError(err) {
 		http.Error(w, "account not found", 404)
 		return
