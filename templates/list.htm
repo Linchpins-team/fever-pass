@@ -9,9 +9,10 @@
 <form action="/list" method="get">
     {{ if lt .Role 3 }}
     <label>帳號</label>
-    <input type="text" name="account_id">
+    <input type="text" name="account_id"><br class="mobile-br">
     {{ end }}
-    日期 <input type="date" name="date">
+    <label>日期</label>
+    <input type="date" name="date">
     <input type="submit" value="查詢">
 </form>
 
