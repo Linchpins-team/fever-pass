@@ -61,22 +61,20 @@ func importTestData(db *gorm.DB) {
 func importAccounts(db *gorm.DB, r io.Reader, role Role) (n int, err error) {
 	reader := csv.NewReader(r)
 	index, _ := reader.Read() // ignore column name
-	tx := db.Begin()
 	for {
 		row, err := reader.Read()
 		if err == io.EOF {
 			break
 		}
-		added, err := createAccount(tx, parseColumns(index, row), role)
+		added, err := createAccount(db, parseColumns(index, row), role)
 		if err != nil {
-			tx.Rollback()
 			return n, err
 		}
 		if added {
 			n++
 		}
 	}
-	return n, tx.Commit().Error
+	return n, nil
 }
 
 func parseColumns(index, row []string) (columns map[string]string) {
