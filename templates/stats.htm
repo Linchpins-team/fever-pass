@@ -46,17 +46,17 @@
 <table>
     <tr>
         <th>帳號</th>
-        <th>姓名</th>
         <th>班級</th>
         <th>座號</th>
+        <th>姓名</th>
         <th>身份</th>
     </tr>
     {{ range . }}
     <tr>
         <td>{{ .ID }}</td>
-        <td><a href="/list?account_id={{ .ID }}">{{ .Name }}</a></td>
         <td>{{ .Class }}</td>
         <td>{{ .Number }}</td>
+        <td><a href="/list?account_id={{ .ID }}">{{ .Name }}</a></td>
         <td>{{ .Role }}</td>
     </tr>
     {{ end }}

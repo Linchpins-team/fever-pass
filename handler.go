@@ -47,6 +47,7 @@ func (h *Handler) newRouter() {
 
 	r.HandleFunc("/api/accounts/{id}", h.auth(h.deleteAccount, Admin)).Methods("DELETE")
 	r.HandleFunc("/api/accounts/{id}", h.auth(h.updateAccount, Admin)).Methods("PUT")
+	r.HandleFunc("/api/accounts", h.auth(h.findAccountByClassAndNumber, Teacher)).Methods("GET")
 	r.HandleFunc("/api/stats", h.auth(h.statsList, Teacher))
 
 	r.HandleFunc("/api/login", h.login)

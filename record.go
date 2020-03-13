@@ -69,18 +69,13 @@ func (r Record) Fever() bool {
 func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 	var err error
 	var account Account
-
-	acct := r.Context().Value(KeyAccount).(Account)
-	err = joinClasses(h.db).Where(
-		"classes.name = ? and number = ?", r.FormValue("class"), r.FormValue("number"),
-	).Set("gorm:auto_preload", true).First(&account).Error
+	err = h.db.Preload("Class").First(&account, "id = ?", r.FormValue("account_id")).Error
 	if gorm.IsRecordNotFoundError(err) {
-		http.Error(w, "account not found", 404)
+		http.Error(w, AccountNotFound.Error(), 404)
 		return
-	} else if err != nil {
-		panic(err)
 	}
 
+	acct := r.Context().Value(KeyAccount).(Account)
 	if !permission(acct, account) {
 		http.Error(w, "permission denied", 403)
 		return

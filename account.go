@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	AccountNotFound = errors.New("account not found")
+	AccountNotFound = errors.New("找不到此帳號")
 )
 
 type Role uint32
@@ -180,4 +180,29 @@ func (h Handler) resetPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.resetPage(w, addMessage(r, "已重設 "+account.Name+" 的密碼"))
+}
+
+func (h Handler) findAccountByClassAndNumber(w http.ResponseWriter, r *http.Request) {
+	var err error
+	acct := r.Context().Value(KeyAccount).(Account)
+
+	var account Account
+	err = joinClasses(h.db).Where(
+		"classes.name = ? and number = ?", r.FormValue("class"), r.FormValue("number"),
+	).Set("gorm:auto_preload", true).First(&account).Error
+	if gorm.IsRecordNotFoundError(err) {
+		http.Error(w, AccountNotFound.Error(), 404)
+		return
+	} else if err != nil {
+		panic(err)
+	}
+
+	if !permission(acct, account) {
+		http.Error(w, PermissionDenied.Error(), 403)
+		return
+	}
+
+	if _, err = fmt.Fprint(w, account.ID); err != nil {
+		panic(err)
+	}
 }
