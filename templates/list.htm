@@ -4,12 +4,16 @@
 體溫歷史記錄
 {{ end }}
 {{ define "content-with-session" }}
+<script src="/js/get_account.js"></script>
+<script src="/js/list.js" defer></script>
 <h1>{{ template "title" .Data }}</h1>
 
-<form action="/list" method="get">
+<form action="/list" method="get" id="form">
     {{ if lt .Role 3 }}
-    <label>帳號</label>
-    <input type="text" name="account_id"><br class="mobile-br">
+    <label>班級</label>
+    <input type="text" name="class"><br class="mobile-br">
+    <label>座號</label>
+    <input type="number" name="number"><br class="mobile-br">
     {{ end }}
     <label>日期</label>
     <input type="date" name="date">
