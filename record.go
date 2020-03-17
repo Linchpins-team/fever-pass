@@ -76,7 +76,7 @@ func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 	}
 
 	acct := r.Context().Value(KeyAccount).(Account)
-	if !permission(acct, account) {
+	if !recordPermission(acct, account) {
 		http.Error(w, "permission denied", 403)
 		return
 	}
@@ -108,35 +108,20 @@ func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// permission return whether A can modify B
-func permission(a, b Account) bool {
-	switch a.Role {
-	case Admin:
-		return true
-
-	case Teacher:
-		return a.ClassID == b.ClassID
-
-	case Student:
-		return a.ID == b.ID
-	}
-	return false
-}
-
 func (h Handler) listRecord(acct Account) (tx *gorm.DB) {
 	tx = h.db.Order("id desc").Set("gorm:auto_preload", true)
-	switch acct.Role {
-	case Admin:
+	switch acct.RecordAuthority {
+	case All:
 		return tx
 
-	case Teacher:
+	case Group:
 		return tx.Joins(
 			"JOIN accounts on records.account_id = accounts.id",
 		).Where(
 			"accounts.class_id = ?", acct.ClassID,
 		)
 
-	case Student:
+	case Self:
 		return tx.Where("account_id = ?", acct.ID)
 	}
 
@@ -159,7 +144,7 @@ func (h Handler) deleteRecord(w http.ResponseWriter, r *http.Request) {
 	}
 
 	acct := r.Context().Value(KeyAccount).(Account)
-	if !permission(acct, record.Account) {
+	if !recordPermission(acct, record.Account) {
 		http.Error(w, PermissionDenied.Error(), 403)
 		return
 	}

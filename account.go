@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -15,31 +14,6 @@ import (
 var (
 	AccountNotFound = errors.New("找不到此帳號")
 )
-
-type Role uint32
-
-const (
-	Unknown Role = iota
-	Admin
-	Teacher
-	Student
-)
-
-func (r Role) String() string {
-	switch r {
-	case Admin:
-		return "管理員"
-
-	case Teacher:
-		return "登記者"
-
-	case Student:
-		return "學生"
-
-	default:
-		return "未知"
-	}
-}
 
 type Account struct {
 	ID       string `gorm:"primary_key;type:varchar(32)"`
@@ -54,18 +28,37 @@ type Account struct {
 	DeletedAt *time.Time
 
 	Role Role
+
+	RecordAuthority  Authority
+	AccountAuthority Authority
 }
 
 func (a Account) String() string {
 	return a.Name
 }
 
-func parseRole(str string) (Role, error) {
-	role, err := strconv.Atoi(str)
-	if err != nil || role < 0 || role > 3 {
-		return Unknown, fmt.Errorf("Cannot parse '%s' as role", str)
+func (a Account) permission(tempAuthority, acctAuthority Authority) bool {
+	return a.AccountAuthority >= acctAuthority && a.RecordAuthority >= tempAuthority
+}
+
+func (a *Account) defaultAuthority(role Role) {
+	switch role {
+	case Admin:
+		a.RecordAuthority = All
+		a.AccountAuthority = All
+
+	case Staff:
+		a.RecordAuthority = Group
+		a.AccountAuthority = Group
+
+	case Student:
+		a.RecordAuthority = Self
+		a.AccountAuthority = Self
+
+	default:
+		a.RecordAuthority = None
+		a.AccountAuthority = None
 	}
-	return Role(role), nil
 }
 
 func generatePassword(password string) []byte {
@@ -91,28 +84,29 @@ func (h Handler) deleteAccount(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h Handler) updateAccount(w http.ResponseWriter, r *http.Request) {
-	acct, err := h.getAccount(mux.Vars(r)["id"])
+func (h Handler) updateAccountAuthority(w http.ResponseWriter, r *http.Request) {
+	account, err := h.getAccount(mux.Vars(r)["id"])
+
 	if err == AccountNotFound {
 		http.Error(w, err.Error(), 404)
 		return
 	}
 
-	role, _ := parseRole(r.FormValue("role"))
+	acct, _ := session(r)
+	if !accountPermission(acct, account) {
+		http.Error(w, PermissionDenied.Error(), 403)
+		return
+	}
+
 	if role != Unknown {
-		if acct.ID == "admin" {
+		if account.ID == "admin" {
 			http.Error(w, "cannot change admin role", 403)
 			return
 		}
-		acct.Role = role
+		account.Role = role
 	}
 
-	password := r.FormValue("password")
-	if password != "" {
-		acct.Password = generatePassword(password)
-	}
-
-	err = h.db.Save(&acct).Error
+	err = h.db.Save(&account).Error
 	if err != nil {
 		panic(err)
 	}
@@ -124,14 +118,14 @@ func joinClasses(tx *gorm.DB) *gorm.DB {
 
 func (h Handler) listAccounts(acct Account) *gorm.DB {
 	tx := joinClasses(h.db).Preload("Class").Order("classes.name, number asc")
-	switch acct.Role {
-	case Admin:
+	switch acct.AccountAuthority {
+	case All:
 		return tx
 
-	case Teacher:
+	case Group:
 		return tx.Where("class_id = ?", acct.ClassID)
 
-	case Student:
+	case Self:
 		return tx.Where("id = ?", acct.ID)
 
 	default:
@@ -158,7 +152,7 @@ func (h Handler) resetPassword(w http.ResponseWriter, r *http.Request) {
 		account = acct
 	}
 
-	if !permission(acct, account) {
+	if !recordPermission(acct, account) {
 		w.WriteHeader(403)
 		h.resetPage(w, addMessage(r, "您沒有權限變更 "+account.Name+" 的密碼"))
 		return
@@ -197,7 +191,7 @@ func (h Handler) findAccountByClassAndNumber(w http.ResponseWriter, r *http.Requ
 		panic(err)
 	}
 
-	if !permission(acct, account) {
+	if !recordPermission(acct, account) {
 		http.Error(w, PermissionDenied.Error(), 403)
 		return
 	}

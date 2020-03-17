@@ -29,14 +29,17 @@ func init() {
 	gob.Register(Session{})
 }
 
-func (h Handler) auth(next http.HandlerFunc, role Role) http.HandlerFunc {
+func session(r *http.Request) (acct Account, ok bool) {
+	acct, ok = r.Context().Value(KeyAccount).(Account)
+	return
+}
+
+func (h Handler) auth(next http.HandlerFunc, tempAuthority, acctAuthority Authority) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if role == Unknown {
-			next.ServeHTTP(w, r)
-		} else if acct, ok := r.Context().Value(KeyAccount).(Account); ok && acct.Role <= role {
+		if acct, ok := r.Context().Value(KeyAccount).(Account); ok && acct.permission(tempAuthority, acctAuthority) {
 			next.ServeHTTP(w, r)
 		} else {
-			h.errorPage(w, r, "權限不足", "您的權限不足，需要"+role.String()+"權限")
+			h.errorPage(w, r, "權限不足", "您的權限不足")
 		}
 	}
 }
@@ -136,6 +139,7 @@ func (h Handler) register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	acct.Name = r.FormValue("name")
+
 	acct.Role, err = parseRole(r.FormValue("role"))
 	if err != nil {
 		next(fmt.Sprintf("身份 '%s' 無法被解析", r.FormValue("role")))

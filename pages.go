@@ -48,7 +48,7 @@ func (h Handler) newRecordPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	class := ""
-	if acct.Role == Teacher {
+	if acct.RecordAuthority == Group {
 		class = acct.Class.Name
 	}
 
@@ -128,7 +128,7 @@ func (h Handler) resetPage(w http.ResponseWriter, r *http.Request) {
 		msg = ""
 	}
 
-	if !permission(acct, account) {
+	if !accountPermission(acct, account) {
 		msg = "您沒有權限變更" + account.Name + "的密碼"
 	}
 

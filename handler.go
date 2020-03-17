@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"net/http"
 
@@ -38,37 +37,33 @@ func (h *Handler) newRouter() {
 
 	r.Use(h.identify)
 
-	r.HandleFunc("/api/hi", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "hi")
-	})
+	r.HandleFunc("/api/records", h.auth(h.newRecord, Self, None)).Methods("POST")
+	r.HandleFunc("/api/records/{id}", h.auth(h.deleteRecord, Self, None)).Methods("DELETE")
 
-	r.HandleFunc("/api/records", h.auth(h.newRecord, Student)).Methods("POST")
-	r.HandleFunc("/api/records/{id}", h.auth(h.deleteRecord, Student)).Methods("DELETE")
-
-	r.HandleFunc("/api/accounts/{id}", h.auth(h.deleteAccount, Admin)).Methods("DELETE")
-	r.HandleFunc("/api/accounts/{id}", h.auth(h.updateAccount, Admin)).Methods("PUT")
-	r.HandleFunc("/api/accounts", h.auth(h.findAccountByClassAndNumber, Teacher)).Methods("GET")
-	r.HandleFunc("/api/stats", h.auth(h.statsList, Teacher))
+	r.HandleFunc("/api/accounts/{id}", h.auth(h.deleteAccount, None, All)).Methods("DELETE")
+	r.HandleFunc("/api/accounts/{id}", h.auth(h.updateAccount, None, Group)).Methods("PUT")
+	r.HandleFunc("/api/accounts", h.auth(h.findAccountByClassAndNumber, None, Group)).Methods("GET")
+	r.HandleFunc("/api/stats", h.auth(h.statsList, Group, None))
 
 	r.HandleFunc("/api/login", h.login)
 
-	r.HandleFunc("/new", h.auth(h.newRecordPage, Teacher))
-	r.HandleFunc("/list", h.auth(h.listRecordsPage, Student))
-	r.HandleFunc("/accounts", h.auth(h.listAccountsPage, Student))
-	r.HandleFunc("/stats", h.auth(h.stats, Teacher))
-	r.HandleFunc("/import", h.auth(h.page("import.htm"), Admin)).Methods("GET")
-	r.HandleFunc("/import", h.auth(h.importHandler, Admin)).Methods("POST")
-	r.HandleFunc("/export", h.auth(h.exportCSV, Teacher))
+	r.HandleFunc("/new", h.auth(h.newRecordPage, Group, None))
+	r.HandleFunc("/list", h.auth(h.listRecordsPage, Self, None))
+	r.HandleFunc("/accounts", h.auth(h.listAccountsPage, None, Group))
+	r.HandleFunc("/stats", h.auth(h.stats, Group, None))
+	r.HandleFunc("/import", h.auth(h.page("import.htm"), None, All)).Methods("GET")
+	r.HandleFunc("/import", h.auth(h.importHandler, None, All)).Methods("POST")
+	r.HandleFunc("/export", h.auth(h.exportCSV, All, None))
 
 	r.HandleFunc("/doc/{title}", h.doc)
 
 	r.HandleFunc("/", h.index).Methods("GET")
-	r.HandleFunc("/", h.auth(h.newSelfRecord, Student)).Methods("POST")
-	r.Handle("/reset", h.auth(h.resetPage, Student)).Methods("GET")
-	r.Handle("/reset", h.auth(h.resetPassword, Student)).Methods("POST")
+	r.HandleFunc("/", h.auth(h.newSelfRecord, Self, None)).Methods("POST")
+	r.Handle("/reset", h.auth(h.resetPage, None, Self)).Methods("GET")
+	r.Handle("/reset", h.auth(h.resetPassword, None, Self)).Methods("POST")
 	r.HandleFunc("/logout", logout)
-	r.HandleFunc("/register", h.auth(h.page("register.htm"), Admin)).Methods("GET")
-	r.HandleFunc("/register", h.auth(h.register, Admin)).Methods("POST")
+	r.HandleFunc("/register", h.auth(h.page("register.htm"), None, All)).Methods("GET")
+	r.HandleFunc("/register", h.auth(h.register, None, All)).Methods("POST")
 
 	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("static"))))
 	h.router = r
