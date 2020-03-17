@@ -11,7 +11,7 @@ Fever Pass 是一個數位體溫記錄系統，機構可使用此系統取代紙
 張旭誠：網頁設計
 
 ## 部署
-安裝[Go](https://golang.org)
+安裝[Go](https://golang.org)、[SQL（MariaDB）](https://mariadb.org/download)
 
 編譯：
 
@@ -21,7 +21,7 @@ Fever Pass 是一個數位體溫記錄系統，機構可使用此系統取代紙
 
 	./fever-pass -init
 
-根據提示訊息完成設定：
+依提示訊息完成設定：
 	
 	server base url (default http://localhost:8080): 
 	server listen port (default: 8080): 
