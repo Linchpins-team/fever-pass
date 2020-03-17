@@ -141,11 +141,14 @@ func createMySQLDatabase(c Config) {
 	cmd := exec.Command("/bin/sh", "-c", "sudo mysql")
 	cmd.Stdin = strings.NewReader(fmt.Sprintf(`
 	CREATE DATABASE IF NOT EXISTS %s ;
-	DROP USER %s;
+	DROP USER IF EXISTS '%s'@'localhost';
+	FLUSH PRIVILEGES;
 	CREATE USER '%s'@'localhost' IDENTIFIED BY '%s'; 
 	GRANT ALL PRIVILEGES ON %s . * TO '%s'@'localhost'; 
 	FLUSH PRIVILEGES;
 	`, c.Database.Name, c.Database.User, c.Database.User, c.Database.Password, c.Database.Name, c.Database.User))
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
 	err := cmd.Run()
 	if err != nil {
 		panic(err)
