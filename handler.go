@@ -42,7 +42,7 @@ func (h *Handler) newRouter() {
 
 	r.HandleFunc("/api/accounts/{id}", h.auth(h.deleteAccount, None, All)).Methods("DELETE")
 	r.HandleFunc("/api/accounts/{id}", h.auth(h.updateAccountAuthority, None, Group)).Methods("PUT")
-	r.HandleFunc("/api/accounts", h.auth(h.findAccountByClassAndNumber, None, Group)).Methods("GET")
+	r.HandleFunc("/api/accounts", h.auth(h.findAccountByClassAndNumber, None, None)).Methods("GET")
 	r.HandleFunc("/api/stats", h.auth(h.statsList, Group, None))
 
 	r.HandleFunc("/api/login", h.login)

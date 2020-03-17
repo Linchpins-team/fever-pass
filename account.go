@@ -211,8 +211,6 @@ func (h Handler) resetPassword(w http.ResponseWriter, r *http.Request) {
 
 func (h Handler) findAccountByClassAndNumber(w http.ResponseWriter, r *http.Request) {
 	var err error
-	acct := r.Context().Value(KeyAccount).(Account)
-
 	var account Account
 	err = joinClasses(h.db).Where(
 		"classes.name = ? and number = ?", r.FormValue("class"), r.FormValue("number"),
@@ -224,6 +222,7 @@ func (h Handler) findAccountByClassAndNumber(w http.ResponseWriter, r *http.Requ
 		panic(err)
 	}
 
+	acct, _ := session(r)
 	if !recordPermission(acct, account) {
 		http.Error(w, PermissionDenied.Error(), 403)
 		return

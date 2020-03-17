@@ -17,7 +17,7 @@
         <th>身份</th>
         <th>體溫管理權限</th>
         <th>帳號管理權限</th>
-        {{ if eq $acct.Role 1 }}
+        {{ if eq $acct.AccountAuthority 3 }}
         <th></th>
         <th></th>
         {{ end }}
@@ -29,7 +29,7 @@
             <td>{{ .Class }}</td>
             <td>{{ .Number }}</td>
             <td>{{ .Name }}</td>
-            {{ if and ( eq $acct.Role 1 ) ( ne .ID "admin" ) }}
+            {{ if and ( eq $acct.AccountAuthority 3 ) ( ne .ID "admin" ) }}
             <td>
                 <select onchange="update('{{ .ID }}', this.name, this.value)" >
                     <option value="admin" {{ if eq .Role 1 }}selected{{ end }}>管理員</option>
@@ -56,7 +56,7 @@
             <td>{{ .RecordAuthority }}</td>
             <td>{{ .AccountAuthority }}</td>
             {{ end }}
-            {{ if eq $acct.Role 1 }}
+            {{ if eq $acct.AccountAuthority 3 }}
             <td>
                 <button><a href="/reset?account_id={{ .ID }}">重設密碼</a></button>
             </td>
