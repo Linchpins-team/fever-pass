@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/gorilla/securecookie"
@@ -131,46 +130,21 @@ func (h Handler) register(w http.ResponseWriter, r *http.Request) {
 		h.HTML(w, r, "register.htm", msg)
 	}
 
-	var err error
-	var acct Account
-	acct.ID = r.FormValue("account_id")
-	if err = h.db.First(&acct, "id = ?", acct.ID).Error; !gorm.IsRecordNotFoundError(err) {
-		next(AccountAlreadyExist.Error())
-		return
-	}
-	acct.Name = r.FormValue("name")
+	acct, err := NewAccount(
+		h.db,
+		r.FormValue("account_id"),
+		r.FormValue("name"),
+		r.FormValue("password"),
+		r.FormValue("class"),
+		r.FormValue("number"),
+		r.FormValue("role"),
+		r.FormValue("record_authority"),
+		r.FormValue("account_authority"),
+	)
 
-	acct.Role, err = parseRole(r.FormValue("role"))
 	if err != nil {
-		next(fmt.Sprintf("身份 '%s' 無法被解析", r.FormValue("role")))
+		next(err.Error())
 		return
 	}
-
-	var class Class
-	className := r.FormValue("class")
-	if className == "" {
-		className = "T"
-	}
-	if err = h.db.FirstOrCreate(&class, Class{Name: className}).Error; err != nil {
-		next("無法建立班級：" + err.Error())
-		return
-	}
-	acct.Class = class
-
-	if acct.Role == Student {
-		acct.Number, err = strconv.Atoi(r.FormValue("number"))
-		if err != nil {
-			next("座號不是數字")
-			return
-		}
-	}
-
-	acct.Password = generatePassword(r.FormValue("password"))
-
-	if err = h.db.Create(&acct).Error; err != nil {
-		next("無法註冊使用者：" + err.Error())
-		return
-	}
-
 	next("成功註冊" + acct.Name)
 }

@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/jinzhu/gorm"
@@ -27,13 +26,13 @@ func (h Handler) importHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	role, err := parseRole(r.FormValue("role"))
-	if err != nil {
-		w.WriteHeader(415)
-		h.HTML(w, r, "import.htm", err.Error())
-		return
-	}
-	n, err := importAccounts(h.db, file, role)
+	n, err := importAccounts(
+		h.db,
+		file,
+		r.FormValue("role"),
+		r.FormValue("record_authority"),
+		r.FormValue("account_authority"),
+	)
 	if err != nil {
 		w.WriteHeader(500)
 		h.HTML(w, r, "import.htm", err.Error())
@@ -47,7 +46,7 @@ func importTestData(db *gorm.DB) {
 	if err != nil {
 		panic(err)
 	}
-	_, err = importAccounts(db, file, Teacher)
+	_, err = importAccounts(db, file, "teacher", "group", "self")
 	if err != nil {
 		panic(err)
 	}
@@ -55,10 +54,10 @@ func importTestData(db *gorm.DB) {
 	if err != nil {
 		panic(err)
 	}
-	_, err = importAccounts(db, file, Student)
+	_, err = importAccounts(db, file, "student", "self", "self")
 }
 
-func importAccounts(db *gorm.DB, r io.Reader, role Role) (n int, err error) {
+func importAccounts(db *gorm.DB, r io.Reader, role, recordAuthority, accountAuthority string) (n int, err error) {
 	reader := csv.NewReader(r)
 	index, _ := reader.Read() // ignore column name
 	for {
@@ -66,7 +65,11 @@ func importAccounts(db *gorm.DB, r io.Reader, role Role) (n int, err error) {
 		if err == io.EOF {
 			break
 		}
-		added, err := createAccount(db, parseColumns(index, row), role)
+		columns := parseColumns(index, row)
+		columns["role"] = role
+		columns["record_authority"] = recordAuthority
+		columns["account_authority"] = accountAuthority
+		added, err := createAccount(db, columns)
 		if err != nil {
 			return n, err
 		}
@@ -87,34 +90,20 @@ func parseColumns(index, row []string) (columns map[string]string) {
 	return
 }
 
-func createAccount(db *gorm.DB, columns map[string]string, role Role) (added bool, err error) {
-	acct := Account{
-		ID:   columns["id"],
-		Name: columns["name"],
+func createAccount(db *gorm.DB, columns map[string]string) (_ bool, err error) {
+	_, err = NewAccount(
+		db,
+		columns["id"],
+		columns["name"],
+		columns["password"],
+		columns["class"],
+		columns["number"],
+		columns["role"],
+		columns["record_authority"],
+		columns["account_authority"],
+	)
+	if err == AccountAlreadyExist {
+		return false, nil
 	}
-	acct.Role = role
-	password := columns["password"]
-
-	if err := db.First(&acct, "id = ?", acct.ID).Error; !gorm.IsRecordNotFoundError(err) {
-		return false, err
-	}
-
-	var class Class
-	className := columns["class"]
-	if className == "" {
-		className = "T"
-	}
-	if err := db.FirstOrCreate(&class, Class{Name: className}).Error; err != nil {
-		return false, err
-	}
-	acct.Class = class
-
-	acct.Number, err = strconv.Atoi(columns["number"])
-	if err != nil {
-		acct.Number = 0
-	}
-
-	acct.Password = generatePassword(password)
-
-	return true, db.Create(&acct).Error
+	return true, err
 }

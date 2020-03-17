@@ -10,6 +10,22 @@ const (
 	All
 )
 
+func (a Authority) String() string {
+	switch a {
+	case Self:
+		return "個人"
+
+	case Group:
+		return "班級"
+
+	case All:
+		return "全校"
+
+	default:
+		return "無"
+	}
+}
+
 // recordPermission return whether A can access B's records
 func recordPermission(a, b Account) bool {
 	switch a.RecordAuthority {

@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/jinzhu/gorm"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func initDB(c Config) (db *gorm.DB, err error) {
@@ -30,30 +29,18 @@ func migrate(db *gorm.DB) {
 }
 
 func setupDB(c Config, db *gorm.DB) {
-	var admin Account
-	err := db.First(&admin, "id = 'admin'").Error
-	if err != nil && !gorm.IsRecordNotFoundError(err) {
-		panic(err)
-	}
-	admin.ID = "admin"
-	admin.Name = "admin"
-	admin.Role = Admin
-
-	class := Class{
-		Name: "T",
-	}
-	err = db.FirstOrCreate(&class, class).Error
-	if err != nil {
-		panic(err)
-	}
-	admin.Class = class
-
-	password := c.Password
-	admin.Password, err = bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		panic(err)
-	}
-	err = db.Save(&admin).Error
+	db.Unscoped().Where("id = 'admin'").Delete(&Account{})
+	_, err := NewAccount(
+		db,
+		"admin",
+		"admin",
+		c.Password,
+		"T",
+		"0",
+		"admin",
+		"all",
+		"all",
+	)
 	if err != nil {
 		panic(err)
 	}

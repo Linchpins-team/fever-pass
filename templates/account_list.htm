@@ -14,7 +14,9 @@
         <th>班級</th>
         <th>座號</th>
         <th>姓名</th>
-        <th>權限</th>
+        <th>身份</th>
+        <th>體溫管理權限</th>
+        <th>帳號管理權限</th>
         {{ if eq $acct.Role 1 }}
         <th></th>
         <th></th>
@@ -27,15 +29,33 @@
             <td>{{ .Class }}</td>
             <td>{{ .Number }}</td>
             <td>{{ .Name }}</td>
+            {{ if and ( eq $acct.Role 1 ) ( ne .ID "admin" ) }}
             <td>
-                {{ if and ( eq $acct.Role 1 ) ( ne .ID "admin" ) }}
-                <select onchange="update(this, '{{ .ID }}')" >
-                    <option value="1" {{ if eq .Role 1 }}selected{{ end }}>管理員</option>
-                    <option value="2" {{ if eq .Role 2 }}selected{{ end }}>登記者</option>
-                    <option value="3" {{ if eq .Role 3 }}selected{{ end }}>學生</option>
+                <select onchange="update('{{ .ID }}', this.name, this.value)" >
+                    <option value="admin" {{ if eq .Role 1 }}selected{{ end }}>管理員</option>
+                    <option value="staff" {{ if eq .Role 2 }}selected{{ end }}>教職員</option>
+                    <option value="student" {{ if eq .Role 3 }}selected{{ end }}>學生</option>
                 </select>
-                {{ else }} {{ .Role }} {{ end }}
             </td>
+            <td>
+                <select name="record_authority" onchange="update('{{ .ID }}', this.name, this.value)">
+                    <option value="self"{{ if eq .RecordAuthority 1 }}selected{{ end }}>個人</option>
+                    <option value="group"{{ if eq .RecordAuthority 2 }}selected{{ end }}>班級</option>
+                    <option value="all"{{ if eq .RecordAuthority 3 }}selected{{ end }}>全校</option>
+                </select>
+            </td>
+            <td>
+                <select name="account_authority" onchange="update('{{ .ID }}', this.name, this.value)">
+                    <option value="self"{{ if eq .AccountAuthority 1 }}selected{{ end }}>個人</option>
+                    <option value="group"{{ if eq .AccountAuthority 2 }}selected{{ end }}>班級</option>
+                    <option value="all"{{ if eq .AccountAuthority 3 }}selected{{ end }}>全校</option>
+                </select>
+            </td>
+            {{ else }} 
+            <td>{{ .Role }}</td> 
+            <td>{{ .RecordAuthority }}</td>
+            <td>{{ .AccountAuthority }}</td>
+            {{ end }}
             {{ if eq $acct.Role 1 }}
             <td>
                 <button><a href="/reset?account_id={{ .ID }}">重設密碼</a></button>

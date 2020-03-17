@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -13,6 +14,7 @@ import (
 
 var (
 	AccountNotFound = errors.New("找不到此帳號")
+	InvalidValue    = errors.New("無效的資料")
 )
 
 type Account struct {
@@ -37,27 +39,58 @@ func (a Account) String() string {
 	return a.Name
 }
 
-func (a Account) permission(tempAuthority, acctAuthority Authority) bool {
-	return a.AccountAuthority >= acctAuthority && a.RecordAuthority >= tempAuthority
+func NewAccount(db *gorm.DB, id, name, password, class, number, role, recordAuthority, accountAuthority string) (account Account, err error) {
+	account = Account{
+		ID:       id,
+		Name:     name,
+		Password: generatePassword(password),
+	}
+
+	if err = db.First(&account, "id = ?", id).Error; !gorm.IsRecordNotFoundError(err) {
+		return account, AccountAlreadyExist
+	}
+
+	account.Number, err = strconv.Atoi(number)
+	if err != nil {
+		account.Number = 0
+	}
+
+	if err = db.FirstOrCreate(&account.Class, Class{Name: class}).Error; err != nil {
+		return
+	}
+
+	account.Role = parseRole(role)
+	if account.Role == 0 {
+		return account, fmt.Errorf("%w: 無效的身份%s", InvalidValue, role)
+	}
+	account.RecordAuthority = parseAuthority(recordAuthority)
+	if account.RecordAuthority == None {
+		return account, fmt.Errorf("%w: 無效的體溫權限%s", InvalidValue, recordAuthority)
+	}
+	account.AccountAuthority = parseAuthority(accountAuthority)
+	if account.AccountAuthority == None {
+		return account, fmt.Errorf("%w: 無效的帳號權限%s", InvalidValue, accountAuthority)
+	}
+
+	err = db.Create(&account).Error
+	return
 }
 
-func (a *Account) defaultAuthority(role Role) {
-	switch role {
-	case Admin:
-		a.RecordAuthority = All
-		a.AccountAuthority = All
+func (a Account) permission(recordAuthority, acctAuthority Authority) bool {
+	return a.AccountAuthority >= acctAuthority && a.RecordAuthority >= recordAuthority
+}
 
-	case Staff:
-		a.RecordAuthority = Group
-		a.AccountAuthority = Group
+func (account *Account) updateAuthority(role, recordAuthority, accountAuthority string) {
+	if r := parseRole(role); r != 0 {
+		account.Role = r
+	}
 
-	case Student:
-		a.RecordAuthority = Self
-		a.AccountAuthority = Self
+	if r := parseAuthority(recordAuthority); r != None {
+		account.RecordAuthority = r
+	}
 
-	default:
-		a.RecordAuthority = None
-		a.AccountAuthority = None
+	if r := parseAuthority(accountAuthority); r != None {
+		account.AccountAuthority = r
 	}
 }
 
@@ -92,19 +125,19 @@ func (h Handler) updateAccountAuthority(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	acct, _ := session(r)
-	if !accountPermission(acct, account) {
-		http.Error(w, PermissionDenied.Error(), 403)
-		return
-	}
-
-	if role != Unknown {
-		if account.ID == "admin" {
-			http.Error(w, "cannot change admin role", 403)
+	{
+		acct, _ := session(r)
+		if !accountPermission(acct, account) {
+			http.Error(w, PermissionDenied.Error(), 403)
 			return
 		}
-		account.Role = role
 	}
+
+	account.updateAuthority(
+		r.FormValue(KeyRole),
+		r.FormValue(KeyRecordAuthority),
+		r.FormValue(KeyAccountAuthority),
+	)
 
 	err = h.db.Save(&account).Error
 	if err != nil {

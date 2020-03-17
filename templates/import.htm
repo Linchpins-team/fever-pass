@@ -10,10 +10,19 @@
     <form action="/import" method="post" enctype="multipart/form-data">
         <label for="file">上傳 .csv 檔</label>
         <input type="file" name="file" onchange="updateFileName(this)">
-        <select name="role">
-            <option value="3">學生</option>
-            <option value="2">老師</option>
-            <option value="1">管理員</option>
+        <label>身份</label><select name="role">
+            <option value="student">學生</option>
+            <option value="staff">教職員</option>
+        </select>
+        <label>體溫記錄權限</label><select name="record_authority" required>
+            <option value="self">個人</option>
+            <option value="group">班級</option>
+            <option value="all">全校</option>
+        </select>
+        <label>帳號管理權限</label><select name="account_authority">
+            <option value="self">個人</option>
+            <option value="group">班級</option>
+            <option value="all">全校</option>
         </select>
         <input type="submit" value="匯入"><br>
         <p id="filename"></p><br>

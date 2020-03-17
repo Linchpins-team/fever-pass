@@ -3,15 +3,25 @@
 <div class="middle">
 <h1>新增使用者</h1>
 <form action="/register" id="form" method="POST">
-    帳號 <input type="text" name="account_id"><br class="mobile-br">
-    姓名 <input type="text" name="name"><br class="mobile-br">
+    帳號 <input type="text" name="account_id" required><br class="mobile-br">
+    姓名 <input type="text" name="name" required><br class="mobile-br">
     班級 <input type="text" name="class">
     座號 <input type="number" name="number"><br class="mobile-br">
     密碼 <input type="password" name="password"><br class="mobile-br">
-    身份 <select name="role">
-        <option value="1">管理員</option>
-        <option value="2">老師</option>
-        <option value="3">學生</option>
+    身份 <select name="role" required>
+        <option value="admin">管理員</option>
+        <option value="staff">教職員</option>
+        <option value="student">學生</option>
+    </select>
+    <label>體溫記錄權限</label><select name="record_authority" required>
+        <option value="self">個人</option>
+        <option value="group">班級</option>
+        <option value="all">全校</option>
+    </select>
+    <label>帳號管理權限</label><select name="account_authority">
+        <option value="self">個人</option>
+        <option value="group">班級</option>
+        <option value="all">全校</option>
     </select>
     <input type="submit" value="新增">
     <p id="msg">{{ . }}</p>

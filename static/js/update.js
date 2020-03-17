@@ -1,6 +1,6 @@
-async function update(select, id) {
+async function update(id, column, value) {
     let form = new FormData()
-    form.append("role", select.value)
+    form.append(column, value)
     let response = await fetch(`/api/accounts/${id}`, {
         method: "PUT",
         body: form,
