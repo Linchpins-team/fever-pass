@@ -49,7 +49,7 @@ func statsBase(db *gorm.DB, acct Account, class string) (tx *gorm.DB, err error)
 		}
 		tx = tx.Where("classes.name = ?", class)
 	}
-	tx = tx.Where("role = ?", Student)
+	tx = tx.Where("role = ? or role = ?", Student, Teacher)
 	tx = tx.Order("classes.name, number asc")
 	return
 }

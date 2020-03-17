@@ -31,7 +31,7 @@ func (r Role) String() string {
 		return "管理員"
 
 	case Teacher:
-		return "老師"
+		return "登記者"
 
 	case Student:
 		return "學生"
@@ -123,7 +123,7 @@ func joinClasses(tx *gorm.DB) *gorm.DB {
 }
 
 func (h Handler) listAccounts(acct Account) *gorm.DB {
-	tx := joinClasses(h.db).Preload("Class").Order("role asc").Order("classes.name, number asc")
+	tx := joinClasses(h.db).Preload("Class").Order("classes.name, number asc")
 	switch acct.Role {
 	case Admin:
 		return tx

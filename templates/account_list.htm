@@ -15,7 +15,6 @@
         <th>座號</th>
         <th>姓名</th>
         <th>權限</th>
-        <th></th>
         {{ if eq $acct.Role 1 }}
         <th></th>
         <th></th>
@@ -28,17 +27,18 @@
             <td>{{ .Class }}</td>
             <td>{{ .Number }}</td>
             <td>{{ .Name }}</td>
-            <td>{{ .Role }}</td>
             <td>
-                <button><a href="/reset?account_id={{ .ID }}">重設密碼</a></button>
+                {{ if and ( eq $acct.Role 1 ) ( ne .ID "admin" ) }}
+                <select onchange="update(this, '{{ .ID }}')" >
+                    <option value="1" {{ if eq .Role 1 }}selected{{ end }}>管理員</option>
+                    <option value="2" {{ if eq .Role 2 }}selected{{ end }}>登記者</option>
+                    <option value="3" {{ if eq .Role 3 }}selected{{ end }}>學生</option>
+                </select>
+                {{ else }} {{ .Role }} {{ end }}
             </td>
             {{ if eq $acct.Role 1 }}
             <td>
-                {{ if eq .Role 2 }}
-                <button value="{{ .ID }}" onclick="update(this, 1, '')">設為管理員</button>
-                {{ else if and (eq .Role 1) (ne .ID "admin") }}
-                <button value="{{ .ID }}" onclick="update(this, 2, '')">設為老師</button>
-                {{ end }}
+                <button><a href="/reset?account_id={{ .ID }}">重設密碼</a></button>
             </td>
             <td>
                 {{ if ne .ID "admin" }}

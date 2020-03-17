@@ -1,32 +1,11 @@
-function update(button, role, password) {
+async function update(select, id) {
     let form = new FormData()
-    if (role != 0) {
-        form.append("role", role)
-    }
-    if (password != "") {
-        form.append("password", password)
-    }
-    fetch(`/api/accounts/${button.value}`, {
+    form.append("role", select.value)
+    let response = await fetch(`/api/accounts/${id}`, {
         method: "PUT",
         body: form,
     })
-    .then(response => {
-        switch (response.status) {
-        case 200:
-            button.disabled = true
-            break
-
-        case 404:
-            throw "user not found"
-
-        case 415:
-            throw "invalid data"
-
-        case 401:
-            throw "permission denied"
-        }
-    })
-    .catch(err => {
-        alert(err)
-    })
+    if (response.status != 200) {
+        alert(await response.text())
+    }
 }
