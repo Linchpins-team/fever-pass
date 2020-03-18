@@ -3,7 +3,7 @@
 {{ end }}
 
 {{ define "content-with-session" }}
-<script src="/js/load_account_list.js"></script>
+<script src="/static/js/load_account_list.js"></script>
 <h1>{{ template "title" .Data }}</h1>
 {{ if eq .Role 1 }}
 <form action="/stats" method="get">

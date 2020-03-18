@@ -34,7 +34,19 @@ main {
 }
 
 .fever {
-    background-color: #fcd;
+    background: #fcd;
+}
+
+.admin {
+    background: #8ec;
+}
+
+.staff {
+    background: #9ea;
+}
+
+.hygiene {
+    background: #aeb;
 }
 
 #logo {
@@ -67,6 +79,11 @@ nav a {
 
 #menu {
     display: none;
+}
+
+#page {
+    width: 24px;
+    margin: 4px;
 }
 
 input {

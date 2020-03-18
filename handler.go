@@ -65,7 +65,7 @@ func (h *Handler) newRouter() {
 	r.HandleFunc("/register", h.auth(h.page("register.htm"), None, All)).Methods("GET")
 	r.HandleFunc("/register", h.auth(h.register, None, All)).Methods("POST")
 
-	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("static"))))
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	h.router = r
 }
 

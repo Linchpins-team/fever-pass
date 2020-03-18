@@ -2,15 +2,15 @@
 
 ## 
 
-![](/img/index.png)
-![](/img/logged_in.png)
-![](/img/result.png)
+![](/static/img/index.png)
+![](/static/img/logged_in.png)
+![](/static/img/result.png)
 
 ## 教師
 
-![](/img/class_accounts.png)
-![](/img/class_history.png)
-![](/img/class_stats.png)
+![](/static/img/class_accounts.png)
+![](/static/img/class_history.png)
+![](/static/img/class_stats.png)
 
 ## 管理員
 
