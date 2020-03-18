@@ -9,7 +9,7 @@
 <h1>{{ template "title" .Data }}</h1>
 
 <form action="/list" method="get" id="form">
-    {{ if lt .Role 3 }}
+    {{ if ge .RecordAuthority 2 }}
     <label>班級</label>
     <input type="text" name="class"><br class="mobile-br">
     <label>座號</label>

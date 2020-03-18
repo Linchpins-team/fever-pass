@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	PermissionDenied = errors.New("permission denied")
+	PermissionDenied = errors.New("你沒有權限進行此操作")
 	RecordNotFound   = errors.New("record not found")
 )
 
@@ -144,7 +144,7 @@ func (h Handler) deleteRecord(w http.ResponseWriter, r *http.Request) {
 	}
 
 	acct := r.Context().Value(KeyAccount).(Account)
-	if !recordPermission(acct, record.Account) {
+	if acct.RecordAuthority != All && acct.ID != record.RecorderID {
 		http.Error(w, PermissionDenied.Error(), 403)
 		return
 	}

@@ -2,6 +2,7 @@
 <script src="/js/delete.js"></script>
 <table>
     <tr>
+        <th>帳號</th>
         <th>班級</th>
         <th>座號</th>
         <th>姓名</th>
@@ -15,6 +16,7 @@
         {{ range . }}
         {{ block "row" . }}
         <tr {{ if .Fever }}class="fever"{{ end }}>
+            <td>{{ .Account.ID }}</td>
             <td>{{ .Account.Class }}</td>
             <td>{{ .Account.Number }}</td>
             <td><a href="/list?account_id={{ .Account.ID }}">{{ .Account }}</a></td>

@@ -37,7 +37,7 @@ func (h Handler) newRecordPage(w http.ResponseWriter, r *http.Request) {
 	var records []Record
 	acct, ok := r.Context().Value(KeyAccount).(Account)
 	if ok {
-		err := h.listRecord(acct).Limit(20).Find(&records).Error
+		err := h.listRecord(acct).Where("recorder_id = ?", acct.ID).Limit(20).Find(&records).Error
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
