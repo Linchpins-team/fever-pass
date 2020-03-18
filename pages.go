@@ -108,12 +108,21 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 func (h Handler) listAccountsPage(w http.ResponseWriter, r *http.Request) {
 	acct := r.Context().Value(KeyAccount).(Account)
 	var accounts []Account
-	err := h.listAccounts(acct).Find(&accounts).Error
+
+	p, err := strconv.Atoi(r.FormValue("page"))
+	if err != nil {
+		p = 1
+	}
+
+	err = h.listAccounts(acct).Offset(100 * (p - 1)).Limit(100).Find(&accounts).Error
 	if err != nil {
 		panic(err)
 	}
 
-	h.HTML(w, r, "account_list.htm", accounts)
+	page := make(map[string]interface{})
+	page["Page"] = p
+	page["Accounts"] = accounts
+	h.HTML(w, r, "account_list.htm", page)
 }
 
 func (h Handler) resetPage(w http.ResponseWriter, r *http.Request) {
