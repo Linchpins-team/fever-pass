@@ -37,6 +37,10 @@
                     <option value="student" {{ if eq .Role 3 }}selected{{ end }}>學生</option>
                 </select>
             </td>
+            {{ else }}
+            <td>{{ .Role }}</td>
+            {{ end }}
+            {{ if and ( ge $acct.AccountAuthority 2 ) ( ne .ID "admin" ) }}
             <td>
                 <select name="record_authority" onchange="update('{{ .ID }}', this.name, this.value)">
                     <option value="self"{{ if eq .RecordAuthority 1 }}selected{{ end }}>個人</option>
@@ -52,7 +56,6 @@
                 </select>
             </td>
             {{ else }} 
-            <td>{{ .Role }}</td> 
             <td>{{ .RecordAuthority }}</td>
             <td>{{ .AccountAuthority }}</td>
             {{ end }}

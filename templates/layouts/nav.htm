@@ -6,7 +6,7 @@
   <a href="/stats">統計資料</a>
   {{ end }}
   <a href="/list">體溫歷史記錄</a>
-  {{ if ge .AccountAuthority 2 }}
+  {{ if or (ge .AccountAuthority 2) (ge .RecordAuthority 2) }}
   <a href="/accounts">帳號管理</a>
   {{ end }}
   <a href="/reset">重設密碼</a>

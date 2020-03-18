@@ -81,17 +81,7 @@ func (a Account) permission(recordAuthority, acctAuthority Authority) bool {
 }
 
 func (account *Account) updateAuthority(role, recordAuthority, accountAuthority string) {
-	if r := parseRole(role); r != 0 {
-		account.Role = r
-	}
 
-	if r := parseAuthority(recordAuthority); r != None {
-		account.RecordAuthority = r
-	}
-
-	if r := parseAuthority(accountAuthority); r != None {
-		account.AccountAuthority = r
-	}
 }
 
 func generatePassword(password string) []byte {
@@ -125,19 +115,32 @@ func (h Handler) updateAccountAuthority(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	{
-		acct, _ := session(r)
-		if !accountPermission(acct, account) {
+	acct, _ := session(r)
+	if !accountPermission(acct, account) {
+		http.Error(w, PermissionDenied.Error(), 403)
+		return
+	}
+
+	setAuthority := func(authority, max Authority, out *Authority) {
+		if authority == 0 {
+			http.Error(w, InvalidValue.Error(), 415)
+			return
+		}
+		if authority > max {
 			http.Error(w, PermissionDenied.Error(), 403)
 			return
 		}
+		*out = authority
+		return
 	}
 
-	account.updateAuthority(
-		r.FormValue(KeyRole),
-		r.FormValue(KeyRecordAuthority),
-		r.FormValue(KeyAccountAuthority),
-	)
+	if role := parseRole(r.FormValue(KeyRole)); role != 0 && acct.AccountAuthority == All {
+		account.Role = role
+	} else if authority := parseAuthority(r.FormValue(KeyRecordAuthority)); authority != None {
+		setAuthority(authority, acct.RecordAuthority, &account.RecordAuthority)
+	} else if authority := parseAuthority(r.FormValue(KeyAccountAuthority)); authority != None {
+		setAuthority(authority, acct.AccountAuthority, &account.AccountAuthority)
+	}
 
 	err = h.db.Save(&account).Error
 	if err != nil {
@@ -150,8 +153,12 @@ func joinClasses(tx *gorm.DB) *gorm.DB {
 }
 
 func (h Handler) listAccounts(acct Account) *gorm.DB {
-	tx := joinClasses(h.db).Preload("Class").Order("classes.name, number asc")
-	switch acct.AccountAuthority {
+	tx := joinClasses(h.db).Preload("Class").Order("role, classes.name, number asc")
+	authority := acct.RecordAuthority
+	if acct.AccountAuthority > authority {
+		authority = acct.AccountAuthority
+	}
+	switch authority {
 	case All:
 		return tx
 
@@ -159,7 +166,7 @@ func (h Handler) listAccounts(acct Account) *gorm.DB {
 		return tx.Where("class_id = ?", acct.ClassID)
 
 	case Self:
-		return tx.Where("id = ?", acct.ID)
+		return tx.Where("accounts.id = ?", acct.ID)
 
 	default:
 		return nil
