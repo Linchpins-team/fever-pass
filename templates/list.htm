@@ -1,11 +1,9 @@
 {{ define "title" }}
 {{ formatDate .Date }}
-{{ if ne .Account.ID "" }}{{ .Account.Name }}{{ end }}
 體溫歷史記錄
 {{ end }}
 {{ define "content-with-session" }}
 <script src="/static/js/get_account.js"></script>
-<script src="/static/js/list.js" defer></script>
 <h1>{{ template "title" .Data }}</h1>
 
 <form action="/list" method="get" id="form">
