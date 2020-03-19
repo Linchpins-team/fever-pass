@@ -66,17 +66,23 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 		p = 1
 	}
 	// acct must have value
+	title := ""
 	acct, _ := session(r)
 	tx := h.listRecord(acct)
-	tx = whereClass(tx, r.FormValue("class"))
-	tx = whereNumber(tx, r.FormValue("number"))
+	if class := r.FormValue("class"); class != "" {
+		tx = whereClass(tx, class)
+		title += class + "班 "
+	}
+	if number := r.FormValue("number"); number != "" {
+		tx = whereNumber(tx, number)
+		title += number + "號 "
+	}
 
 	date, err := time.ParseInLocation("2006-01-02", r.FormValue("date"), time.Local)
 	if err == nil {
 		tx = whereDate(tx, date)
+		title += date.Format("01/02 ")
 	}
-
-	msg := ""
 
 	err = tx.Offset((p - 1) * 20).Limit(20).Find(&records).Error
 	if err != nil {
@@ -85,13 +91,11 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 
 	page := struct {
 		Page    int
-		Date    time.Time
-		Message string
+		Title   string
 		Records []Record
 	}{
 		Page:    p,
-		Date:    date,
-		Message: msg,
+		Title:   title,
 		Records: records,
 	}
 	h.HTML(w, r, "list.htm", page)
