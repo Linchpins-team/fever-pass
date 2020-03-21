@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 )
 
@@ -186,4 +187,20 @@ func (h Handler) registerPage(w http.ResponseWriter, r *http.Request) {
 	page := make(map[string]interface{})
 	page["authorities"] = Authorities
 	h.HTML(w, r, "register.htm", page)
+}
+
+func (h Handler) profile(w http.ResponseWriter, r *http.Request) {
+	acct, _ := session(r)
+	account, err := h.getAccount(mux.Vars(r)["id"])
+	if err == AccountNotFound {
+		h.errorPage(w, r, "此帳號不存在", "")
+		return
+	}
+
+	if !accountPermission(acct, account) && !recordPermission(acct, account) {
+		h.errorPage(w, r, "權限不足", "你沒有權限查看此頁面")
+		return
+	}
+
+	h.HTML(w, r, "profile.htm", account)
 }
