@@ -136,7 +136,7 @@ func (h Handler) listAccountsPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h Handler) resetPage(w http.ResponseWriter, r *http.Request) {
-	acct := r.Context().Value(KeyAccount).(Account)
+	acct, _ := session(r)
 	account, err := h.getAccount(r.FormValue("account_id"))
 	if err == AccountNotFound {
 		account = acct
@@ -148,7 +148,8 @@ func (h Handler) resetPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !accountPermission(acct, account) {
-		msg = "您沒有權限變更" + account.Name + "的密碼"
+		h.errorPage(w, r, "權限不足", "您沒有權限變更"+account.Name+"的密碼")
+		return
 	}
 
 	page := struct {

@@ -164,13 +164,13 @@ func (h Handler) getAccount(id string) (acct Account, err error) {
 
 // 重設密碼
 func (h Handler) resetPassword(w http.ResponseWriter, r *http.Request) {
-	acct := r.Context().Value(KeyAccount).(Account)
+	acct, _ := session(r)
 	account, err := h.getAccount(r.FormValue("account_id"))
 	if err == AccountNotFound {
 		account = acct
 	}
 
-	if !recordPermission(acct, account) {
+	if !accountPermission(acct, account) {
 		w.WriteHeader(403)
 		h.resetPage(w, addMessage(r, "您沒有權限變更 "+account.Name+" 的密碼"))
 		return
