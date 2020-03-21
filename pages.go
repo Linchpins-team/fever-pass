@@ -70,24 +70,22 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 		p = 1
 	}
 	// acct must have value
-	acct := r.Context().Value(KeyAccount).(Account)
+	title := ""
+	acct, _ := session(r)
 	tx := h.listRecord(acct)
-	id := r.FormValue("account_id")
-	var account Account
-	if id != "" {
-		err = h.db.First(&account, "id = ?", id).Error
-		if gorm.IsRecordNotFoundError(err) {
-			http.Error(w, RecordNotFound.Error(), 404)
-			return
-		} else if err != nil {
-			panic(err)
-		}
-		tx = tx.Where("account_id = ?", id)
+	if class := r.FormValue("class"); class != "" {
+		tx = whereClass(tx, class)
+		title += class + "班 "
+	}
+	if number := r.FormValue("number"); number != "" {
+		tx = whereNumber(tx, number)
+		title += number + "號 "
 	}
 
 	date, err := time.ParseInLocation("2006-01-02", r.FormValue("date"), time.Local)
 	if err == nil {
-		tx = tx.Where("records.created_at > ? and records.created_at < ?", date, date.AddDate(0, 0, 1))
+		tx = whereDate(tx, date)
+		title += date.Format("01/02 ")
 	}
 
 	err = tx.Offset((p - 1) * PageLimit).Limit(PageLimit).Find(&records).Error
@@ -97,13 +95,11 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 
 	page := struct {
 		Page    int
-		Date    time.Time
-		Account Account
+		Title   string
 		Records []Record
 	}{
 		Page:    p,
-		Date:    date,
-		Account: account,
+		Title:   title,
 		Records: records,
 	}
 	h.HTML(w, r, "list.htm", page)

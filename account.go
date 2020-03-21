@@ -148,10 +148,6 @@ func (h Handler) updateAccountAuthority(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-func joinClasses(tx *gorm.DB) *gorm.DB {
-	return tx.Table("accounts").Joins("JOIN classes ON class_id = classes.id")
-}
-
 func (h Handler) listAccounts(acct Account) *gorm.DB {
 	tx := joinClasses(h.db).Preload("Class").Order("role, classes.name, number asc")
 	authority := acct.RecordAuthority
@@ -219,9 +215,9 @@ func (h Handler) resetPassword(w http.ResponseWriter, r *http.Request) {
 func (h Handler) findAccountByClassAndNumber(w http.ResponseWriter, r *http.Request) {
 	var err error
 	var account Account
-	err = joinClasses(h.db).Where(
-		"classes.name = ? and number = ?", r.FormValue("class"), r.FormValue("number"),
-	).Set("gorm:auto_preload", true).First(&account).Error
+	tx := whereClass(h.db, r.FormValue("class"))
+	tx = whereNumber(tx, r.FormValue("number"))
+	err = tx.First(&account).Error
 	if gorm.IsRecordNotFoundError(err) {
 		http.Error(w, AccountNotFound.Error(), 404)
 		return

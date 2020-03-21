@@ -110,16 +110,13 @@ func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 
 func (h Handler) listRecord(acct Account) (tx *gorm.DB) {
 	tx = h.db.Order("id desc").Set("gorm:auto_preload", true)
+	tx = tx.Joins("JOIN accounts on records.account_id = accounts.id")
 	switch acct.RecordAuthority {
 	case All:
 		return tx
 
 	case Group:
-		return tx.Joins(
-			"JOIN accounts on records.account_id = accounts.id",
-		).Where(
-			"accounts.class_id = ?", acct.ClassID,
-		)
+		return tx.Where("accounts.class_id = ?", acct.ClassID)
 
 	case Self:
 		return tx.Where("account_id = ?", acct.ID)

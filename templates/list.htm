@@ -1,17 +1,16 @@
 {{ define "title" }}
-{{ formatDate .Date }}
-{{ if ne .Account.ID "" }}{{ .Account.Name }}{{ end }}
-體溫歷史記錄
+{{ .Title }}體溫歷史記錄
 {{ end }}
 {{ define "content-with-session" }}
 <script src="/static/js/get_account.js"></script>
-<script src="/static/js/list.js" defer></script>
 <h1>{{ template "title" .Data }}</h1>
 
 <form action="/list" method="get" id="form">
-    {{ if ge .RecordAuthority 2 }}
+    {{ if ge .RecordAuthority 3 }}
     <label>班級</label>
     <input type="text" name="class"><br class="mobile-br">
+    {{ end }}
+    {{ if ge .RecordAuthority 2 }}
     <label>座號</label>
     <input type="number" name="number"><br class="mobile-br">
     {{ end }}
@@ -30,7 +29,11 @@
 <a href="/list?page={{ add .Page 1}}">下一頁</a>
 {{ end }}
 
+{{ if ne (len .Records) 0}}
 {{ template "list" .Records }}
+{{ else }}
+<h2>查無資料</h2>
+{{ end }}
 
 {{ if gt .Page 1 }}
 <a href="/list?page={{ add .Page -1 }}">上一頁</a>
