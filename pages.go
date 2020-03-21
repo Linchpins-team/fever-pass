@@ -74,6 +74,7 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 	title := ""
 	acct, _ := session(r)
 	tx := h.listRecord(acct)
+	tx = joinClasses(tx)
 	if id := r.FormValue("account_id"); id != "" {
 		account, err := h.getAccount(id)
 		if err == nil {
@@ -123,14 +124,26 @@ func (h Handler) listAccountsPage(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		p = 1
 	}
+	title := ""
 
-	err = h.listAccounts(acct).Offset(100 * (p - 1)).Limit(100).Find(&accounts).Error
+	tx := h.listAccounts(acct)
+	if class := r.FormValue("class"); class != "" {
+		tx = whereClass(tx, class)
+		title += class + "班 "
+	}
+	if number := r.FormValue("number"); number != "" {
+		tx = whereNumber(tx, number)
+		title += number + "號 "
+	}
+
+	err = tx.Offset(100 * (p - 1)).Limit(100).Find(&accounts).Error
 	if err != nil {
 		panic(err)
 	}
 
 	page := make(map[string]interface{})
 	page["Page"] = p
+	page["Title"] = title
 	page["Accounts"] = accounts
 	h.HTML(w, r, "account_list.htm", page)
 }

@@ -16,7 +16,7 @@ func whereClass(tx *gorm.DB, className string) *gorm.DB {
 	if className == "" {
 		return tx
 	}
-	return joinClasses(tx).Where("classes.name = ?", className)
+	return tx.Where("classes.name = ?", className)
 }
 
 // select specific number when query accounts

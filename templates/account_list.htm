@@ -1,9 +1,16 @@
-{{ define "title" }}帳號管理{{ end }}
+{{ define "title" }}{{ .Title }}帳號管理{{ end }}
 {{ define "content-with-session" }}
 <script src="/static/js/delete.js"></script>
 <script src="/static/js/update.js"></script>
-<h1>帳號管理</h1>
+<h1>{{ template "title" .Data }}</h1>
 
+<form action="/accounts" method="get">
+    <label>班級</label>
+    <input type="text" name="class">
+    <label>座號</label>
+    <input type="number" name="number">
+    <input type="submit" value="查詢">
+</form>
 <form action="/accounts" method="get">
 {{ if gt .Data.Page 1 }}
 <a href="/accounts?page={{ add .Data.Page -1 }}">上一頁</a>
@@ -13,13 +20,13 @@
 <a href="/accounts?page={{ add .Data.Page 1}}">下一頁</a>
 {{ end }}
 <br>
+</form>
 {{ $acct := .Account }}
 
 {{ if eq $acct.Authority.Account 3 }}
 <a href="/register">新增使用者</a>
 <a href="/import">匯入帳號資料 (.csv 檔)</a>
 {{ end }}
-</form>
 <table>
     <tr>
         <th>帳號</th>
