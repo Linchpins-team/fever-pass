@@ -7,3 +7,4 @@ fever-pass
 static/qrcodes
 *.toml
 *.sqlite
+build
