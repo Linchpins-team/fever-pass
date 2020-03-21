@@ -33,9 +33,13 @@ func session(r *http.Request) (acct Account, ok bool) {
 	return
 }
 
-func (h Handler) auth(next http.HandlerFunc, tempAuthority, acctAuthority Authority) http.HandlerFunc {
+func (h Handler) auth(next http.HandlerFunc, recordLevel, acctLevel AuthorityLevel) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if acct, ok := r.Context().Value(KeyAccount).(Account); ok && acct.permission(tempAuthority, acctAuthority) {
+		authority := Authority{
+			Record:  recordLevel,
+			Account: acctLevel,
+		}
+		if acct, ok := r.Context().Value(KeyAccount).(Account); ok && acct.Authority.permission(authority) {
 			next.ServeHTTP(w, r)
 		} else {
 			h.errorPage(w, r, "權限不足", "您的權限不足")

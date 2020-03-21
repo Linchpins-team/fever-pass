@@ -29,10 +29,7 @@ type Account struct {
 	CreatedAt time.Time
 	DeletedAt *time.Time
 
-	Role Role
-
-	RecordAuthority  Authority
-	AccountAuthority Authority
+	Authority
 }
 
 func (a Account) String() string {
@@ -63,12 +60,12 @@ func NewAccount(db *gorm.DB, id, name, password, class, number, role, recordAuth
 	if account.Role == 0 {
 		return account, fmt.Errorf("%w: 無效的身份%s", InvalidValue, role)
 	}
-	account.RecordAuthority = parseAuthority(recordAuthority)
-	if account.RecordAuthority == None {
+	account.Authority.Record = parseAuthority(recordAuthority)
+	if account.Authority.Record == None {
 		return account, fmt.Errorf("%w: 無效的體溫權限%s", InvalidValue, recordAuthority)
 	}
-	account.AccountAuthority = parseAuthority(accountAuthority)
-	if account.AccountAuthority == None {
+	account.Authority.Account = parseAuthority(accountAuthority)
+	if account.Authority.Account == None {
 		return account, fmt.Errorf("%w: 無效的帳號權限%s", InvalidValue, accountAuthority)
 	}
 
@@ -76,12 +73,8 @@ func NewAccount(db *gorm.DB, id, name, password, class, number, role, recordAuth
 	return
 }
 
-func (a Account) permission(recordAuthority, acctAuthority Authority) bool {
-	return a.AccountAuthority >= acctAuthority && a.RecordAuthority >= recordAuthority
-}
-
-func (account *Account) updateAuthority(role, recordAuthority, accountAuthority string) {
-
+func (a Authority) permission(authority Authority) bool {
+	return a.Account >= authority.Account && a.Record >= authority.Record
 }
 
 func generatePassword(password string) []byte {
@@ -121,7 +114,7 @@ func (h Handler) updateAccountAuthority(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	setAuthority := func(authority, max Authority, out *Authority) {
+	setAuthority := func(authority, max AuthorityLevel, out *AuthorityLevel) {
 		if authority == 0 {
 			http.Error(w, InvalidValue.Error(), 415)
 			return
@@ -134,12 +127,12 @@ func (h Handler) updateAccountAuthority(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if role := parseRole(r.FormValue(KeyRole)); role != 0 && acct.AccountAuthority == All {
+	if role := parseRole(r.FormValue(KeyRole)); role != 0 && acct.Authority.Account == All {
 		account.Role = role
-	} else if authority := parseAuthority(r.FormValue(KeyRecordAuthority)); authority != None {
-		setAuthority(authority, acct.RecordAuthority, &account.RecordAuthority)
+	} else if level := parseAuthority(r.FormValue(KeyRecordAuthority)); level != None {
+		setAuthority(level, acct.Authority.Record, &account.Authority.Record)
 	} else if authority := parseAuthority(r.FormValue(KeyAccountAuthority)); authority != None {
-		setAuthority(authority, acct.AccountAuthority, &account.AccountAuthority)
+		setAuthority(authority, acct.Authority.Account, &account.Authority.Account)
 	}
 
 	err = h.db.Save(&account).Error
@@ -150,11 +143,8 @@ func (h Handler) updateAccountAuthority(w http.ResponseWriter, r *http.Request) 
 
 func (h Handler) listAccounts(acct Account) *gorm.DB {
 	tx := joinClasses(h.db).Preload("Class").Order("role, classes.name, number asc")
-	authority := acct.RecordAuthority
-	if acct.AccountAuthority > authority {
-		authority = acct.AccountAuthority
-	}
-	switch authority {
+	level := acct.bigger()
+	switch level {
 	case All:
 		return tx
 

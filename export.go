@@ -67,7 +67,7 @@ func (h Handler) exportCSV(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/x-csv")
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
 	acct := r.Context().Value(KeyAccount).(Account)
-	tx := h.listAccounts(acct).Where("role = ?", Student)
+	tx := h.listAccounts(acct).Where("role = ?", RoleStudent)
 	err := h.export(tx, w)
 	if err != nil {
 		http.Error(w, err.Error(), 500)

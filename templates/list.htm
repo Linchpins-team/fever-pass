@@ -6,11 +6,11 @@
 <h1>{{ template "title" .Data }}</h1>
 
 <form action="/list" method="get" id="form">
-    {{ if ge .RecordAuthority 3 }}
+    {{ if ge .Authority.Record 3 }}
     <label>班級</label>
     <input type="text" name="class"><br class="mobile-br">
     {{ end }}
-    {{ if ge .RecordAuthority 2 }}
+    {{ if ge .Authority.Record 2 }}
     <label>座號</label>
     <input type="number" name="number"><br class="mobile-br">
     {{ end }}

@@ -111,7 +111,7 @@ func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 func (h Handler) listRecord(acct Account) (tx *gorm.DB) {
 	tx = h.db.Order("id desc").Set("gorm:auto_preload", true)
 	tx = tx.Joins("JOIN accounts on records.account_id = accounts.id")
-	switch acct.RecordAuthority {
+	switch acct.Authority.Record {
 	case All:
 		return tx
 
@@ -141,7 +141,7 @@ func (h Handler) deleteRecord(w http.ResponseWriter, r *http.Request) {
 	}
 
 	acct := r.Context().Value(KeyAccount).(Account)
-	if acct.RecordAuthority != All && acct.ID != record.RecorderID {
+	if acct.Authority.Record != All && acct.ID != record.RecorderID {
 		http.Error(w, PermissionDenied.Error(), 403)
 		return
 	}

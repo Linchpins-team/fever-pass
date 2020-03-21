@@ -52,7 +52,7 @@ func (h Handler) newRecordPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	class := ""
-	if acct.RecordAuthority == Group {
+	if acct.Authority.Record == Group {
 		class = acct.Class.Name
 	}
 

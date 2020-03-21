@@ -17,7 +17,7 @@ import (
 var (
 	testDB *gorm.DB
 	admin  = Account{
-		Role:     Admin,
+		Role:     RoleAdmin,
 		Name:     "admin",
 		Password: []byte{},
 	}
@@ -27,14 +27,14 @@ var (
 			Class: Class{
 				Name: "103",
 			},
-			Role: Student,
+			Role: RoleStudent,
 		},
 		Account{
 			Name: "小美",
 			Class: Class{
 				Name: "103",
 			},
-			Role: Student,
+			Role: RoleStudent,
 		},
 		Account{
 			Name: "陳老師",

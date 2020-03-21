@@ -39,7 +39,7 @@ func statsQuery(db, base *gorm.DB, t ListType) (tx *gorm.DB) {
 
 func statsBase(db *gorm.DB, acct Account, class string) (tx *gorm.DB, err error) {
 	tx = joinClasses(db).Set("gorm:auto_preload", true)
-	if acct.RecordAuthority == Group {
+	if acct.Authority.Record == Group {
 		class = acct.Class.Name
 	}
 	if class != "" {
@@ -49,7 +49,7 @@ func statsBase(db *gorm.DB, acct Account, class string) (tx *gorm.DB, err error)
 		}
 		tx = tx.Where("classes.name = ?", class)
 	}
-	tx = tx.Where("role = ?", Student)
+	tx = tx.Where("role = ?", RoleStudent)
 	tx = tx.Order("classes.name, number asc")
 	return
 }
