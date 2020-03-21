@@ -9,6 +9,10 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+const (
+	PageLimit = 100
+)
+
 func (h Handler) index(w http.ResponseWriter, r *http.Request) {
 	acct, ok := r.Context().Value(KeyAccount).(Account)
 	if ok {
@@ -60,7 +64,7 @@ func (h Handler) newRecordPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
-	records := make([]Record, 0, 20)
+	records := make([]Record, 0, PageLimit)
 	p, err := strconv.Atoi(r.FormValue("page"))
 	if err != nil {
 		p = 1
@@ -86,7 +90,7 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 		tx = tx.Where("records.created_at > ? and records.created_at < ?", date, date.AddDate(0, 0, 1))
 	}
 
-	err = tx.Offset((p - 1) * 100).Limit(100).Find(&records).Error
+	err = tx.Offset((p - 1) * PageLimit).Limit(PageLimit).Find(&records).Error
 	if err != nil {
 		panic(err)
 	}

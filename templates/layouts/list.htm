@@ -19,12 +19,8 @@
             <td>{{ .Account.ID }}</td>
             <td>{{ .Account.Class }}</td>
             <td>{{ .Account.Number }}</td>
-            <td>{{ if or (eq $acct.AccountAuthority 3) (eq $acct.AccountAuthority 2) }}
+            <td>
                 <a href="/list?account_id={{ .Account.ID }}">{{ .Account }}</a>
-                {{ end }}
-                {{ else }}
-                {{ .Account }}
-                {{ end }}
             </td>
             <td>{{ .Temperature }}</td>
             <td>{{ .Type }}</td>
