@@ -152,7 +152,7 @@ func (h Handler) listAccounts(acct Account) *gorm.DB {
 }
 
 func (h Handler) getAccount(id string) (acct Account, err error) {
-	err = h.db.First(&acct, "id = ?", id).Error
+	err = h.db.Set("gorm:auto_preload", true).First(&acct, "id = ?", id).Error
 	if gorm.IsRecordNotFoundError(err) {
 		err = AccountNotFound
 		return

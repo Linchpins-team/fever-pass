@@ -10,7 +10,7 @@
   <a href="/accounts">帳號管理</a>
   {{ end }}
   <a href="/reset">重設密碼</a>
-  <a href="/list?account_id={{ .Account.ID }}">{{ .Authority }}：{{ .Account.Name }}</a>
+  <a href="/accounts/{{ .Account.ID }}">{{ .Authority }}：{{ .Account.Name }}</a>
   <a href="/logout">登出</a>
   {{ end }}
 

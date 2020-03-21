@@ -1,7 +1,5 @@
 {{ define "title" }}帳號管理{{ end }}
 {{ define "content-with-session" }}
-<script src="/static/js/delete.js"></script>
-<script src="/static/js/update.js"></script>
 <h1>帳號管理</h1>
 
 <form action="/accounts" method="get">
@@ -27,12 +25,7 @@
         <th>座號</th>
         <th>姓名</th>
         <th>身份</th>
-        <th>體溫管理權限</th>
-        <th>帳號管理權限</th>
-        {{ if eq $acct.Authority.Account 3 }}
         <th></th>
-        <th></th>
-        {{ end }}
     </tr>
     <tbody>
         {{ range .Data.Accounts }}
@@ -42,46 +35,8 @@
             <td>{{ .Class }}</td>
             <td>{{ .Number }}</td>
             <td>{{ .Name }}</td>
-            {{ if and ( eq $acct.Authority.Account 3 ) ( ne .ID "admin" ) }}
-            <td>
-                <select name="role" onchange="update('{{ .ID }}', this.name, this.value)">
-                    <option value="admin" {{ if eq .Role 1 }}selected{{ end }}>管理員</option>
-                    <option value="staff" {{ if eq .Role 2 }}selected{{ end }}>教職員</option>
-                    <option value="student" {{ if eq .Role 3 }}selected{{ end }}>學生</option>
-                </select>
-            </td>
-            {{ else }}
             <td>{{ .Authority }}</td>
-            {{ end }}
-            {{ if and ( ge $acct.Authority.Account 2 ) ( ne .ID "admin" ) }}
-            <td>
-                <select name="record_authority" onchange="update('{{ .ID }}', this.name, this.value)">
-                    <option value="self" {{ if eq .Authority.Record 1 }}selected{{ end }}>個人</option>
-                    <option value="group" {{ if eq .Authority.Record 2 }}selected{{ end }}>班級</option>
-                    <option value="all" {{ if eq .Authority.Record 3 }}selected{{ end }}>全校</option>
-                </select>
-            </td>
-            <td>
-                <select name="account_authority" onchange="update('{{ .ID }}', this.name, this.value)">
-                    <option value="self" {{ if eq .Authority.Account 1 }}selected{{ end }}>個人</option>
-                    <option value="group" {{ if eq .Authority.Account 2 }}selected{{ end }}>班級</option>
-                    <option value="all" {{ if eq .Authority.Account 3 }}selected{{ end }}>全校</option>
-                </select>
-            </td>
-            {{ else }}
-            <td>{{ .Authority.Record }}</td>
-            <td>{{ .Authority.Account }}</td>
-            {{ end }}
-            {{ if or (eq $acct.Authority.Account 3) (eq $acct.Authority.Account 2) }}
-            <td>
-                <button><a href="/reset?account_id={{ .ID }}">重設密碼</a></button>
-            </td>
-            <td>
-                {{ if ne .ID "admin" }}
-                <button value="{{ .ID }}" onclick="deleteAccount(this)">刪除帳號</button>
-                {{ end }}
-            </td>
-            {{ end }}
+            <td><a href="/accounts/{{ .ID }}">詳細資訊</a></td>
         </tr>
         {{ end }}
     </tbody>
