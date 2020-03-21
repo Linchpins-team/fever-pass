@@ -102,6 +102,11 @@ input[type="file"] {
     height: 24px;
 }
 
+input[type="radio"] {
+    position: relative;
+    top: 4px;
+}
+
 input:focus {
     background-color: #efe;
 }

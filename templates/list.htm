@@ -25,7 +25,7 @@
 {{ if gt .Page 1 }}
 <a href="/list?page={{ add .Page -1 }}">上一頁</a>
 {{ end }}
-{{ if eq 20 (len .Records) }}
+{{ if eq .PageLimit (len .Records) }}
 <a href="/list?page={{ add .Page 1}}">下一頁</a>
 {{ end }}
 
@@ -38,7 +38,7 @@
 {{ if gt .Page 1 }}
 <a href="/list?page={{ add .Page -1 }}">上一頁</a>
 {{ end }}
-{{ if eq 20 (len .Records) }}
+{{ if eq .PageLimit (len .Records) }}
 <a href="/list?page={{ add .Page 1}}">下一頁</a>
 {{ end }}
 

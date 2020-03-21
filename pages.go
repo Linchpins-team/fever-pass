@@ -57,9 +57,10 @@ func (h Handler) newRecordPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page := struct {
-		Class   string
-		Records []Record
-	}{class, records}
+		Class     string
+		PageLimit int
+		Records   []Record
+	}{class, PageLimit, records}
 	h.HTML(w, r, "new.htm", page)
 }
 
@@ -94,13 +95,15 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page := struct {
-		Page    int
-		Title   string
-		Records []Record
+		Page      int
+		Title     string
+		PageLimit int
+		Records   []Record
 	}{
-		Page:    p,
-		Title:   title,
-		Records: records,
+		Page:      p,
+		Title:     title,
+		PageLimit: PageLimit,
+		Records:   records,
 	}
 	h.HTML(w, r, "list.htm", page)
 }
