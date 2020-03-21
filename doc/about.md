@@ -1,6 +1,6 @@
-# 關於本系統
+# 關於 Fever Pass
 
-Fever Pass 是一個數位體溫記錄系統，機構可使用此系統取代紙本自主體溫記錄表。
+Fever Pass 是一個數位體溫記錄系統。可使用此系統取代紙本體溫記錄表。
 
 ## License 
 本網站由 Linchpins 團隊開發，以 GPL v3 釋出，可於 [GitHub](https://github.com/Linchpins-team/fever-pass) 取得原始碼。

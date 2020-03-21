@@ -72,7 +72,7 @@
             <td>{{ .RecordAuthority }}</td>
             <td>{{ .AccountAuthority }}</td>
             {{ end }}
-            {{ if eq $acct.AccountAuthority 3 }}
+            {{ if or (eq $acct.AccountAuthority 3) (eq $acct.AccountAuthority 2) }}
             <td>
                 <button><a href="/reset?account_id={{ .ID }}">重設密碼</a></button>
             </td>
@@ -86,4 +86,12 @@
         {{ end }}
     </tbody>
 </table>
+{{ if gt .Data.Page 1 }}
+<a href="/accounts?page={{ add .Data.Page -1 }}">上一頁</a>
+{{ end }}
+<span>第<input id="page" type="number" name="page" value="{{ .Data.Page }}">頁</span>
+{{ if eq 100 (len .Data.Accounts) }}
+<a href="/accounts?page={{ add .Data.Page 1}}">下一頁</a>
+{{ end }}
+
 {{ end }}

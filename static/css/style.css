@@ -94,7 +94,7 @@ input {
 }
 
 input[type="submit"] {
-    height: 28px;
+    height: 32px;
     width: 64px;
 }
 
@@ -129,6 +129,7 @@ select {
     text-align-last: center;
     -moz-text-align-last: center;
     -ms-text-align-last: center;
+    margin: 2px;
     height: 28px;
     width: 72px;
 }
@@ -307,7 +308,7 @@ h2 {
 
 @media(max-width:600px) {
     tr {
-        font-size: 11px;
+        font-size: 10px;
     }
     .mobile-br {
         display: block;

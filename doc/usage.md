@@ -1,9 +1,14 @@
 # 使用說明
 
-## 
+平日每天早上記錄體溫。
 
+## 記錄體溫
+
+登入
 ![](/static/img/index.png)
+填體溫
 ![](/static/img/logged_in.png)
+完成！
 ![](/static/img/result.png)
 
 ## 教師

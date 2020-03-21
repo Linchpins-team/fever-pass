@@ -8,10 +8,10 @@
             <form action="/" id="home-form" method="POST">
                 <label for="temperature">體溫（℃）</label>
                 <input type="number" name="temperature" required autofocus autocomplete="off" min="34" max="41" step="0.1">
-                <select name="type">
-                    <option value="1">耳溫</option>
-                    <option value="2">額溫</option>
-                </select>
+                <input type="radio" name="ear" value="1" checked>
+                <label for="ear">耳溫</label>
+                <input type="radio" name="forehead" value="2">
+                <label for="forehead">額溫</label>
                 <input type="submit" value="記錄">
             </form>
             <p id="result">{{ .Message }}</p>
@@ -23,6 +23,7 @@
                 <label for="password">密碼</label>
                 <input type="password" name="password">
                 <input type="submit" value="登入">
+                <input type="reset" value="清空">
                 <p id="msg"></p>
             </form>
         {{ end }}
@@ -34,12 +35,14 @@
                     <th>狀態</th>
                     <th>類型</th>
                     <th>時間</th>
+                    <th></th>
                 </tr>
                 <tr {{ if .Fever }}class="fever"{{ end }}>
                     <td>{{ .Temperature }}</td>
                     <td>{{ if .Fever }}發燒{{ else }}正常{{ end }}</td>
                     <td>{{ .Type }}</td>
                     <td>{{ formatTime .CreatedAt }}</td>
+                    <td><button value="{{ .ID }}" onclick="deleteRow(this, 'records')">刪除</button></td>
                 </tr>
             </table>
         {{ end }}

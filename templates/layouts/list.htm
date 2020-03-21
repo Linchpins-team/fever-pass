@@ -15,11 +15,17 @@
     <tbody id="table">
         {{ range . }}
         {{ block "row" . }}
-        <tr {{ if .Fever }}class="fever"{{ end }}>
+        <tr {{ if .Fever }}class="fever" {{ end }}>
             <td>{{ .Account.ID }}</td>
             <td>{{ .Account.Class }}</td>
             <td>{{ .Account.Number }}</td>
-            <td><a href="/list?account_id={{ .Account.ID }}">{{ .Account }}</a></td>
+            <td>{{ if or (eq $acct.AccountAuthority 3) (eq $acct.AccountAuthority 2) }}
+                <a href="/list?account_id={{ .Account.ID }}">{{ .Account }}</a>
+                {{ end }}
+                {{ else }}
+                {{ .Account }}
+                {{ end }}
+            </td>
             <td>{{ .Temperature }}</td>
             <td>{{ .Type }}</td>
             <td>{{ formatTime .CreatedAt }}</td>

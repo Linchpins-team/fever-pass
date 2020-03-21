@@ -37,7 +37,7 @@ func (h Handler) newRecordPage(w http.ResponseWriter, r *http.Request) {
 	var records []Record
 	acct, ok := r.Context().Value(KeyAccount).(Account)
 	if ok {
-		err := h.listRecord(acct).Where("recorder_id = ?", acct.ID).Limit(20).Find(&records).Error
+		err := h.listRecord(acct).Where("recorder_id = ?", acct.ID).Limit(100).Find(&records).Error
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
@@ -86,7 +86,7 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 		tx = tx.Where("records.created_at > ? and records.created_at < ?", date, date.AddDate(0, 0, 1))
 	}
 
-	err = tx.Offset((p - 1) * 20).Limit(20).Find(&records).Error
+	err = tx.Offset((p - 1) * 100).Limit(100).Find(&records).Error
 	if err != nil {
 		panic(err)
 	}
