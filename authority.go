@@ -54,14 +54,7 @@ var (
 
 	Unknown = Authority{}
 
-	Authorities = [...]Authority{
-		Admin,
-		Nurse,
-		Staff,
-		Tutor,
-		Hygiene,
-		Student,
-	}
+	Authorities = [...]Authority{Admin, Nurse, Staff, Tutor, Hygiene, Student}
 )
 
 const (

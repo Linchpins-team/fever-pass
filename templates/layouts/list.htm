@@ -19,7 +19,7 @@
             <td>{{ .Account.ID }}</td>
             <td><a href="/list?class={{ .Account.Class }}">{{ .Account.Class }}</a></td>
             <td>{{ .Account.Number }}</td>
-            <td><a href="/list?class={{ .Account.Class }}&number={{ .Account.Number }}">{{ .Account }}</a></td>
+            <td><a href="/list?account_id={{ .Account.ID }}">{{ .Account }}</a></td>
             <td>{{ .Temperature }}</td>
             <td>{{ .Type }}</td>
             <td>{{ formatTime .CreatedAt }}</td>

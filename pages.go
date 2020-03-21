@@ -74,6 +74,13 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 	title := ""
 	acct, _ := session(r)
 	tx := h.listRecord(acct)
+	if id := r.FormValue("account_id"); id != "" {
+		account, err := h.getAccount(id)
+		if err == nil {
+			title += account.Name + " "
+			tx = tx.Where("account_id = ?", id)
+		}
+	}
 	if class := r.FormValue("class"); class != "" {
 		tx = whereClass(tx, class)
 		title += class + "班 "
