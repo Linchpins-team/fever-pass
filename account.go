@@ -27,7 +27,6 @@ type Account struct {
 	Number  int
 
 	CreatedAt time.Time
-	DeletedAt *time.Time
 
 	Authority
 }
@@ -36,7 +35,7 @@ func (a Account) String() string {
 	return a.Name
 }
 
-func NewAccount(db *gorm.DB, id, name, password, class, number, role, recordAuthority, accountAuthority string) (account Account, err error) {
+func NewAccount(db *gorm.DB, id, name, password, class, number, authority string) (account Account, err error) {
 	account = Account{
 		ID:       id,
 		Name:     name,
@@ -56,17 +55,10 @@ func NewAccount(db *gorm.DB, id, name, password, class, number, role, recordAuth
 		return
 	}
 
-	account.Role = parseRole(role)
-	if account.Role == 0 {
-		return account, fmt.Errorf("%w: 無效的身份%s", InvalidValue, role)
-	}
-	account.Authority.Record = parseAuthority(recordAuthority)
-	if account.Authority.Record == None {
-		return account, fmt.Errorf("%w: 無效的體溫權限%s", InvalidValue, recordAuthority)
-	}
-	account.Authority.Account = parseAuthority(accountAuthority)
-	if account.Authority.Account == None {
-		return account, fmt.Errorf("%w: 無效的帳號權限%s", InvalidValue, accountAuthority)
+	account.Authority = parseAuthority(authority)
+
+	if account.Authority == Unknown {
+		return account, fmt.Errorf("%w: 無效的身份 %s", InvalidValue, authority)
 	}
 
 	err = db.Create(&account).Error
@@ -129,9 +121,9 @@ func (h Handler) updateAccountAuthority(w http.ResponseWriter, r *http.Request) 
 
 	if role := parseRole(r.FormValue(KeyRole)); role != 0 && acct.Authority.Account == All {
 		account.Role = role
-	} else if level := parseAuthority(r.FormValue(KeyRecordAuthority)); level != None {
+	} else if level := parseAuthorityLevel(r.FormValue(KeyRecordAuthority)); level != None {
 		setAuthority(level, acct.Authority.Record, &account.Authority.Record)
-	} else if authority := parseAuthority(r.FormValue(KeyAccountAuthority)); authority != None {
+	} else if authority := parseAuthorityLevel(r.FormValue(KeyAccountAuthority)); authority != None {
 		setAuthority(authority, acct.Authority.Account, &account.Authority.Account)
 	}
 

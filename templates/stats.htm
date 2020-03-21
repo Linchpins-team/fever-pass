@@ -5,7 +5,7 @@
 {{ define "content-with-session" }}
 <script src="/static/js/load_account_list.js"></script>
 <h1>{{ template "title" .Data }}</h1>
-{{ if eq .Role 1 }}
+{{ if eq .Record 3 }}
 <form action="/stats" method="get">
     <label for="class">班級</label>
     <input type="text" name="class">
@@ -57,7 +57,7 @@
         <td>{{ .Class }}</td>
         <td>{{ .Number }}</td>
         <td><a href="/list?account_id={{ .ID }}">{{ .Name }}</a></td>
-        <td>{{ .Role }}</td>
+        <td>{{ .Authority }}</td>
     </tr>
     {{ end }}
 </table>

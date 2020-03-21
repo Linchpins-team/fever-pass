@@ -15,7 +15,7 @@
 <br>
 {{ $acct := .Account }}
 
-{{ if eq $acct.Role 1 }}
+{{ if eq $acct.Authority.Account 3 }}
 <a href="/register">新增使用者</a>
 <a href="/import">匯入帳號資料 (.csv 檔)</a>
 {{ end }}
@@ -51,7 +51,7 @@
                 </select>
             </td>
             {{ else }}
-            <td>{{ .Role }}</td>
+            <td>{{ .Authority }}</td>
             {{ end }}
             {{ if and ( ge $acct.Authority.Account 2 ) ( ne .ID "admin" ) }}
             <td>

@@ -160,3 +160,9 @@ func addMessage(r *http.Request, msg string) *http.Request {
 	ctx = context.WithValue(ctx, KeyMessage, msg)
 	return r.WithContext(ctx)
 }
+
+func (h Handler) registerPage(w http.ResponseWriter, r *http.Request) {
+	page := make(map[string]interface{})
+	page["authorities"] = Authorities
+	h.HTML(w, r, "register.htm", page)
+}

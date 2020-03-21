@@ -141,9 +141,7 @@ func (h Handler) register(w http.ResponseWriter, r *http.Request) {
 		r.FormValue("password"),
 		r.FormValue("class"),
 		r.FormValue("number"),
-		r.FormValue("role"),
-		r.FormValue("record_authority"),
-		r.FormValue("account_authority"),
+		r.FormValue("authority"),
 	)
 
 	if err != nil {

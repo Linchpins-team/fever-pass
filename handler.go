@@ -51,7 +51,7 @@ func (h *Handler) newRouter() {
 	r.HandleFunc("/list", h.auth(h.listRecordsPage, Self, None))
 	r.HandleFunc("/accounts", h.auth(h.listAccountsPage, Self, Self))
 	r.HandleFunc("/stats", h.auth(h.stats, Group, None))
-	r.HandleFunc("/import", h.auth(h.page("import.htm"), None, All)).Methods("GET")
+	r.HandleFunc("/import", h.auth(h.importPage, None, All)).Methods("GET")
 	r.HandleFunc("/import", h.auth(h.importHandler, None, All)).Methods("POST")
 	r.HandleFunc("/export", h.auth(h.exportCSV, Group, None))
 
@@ -62,7 +62,7 @@ func (h *Handler) newRouter() {
 	r.Handle("/reset", h.auth(h.resetPage, None, Self)).Methods("GET")
 	r.Handle("/reset", h.auth(h.resetPassword, None, Self)).Methods("POST")
 	r.HandleFunc("/logout", logout)
-	r.HandleFunc("/register", h.auth(h.page("register.htm"), None, All)).Methods("GET")
+	r.HandleFunc("/register", h.auth(h.registerPage, None, All)).Methods("GET")
 	r.HandleFunc("/register", h.auth(h.register, None, All)).Methods("POST")
 
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
