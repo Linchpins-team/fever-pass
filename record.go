@@ -136,6 +136,7 @@ func (h Handler) deleteRecord(w http.ResponseWriter, r *http.Request) {
 	err = h.db.Preload("Account").First(&record, id).Error
 	if gorm.IsRecordNotFoundError(err) {
 		http.Error(w, RecordNotFound.Error(), 404)
+		return
 	} else if err != nil {
 		panic(err)
 	}
@@ -146,7 +147,7 @@ func (h Handler) deleteRecord(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.db.Delete(&record).Error
+	err = h.db.Where("id = ?", id).Delete(&record).Error
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
