@@ -42,11 +42,11 @@ main {
 }
 
 .staff {
-    background: #9ea;
+    background: #86ebb2;
 }
 
 .hygiene {
-    background: #aeb;
+    background: #9ea;
 }
 
 #logo {
@@ -88,12 +88,12 @@ nav a {
 
 input {
     padding: 2px;
-    margin: 8px 16px;
+    margin: 8px 12px;
     height: 20px;
     font-size: 14px;
 }
 
-input[type="submit"] {
+input[type="submit"], input[type="reset"] {
     height: 32px;
     width: 64px;
 }
@@ -103,8 +103,8 @@ input[type="file"] {
 }
 
 input[type="radio"] {
-    position: relative;
-    top: 4px;
+    height: 16px;
+    width: 16px;
 }
 
 input:focus {
@@ -179,7 +179,7 @@ form button {
 }
 
 a {
-    color: var(--secondary);
+    color: #249;
     text-decoration: none;
     text-align: center;
     display: inline-block;
@@ -221,7 +221,7 @@ a[href="/import"] {
 }
 
 table {
-    margin: 12px auto;
+    margin: 24px auto;
     width: 70%;
 }
 
@@ -231,7 +231,7 @@ th {
 }
 
 tr {
-    background: #cfd;
+    background: #bec;
 }
 
 h1 {

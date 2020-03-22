@@ -1,5 +1,6 @@
 {{ define "title" }}體溫記錄系統{{ end }}
 {{ define "content-with-session" }}
+<script src="/static/js/delete.js"></script>
 <div class="middle">
     <div>
         <h1 id="home-h1">Fever Pass</h1>
@@ -9,9 +10,9 @@
                 <label for="temperature">體溫（℃）</label>
                 <input type="number" name="temperature" required autofocus autocomplete="off" min="34" max="41" step="0.1">
                 <input type="radio" name="type" value="1" checked>
-                <label for="ear">耳溫</label>
+                <label for="type">耳溫</label>
                 <input type="radio" name="type" value="2">
-                <label for="forehead">額溫</label>
+                <label for="type">額溫</label>
                 <input type="submit" value="記錄">
             </form>
             <p id="result">{{ .Message }}</p>
