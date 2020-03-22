@@ -109,7 +109,7 @@ func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h Handler) listRecord(acct Account) (tx *gorm.DB) {
-	tx = h.db.Order("id desc").Set("gorm:auto_preload", true)
+	tx = h.db.Table("records").Order("id desc").Set("gorm:auto_preload", true)
 	tx = tx.Joins("JOIN accounts on records.account_id = accounts.id")
 	switch acct.Authority.Record {
 	case All:

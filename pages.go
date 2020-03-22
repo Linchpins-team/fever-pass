@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/jinzhu/gorm"
 )
 
 const (
@@ -99,18 +100,25 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	page := struct {
-		Page      int
-		Title     string
-		PageLimit int
-		Records   []Record
-	}{
-		Page:      p,
-		Title:     title,
-		PageLimit: PageLimit,
-		Records:   records,
-	}
+	page := make(map[string]interface{})
+	page["Page"] = p
+	page["Title"] = title
+	page["PageLimit"] = PageLimit
+	page["Records"] = records
+	page["Count"] = pageCount(tx)
 	h.HTML(w, r, "list.htm", page)
+}
+
+func pageCount(tx *gorm.DB) int {
+	var count int
+	tx.Count(&count)
+	if count%PageLimit == 0 {
+		count /= PageLimit
+	} else {
+		count /= PageLimit
+		count++
+	}
+	return count
 }
 
 func (h Handler) listAccountsPage(w http.ResponseWriter, r *http.Request) {
@@ -142,6 +150,7 @@ func (h Handler) listAccountsPage(w http.ResponseWriter, r *http.Request) {
 	page["Page"] = p
 	page["Title"] = title
 	page["Accounts"] = accounts
+	page["Count"] = pageCount(tx)
 	h.HTML(w, r, "account_list.htm", page)
 }
 
