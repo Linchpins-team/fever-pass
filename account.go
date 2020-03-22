@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -51,6 +52,9 @@ func NewAccount(db *gorm.DB, id, name, password, class, number, authority string
 		account.Number = 0
 	}
 
+	if strings.TrimSpace(class) == "" {
+		class = "T"
+	}
 	if err = db.FirstOrCreate(&account.Class, Class{Name: class}).Error; err != nil {
 		return
 	}
@@ -197,7 +201,8 @@ func (h Handler) resetPassword(w http.ResponseWriter, r *http.Request) {
 func (h Handler) findAccountByClassAndNumber(w http.ResponseWriter, r *http.Request) {
 	var err error
 	var account Account
-	tx := whereClass(h.db, r.FormValue("class"))
+	tx := joinClasses(h.db)
+	tx = whereClass(tx, r.FormValue("class"))
 	tx = whereNumber(tx, r.FormValue("number"))
 	err = tx.First(&account).Error
 	if gorm.IsRecordNotFoundError(err) {

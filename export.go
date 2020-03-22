@@ -29,9 +29,9 @@ func (h Handler) export(tx *gorm.DB, w io.Writer) (err error) {
 			strconv.Itoa(account.Number),
 			account.Name,
 		}
-		record, err := h.lastRecord(account)
-		if err == nil {
-			row = append(row, record.CSV()...)
+		records, err := h.lastRecords(account, 1)
+		if len(records) == 1 {
+			row = append(row, records[0].CSV()...)
 		}
 		if err = enc.Write(row); err != nil {
 			panic(err)
@@ -57,16 +57,15 @@ func (r Record) CSV() []string {
 func (r Record) FeverString() string {
 	if r.Fever() {
 		return "發燒"
-	} else {
-		return "正常"
 	}
+	return "正常"
 }
 
 func (h Handler) exportCSV(w http.ResponseWriter, r *http.Request) {
 	filename := time.Now().Format("fever-pass-2006-01-02_03-04-export.csv")
 	w.Header().Set("Content-Type", "text/x-csv")
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
-	acct := r.Context().Value(KeyAccount).(Account)
+	acct, _ := session(r)
 	tx := h.listAccounts(acct).Where("role = ?", RoleStudent)
 	err := h.export(tx, w)
 	if err != nil {

@@ -29,7 +29,6 @@
             </form>
         {{ end }}
         {{ with .Data }}
-        {{ if ne .ID 0 }}
             <table>
                 <tr>
                     <th>最新體溫記錄（℃）</th>
@@ -38,6 +37,7 @@
                     <th>時間</th>
                     <th></th>
                 </tr>
+                {{ range . }}
                 <tr {{ if .Fever }}class="fever"{{ end }}>
                     <td>{{ .Temperature }}</td>
                     <td>{{ if .Fever }}發燒{{ else }}正常{{ end }}</td>
@@ -45,8 +45,8 @@
                     <td>{{ formatTime .CreatedAt }}</td>
                     <td><button value="{{ .ID }}" onclick="deleteRow(this, 'records')">刪除</button></td>
                 </tr>
+                {{ end }}
             </table>
-        {{ end }}
         {{ end }}
     </div>
 </div>
