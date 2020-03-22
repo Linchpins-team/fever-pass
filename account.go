@@ -126,7 +126,7 @@ func (h Handler) updateAccountAuthority(w http.ResponseWriter, r *http.Request) 
 	if role := parseRole(r.FormValue(KeyRole)); role != 0 && acct.Authority.Account == All {
 		account.Role = role
 	} else if level := parseAuthorityLevel(r.FormValue(KeyRecordAuthority)); level != None {
-		setAuthority(level, acct.Authority.Record, &account.Authority.Record)
+		setAuthority(level, acct.Authority.Account, &account.Authority.Record)
 	} else if authority := parseAuthorityLevel(r.FormValue(KeyAccountAuthority)); authority != None {
 		setAuthority(authority, acct.Authority.Account, &account.Authority.Account)
 	}

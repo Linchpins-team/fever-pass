@@ -3,6 +3,7 @@
 {{ $acct := .Account }}
 <h1>{{ template "title" .Data }}</h1>
 
+{{ if or ( eq $acct.Authority.Record 3 ) ( eq $acct.Authority.Account 3 )}}
 <form action="/accounts" method="get">
     <label>班級</label>
     <input type="text" name="class">
@@ -10,6 +11,7 @@
     <input type="number" name="number">
     <input type="submit" value="查詢">
 </form>
+{{ end }}
 
 {{ with .Data }}
 

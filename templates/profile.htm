@@ -36,7 +36,7 @@
     <tr>
         {{ if and ( eq $acct.Authority.Account 3 ) ( ne .ID "admin" ) }}
         <td>
-            <select name="role" onchange="update('{{ .ID }}', this.name, this.value)">
+            <select name="role" onchange="update('{{ .ID }}', this.name, this.value)" autocomplete="off">
                 <option value="admin" {{ if eq .Role 1 }}selected{{ end }}>管理員</option>
                 <option value="staff" {{ if eq .Role 2 }}selected{{ end }}>教職員</option>
                 <option value="student" {{ if eq .Role 3 }}selected{{ end }}>學生</option>
@@ -47,14 +47,14 @@
         {{ end }}
         {{ if and ( ge $acct.Authority.Account 2 ) ( ne .ID "admin" ) }}
         <td>
-            <select name="record_authority" onchange="update('{{ .ID }}', this.name, this.value)">
+            <select name="record_authority" onchange="update('{{ .ID }}', this.name, this.value)" autocomplete="off">
                 <option value="self" {{ if eq .Authority.Record 1 }}selected{{ end }}>個人</option>
                 <option value="group" {{ if eq .Authority.Record 2 }}selected{{ end }}>班級</option>
                 <option value="all" {{ if eq .Authority.Record 3 }}selected{{ end }}>全校</option>
             </select>
         </td>
         <td>
-            <select name="account_authority" onchange="update('{{ .ID }}', this.name, this.value)">
+            <select name="account_authority" onchange="update('{{ .ID }}', this.name, this.value)" autocomplete="off">
                 <option value="self" {{ if eq .Authority.Account 1 }}selected{{ end }}>個人</option>
                 <option value="group" {{ if eq .Authority.Account 2 }}selected{{ end }}>班級</option>
                 <option value="all" {{ if eq .Authority.Account 3 }}selected{{ end }}>全校</option>
