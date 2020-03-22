@@ -1,5 +1,5 @@
 {{ define "title" }}新增使用者{{ end }}
-{{ define "content" }}
+{{ define "content-with-session" }}
 <div class="middle">
 <h1>新增使用者</h1>
 <form action="/register" id="form" method="POST">
@@ -9,7 +9,7 @@
     座號 <input type="number" name="number"><br class="mobile-br">
     密碼 <input type="password" name="password"><br class="mobile-br">
     身份 <select name="authority" required>
-        {{ range .authorities }}
+        {{ range .Data.authorities }}
         <option value="{{ .Key }}">
             {{ . }}
         </option>
@@ -17,7 +17,7 @@
     </select>
     <input type="submit" value="新增">
     {{ with .Message }}
-    <p id="msg">{{ .Message }}</p>
+    <p id="msg">{{ . }}</p>
     {{ end }}
 </form>
 </div>

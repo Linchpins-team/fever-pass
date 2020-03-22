@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/jinzhu/gorm"
+	"github.com/gorilla/mux"
 )
 
 const (
@@ -14,11 +14,11 @@ const (
 )
 
 func (h Handler) index(w http.ResponseWriter, r *http.Request) {
-	acct, ok := r.Context().Value(KeyAccount).(Account)
+	acct, ok := session(r)
 	if ok {
-		record, err := h.lastRecord(acct)
+		records, err := h.lastRecords(acct, 3)
 		if err == nil {
-			h.HTML(w, r, "index.htm", record)
+			h.HTML(w, r, "index.htm", records)
 			return
 		}
 	}
@@ -26,12 +26,9 @@ func (h Handler) index(w http.ResponseWriter, r *http.Request) {
 }
 
 // get the last record today of the account
-func (h Handler) lastRecord(account Account) (record Record, err error) {
-	err = h.db.Set("gorm:auto_preload", true).Where("created_at > ?", today()).Order("id desc").First(&record, "account_id = ?", account.ID).Error
-	if gorm.IsRecordNotFoundError(err) {
-		err = RecordNotFound
-		return
-	} else if err != nil {
+func (h Handler) lastRecords(account Account, n int) (record []Record, err error) {
+	err = h.db.Set("gorm:auto_preload", true).Where("created_at > ?", today()).Order("id desc").Limit(n).Find(&record, "account_id = ?", account.ID).Error
+	if err != nil {
 		panic(err)
 	}
 	return
@@ -186,4 +183,20 @@ func (h Handler) registerPage(w http.ResponseWriter, r *http.Request) {
 	page := make(map[string]interface{})
 	page["authorities"] = Authorities
 	h.HTML(w, r, "register.htm", page)
+}
+
+func (h Handler) profile(w http.ResponseWriter, r *http.Request) {
+	acct, _ := session(r)
+	account, err := h.getAccount(mux.Vars(r)["id"])
+	if err == AccountNotFound {
+		h.errorPage(w, r, "此帳號不存在", "")
+		return
+	}
+
+	if !accountPermission(acct, account) && !recordPermission(acct, account) {
+		h.errorPage(w, r, "權限不足", "你沒有權限查看此頁面")
+		return
+	}
+
+	h.HTML(w, r, "profile.htm", account)
 }

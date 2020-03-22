@@ -131,7 +131,7 @@ func logout(w http.ResponseWriter, r *http.Request) {
 
 func (h Handler) register(w http.ResponseWriter, r *http.Request) {
 	next := func(msg string) {
-		h.HTML(w, r, "register.htm", msg)
+		h.registerPage(w, addMessage(r, msg))
 	}
 
 	acct, err := NewAccount(
