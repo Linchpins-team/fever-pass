@@ -20,13 +20,17 @@
 </form>
 
 {{ with .Data }}
-<p>第 {{ .Page }} 頁</p>
 
-{{ if gt .Page 1 }}
-<a href="/list?page={{ add .Page -1 }}">上一頁</a>
-{{ end }}
-{{ if eq .PageLimit (len .Records) }}
-<a href="/list?page={{ add .Page 1}}">下一頁</a>
+{{ block "page_number" . }}
+    <form action="/list" method="GET">
+    {{ if gt .Page 1 }}
+    <a href="/list?page={{ add .Page -1 }}">上一頁</a>
+    {{ end }}
+    <span>第<input id="page" type="number" name="page" value="{{ .Page }}" max="{{ .Count }}" min="1">頁</span>
+    {{ if eq .PageLimit (len .Records) }}
+    <a href="/list?page={{ add .Page 1}}">下一頁</a>
+    {{ end }}
+    </form>
 {{ end }}
 
 {{ if ne (len .Records) 0}}
@@ -35,12 +39,7 @@
 <h2>查無資料</h2>
 {{ end }}
 
-{{ if gt .Page 1 }}
-<a href="/list?page={{ add .Page -1 }}">上一頁</a>
-{{ end }}
-{{ if eq .PageLimit (len .Records) }}
-<a href="/list?page={{ add .Page 1}}">下一頁</a>
-{{ end }}
+{{ template "page_number" .}}
 
 {{ end }}
 {{ end }}

@@ -1,5 +1,6 @@
 {{ define "title" }}{{ .Title }}帳號管理{{ end }}
 {{ define "content-with-session" }}
+{{ $acct := .Account }}
 <h1>{{ template "title" .Data }}</h1>
 
 <form action="/accounts" method="get">
@@ -9,17 +10,21 @@
     <input type="number" name="number">
     <input type="submit" value="查詢">
 </form>
-<form action="/accounts" method="get">
-{{ if gt .Data.Page 1 }}
-<a href="/accounts?page={{ add .Data.Page -1 }}">上一頁</a>
+
+{{ with .Data }}
+
+{{ block "page_number" . }}
+    <form action="/accounts" method="get">
+    {{ if gt .Page 1 }}
+    <a href="/accounts?page={{ add .Page -1 }}">上一頁</a>
+    {{ end }}
+    <span>第<input id="page" type="number" name="page" value="{{ .Page }}" min="1" max="{{ .Count }}">頁</span>
+    {{ if eq 100 (len .Accounts) }}
+    <a href="/accounts?page={{ add .Page 1}}">下一頁</a>
+    {{ end }}
+    <br>
+    </form>
 {{ end }}
-<span>第<input id="page" type="number" name="page" value="{{ .Data.Page }}">頁</span>
-{{ if eq 100 (len .Data.Accounts) }}
-<a href="/accounts?page={{ add .Data.Page 1}}">下一頁</a>
-{{ end }}
-<br>
-</form>
-{{ $acct := .Account }}
 
 {{ if eq $acct.Authority.Account 3 }}
 <a href="/register">新增使用者</a>
@@ -35,7 +40,7 @@
         <th></th>
     </tr>
     <tbody>
-        {{ range .Data.Accounts }}
+        {{ range .Accounts }}
         <tr {{ if eq .Role 1 }} class="admin" {{ end }} {{ if eq .Role 2 }} class="staff" {{ end }}
             {{ if and ( eq .Authority.Record 2 ) ( eq .Role 3 ) }} class="hygiene" {{ end }}>
             <td>{{ .ID }}</td>
@@ -48,12 +53,8 @@
         {{ end }}
     </tbody>
 </table>
-{{ if gt .Data.Page 1 }}
-<a href="/accounts?page={{ add .Data.Page -1 }}">上一頁</a>
-{{ end }}
-<span>第<input id="page" type="number" name="page" value="{{ .Data.Page }}">頁</span>
-{{ if eq 100 (len .Data.Accounts) }}
-<a href="/accounts?page={{ add .Data.Page 1}}">下一頁</a>
-{{ end }}
 
+{{ template "page_number" . }}
+
+{{ end }}
 {{ end }}

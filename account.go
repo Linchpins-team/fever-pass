@@ -138,7 +138,7 @@ func (h Handler) updateAccountAuthority(w http.ResponseWriter, r *http.Request) 
 }
 
 func (h Handler) listAccounts(acct Account) *gorm.DB {
-	tx := joinClasses(h.db).Preload("Class").Order("role, classes.name, number asc")
+	tx := joinClasses(h.db.Table("accounts")).Preload("Class").Order("role, classes.name, number asc")
 	level := acct.bigger()
 	switch level {
 	case All:
