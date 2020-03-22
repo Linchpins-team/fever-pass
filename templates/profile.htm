@@ -1,6 +1,7 @@
 {{ define "content-with-session" }}
 <script src="/static/js/delete.js"></script>
 <script src="/static/js/update.js"></script>
+<div class="middle">
 <h1>{{ block "title" .Data }}{{ .Name }} 帳號資訊{{ end }}</h1>
 {{ $acct := .Account }}
 {{ with .Data }}
@@ -79,3 +80,4 @@
 </table>
 {{ end }}
 {{ end }}
+</div>
