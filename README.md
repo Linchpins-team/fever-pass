@@ -1,6 +1,6 @@
 # 使用說明
 
-Fever Pass 是一個數位體溫記錄系統，機構可使用此系統取代紙本體溫記錄表。
+Fever Pass 是一個數位體溫記錄系統，可使用此系統取代紙本體溫記錄表。
 
 ## License 
 本網站由 Linchpins 團隊開發，以 GPL v3 釋出。
@@ -8,7 +8,7 @@ Fever Pass 是一個數位體溫記錄系統，機構可使用此系統取代紙
 ## 開發者
 林宏信：資料庫、後端與網頁模板
 
-張旭誠：網頁設計
+張旭誠：網頁設計、文檔
 
 ## 部署
 安裝[Go](https://golang.org)、[SQL（MariaDB）](https://mariadb.org/download)
@@ -39,3 +39,7 @@ Fever Pass 是一個數位體溫記錄系統，機構可使用此系統取代紙
 加密金鑰將會自動生成，儲存於 .env 中供下次存取。
 
 可以透過 `quicktest.sh` 執行 curl 測試，go 測試使用 `go test`  
+
+---
+
+若需要代為部署，請來信 linchpins-team@protonmail.com 商談。
