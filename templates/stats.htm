@@ -1,5 +1,5 @@
 {{ define "title" }}
-    {{ with .Class }}{{ . }}班{{ end }}統計資料
+    {{ with .Class }}{{ . }}班{{ end }}本日體溫資料
 {{ end }}
 
 {{ define "content-with-session" }}
@@ -11,8 +11,8 @@
     <input type="text" name="class">
     <input type="submit" value="查詢">
 </form>
-{{ end }}
 <a href="/export">下載本日資料 (.csv)</a>
+{{ end }}
 {{ with .Data }}
 <table>
     <tr>
@@ -28,12 +28,12 @@
         <td>{{ .Fevered }}</td>
     </tr>
 </table>
-<input type="radio" name="list_type" onchange="loadAccountList(2, '{{ .Class }}')"><label>未記錄</label>
+<input type="radio" name="list_type" onchange="loadAccountList(2, '{{ .Class }}')" checked><label>未記錄</label>
 <input type="radio" name="list_type" onchange="loadAccountList(1, '{{ .Class }}')"><label>已記錄</label>
-<input type="radio" name="list_type" onchange="loadAccountList(3, '{{ .Class }}')" checked><label>發燒</label>
+<input type="radio" name="list_type" onchange="loadAccountList(3, '{{ .Class }}')"><label>發燒</label>
 <div id="list"></div>
 <script>
-    loadAccountList(3, '{{ .Class }}')
+    loadAccountList(2, '{{ .Class }}')
 </script>
 {{ end }}
 
@@ -46,6 +46,7 @@
         <th>班級</th>
         <th>座號</th>
         <th>姓名</th>
+        <th>體溫</th>
         <th>身份</th>
     </tr>
     {{ range . }}
@@ -54,6 +55,7 @@
         <td>{{ .Class }}</td>
         <td>{{ .Number }}</td>
         <td><a href="/list?account_id={{ .ID }}">{{ .Name }}</a></td>
+        <td></td>
         <td>{{ .Authority }}</td>
     </tr>
     {{ end }}

@@ -3,7 +3,7 @@
   {{ if .Login }}
   {{ if ge .Authority.Record 2 }}
   <a href="/new">新增體溫記錄</a>
-  <a href="/stats">統計資料</a>
+  <a href="/stats">本日體溫資料</a>
   {{ end }}
   <a href="/list">體溫歷史記錄</a>
   {{ if or (ge .Authority.Account 2) (ge .Authority.Record 2) }}
