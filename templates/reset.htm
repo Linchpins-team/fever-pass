@@ -6,10 +6,9 @@
 <h1>{{ template "title" . }}</h1>
 <form action="/reset" method="POST">
     <input type="hidden" name="account_id" value="{{ .ID }}">
-    <p>進行本操作需要驗證密碼</p>
-    <label for="current_passwd">驗證密碼</label>
-    <input type="password" name="current_password" autofocus><br>
-    <label for="new_password">新的密碼</label>
+    <label for="current_passwd">操作者密碼</label>
+    <input type="password" name="current_password"><br>
+    <label for="new_password">新密碼</label>
     <input type="password" name="new_password"><br>
     <input type="submit" value="重設">
     <p id="msg">{{ .Message }}</p>
