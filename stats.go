@@ -19,11 +19,10 @@ const (
 )
 
 func statsQuery(db, base *gorm.DB, t ListType, date time.Time) *gorm.DB {
-	subQuery := db.Table("records").Select(
-		"max(id) as id",
-	).Where(
-		"created_at > ? and created_at < ?", date, date.AddDate(0, 0, 1),
-	).Where("deleted_at is NULL").Group("account_id").SubQuery()
+	subQuery := whereDate(
+		db.Table("records").Select("max(id) as id").
+			Where("deleted_at is NULL").Group("account_id"), date,
+	).SubQuery()
 	subQuery = db.Table("records").Joins("inner join ? as m on m.id = records.id", subQuery).SubQuery()
 	base = base.Table("accounts").Joins(
 		"left join ? as records on records.account_id = accounts.id", subQuery)
@@ -46,7 +45,7 @@ func statsQuery(db, base *gorm.DB, t ListType, date time.Time) *gorm.DB {
 	return nil
 }
 
-func statsBase(db *gorm.DB, acct Account, class string) (tx *gorm.DB, err error) {
+func statsBase(db *gorm.DB, acct Account, class, date string) (tx *gorm.DB, err error) {
 	tx = joinClasses(db).Set("gorm:auto_preload", true)
 	if acct.Authority.Record == Group {
 		class = acct.Class.Name
@@ -67,27 +66,36 @@ func statsBase(db *gorm.DB, acct Account, class string) (tx *gorm.DB, err error)
 func (h Handler) stats(w http.ResponseWriter, r *http.Request) {
 	acct := r.Context().Value(KeyAccount).(Account)
 	class := r.FormValue("class")
-	page := struct {
-		Class                         string
-		Recorded, Unrecorded, Fevered int
-	}{
-		Class: class,
-	}
 	var err error
-	base, err := statsBase(h.db, acct, class)
+	base, err := statsBase(h.db, acct, class, r.FormValue("date"))
 	if gorm.IsRecordNotFoundError(err) {
 		h.errorPage(w, r, "找不到班級", "找不到班級"+class)
 		return
 	}
-	err = statsQuery(h.db, base, Recorded, today()).Count(&page.Recorded).Error
+
+	date, err := time.ParseInLocation("2006-01-02", r.FormValue("date"), time.Local)
+	if err != nil {
+		date = today()
+	}
+
+	page := struct {
+		Class                         string
+		Date                          string
+		Recorded, Unrecorded, Fevered int
+	}{
+		Class: class,
+		Date:  date.Format("2006-01-02"),
+	}
+
+	err = statsQuery(h.db, base, Recorded, date).Count(&page.Recorded).Error
 	if err != nil {
 		panic(err)
 	}
-	err = statsQuery(h.db, base, Unrecorded, today()).Count(&page.Unrecorded).Error
+	err = statsQuery(h.db, base, Unrecorded, date).Count(&page.Unrecorded).Error
 	if err != nil {
 		panic(err)
 	}
-	err = statsQuery(h.db, base, Fevered, today()).Count(&page.Fevered).Error
+	err = statsQuery(h.db, base, Fevered, date).Count(&page.Fevered).Error
 	if err != nil {
 		panic(err)
 	}
@@ -104,13 +112,17 @@ func (h Handler) statsList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var err error
-	base, err := statsBase(h.db, acct, class)
+	base, err := statsBase(h.db, acct, class, r.FormValue("date"))
 	if gorm.IsRecordNotFoundError(err) {
 		h.errorPage(w, r, "找不到班級", "找不到班級"+class)
 		return
 	}
 
-	result := selectRecords(statsQuery(h.db, base, t, today()))
+	date, err := time.ParseInLocation("2006-01-02", r.FormValue("date"), time.Local)
+	if err != nil {
+		date = today()
+	}
+	result := selectRecords(statsQuery(h.db, base, t, date))
 	if err = h.tpls["stats.htm"].ExecuteTemplate(w, "account_list", result); err != nil {
 		http.Error(w, err.Error(), 500)
 	}

@@ -29,5 +29,5 @@ func whereNumber(tx *gorm.DB, number string) *gorm.DB {
 
 // select specific date when query records
 func whereDate(tx *gorm.DB, date time.Time) *gorm.DB {
-	return tx.Table("records").Where("records.created_at > ? and records.created_at < ?", date, date.AddDate(0, 0, 1))
+	return tx.Where("records.created_at > ? and records.created_at < ?", date, date.AddDate(0, 0, 1))
 }

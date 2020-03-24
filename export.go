@@ -56,12 +56,17 @@ func (r Record) FeverString() string {
 }
 
 func (h Handler) exportCSV(w http.ResponseWriter, r *http.Request) {
-	filename := time.Now().Format("fever-pass-2006-01-02_03-04-export.csv")
+	date, err := time.ParseInLocation("2006-01-02", r.FormValue("date"), time.Local)
+	if err != nil {
+		date = today()
+	}
+	class := r.FormValue("class")
+	filename := fmt.Sprintf("fever-pass-%s-%s-export.csv", class, date.Format("2006-01-02_03-04"))
 	w.Header().Set("Content-Type", "text/x-csv")
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
 	acct, _ := session(r)
-	tx, err := statsBase(h.db, acct, "")
-	tx = statsQuery(h.db, tx, Complete, today())
+	tx, err := statsBase(h.db, acct, class, r.FormValue("date"))
+	tx = statsQuery(h.db, tx, Complete, date)
 	err = h.export(selectRecords(tx), w)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
