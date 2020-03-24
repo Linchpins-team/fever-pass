@@ -30,7 +30,7 @@ func statsQuery(db, base *gorm.DB, t ListType) (tx *gorm.DB) {
 		return base.Table("accounts").Joins(
 			"inner join records as r on r.account_id = accounts.id",
 		).Joins("inner join ? as m on m.id = r.id", subQuery).Where(
-			"(temperature > 38 and type = 1) or (temperature > 37.5 and type = 2)",
+			"(temperature >= 38 and type = 1) or (temperature >= 37.5 and type = 2)",
 		)
 
 	}
