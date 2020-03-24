@@ -9,6 +9,7 @@ import (
 type AccountRecords struct {
 	Account
 	Record
+	Recorded    bool
 	temperature sql.NullFloat64
 	tempType    sql.NullInt32
 	createdAt   sql.NullTime
@@ -38,6 +39,7 @@ func selectRecords(tx *gorm.DB) (result []AccountRecords) {
 			panic(err)
 		}
 		if r.temperature.Valid {
+			r.Recorded = true
 			r.Record.Temperature = r.temperature.Float64
 			r.Record.Type = TempType(r.tempType.Int32)
 			r.Record.CreatedAt = r.createdAt.Time

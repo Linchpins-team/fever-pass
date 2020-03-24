@@ -15,9 +15,10 @@ const (
 	Recorded
 	Unrecorded
 	Fevered
+	Complete
 )
 
-func statsQuery(db, base *gorm.DB, t ListType, date time.Time) (tx *gorm.DB) {
+func statsQuery(db, base *gorm.DB, t ListType, date time.Time) *gorm.DB {
 	subQuery := db.Table("records").Select(
 		"max(id) as id",
 	).Where(
@@ -38,6 +39,9 @@ func statsQuery(db, base *gorm.DB, t ListType, date time.Time) (tx *gorm.DB) {
 		return base.Where(
 			"(temperature >= 38 and type = 1) or (temperature >= 37.5 and type = 2)",
 		)
+
+	case Complete:
+		return base
 	}
 	return nil
 }

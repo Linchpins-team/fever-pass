@@ -11,8 +11,8 @@
     <input type="text" name="class">
     <input type="submit" value="查詢">
 </form>
-<a href="/export">下載本日資料 (.csv)</a>
 {{ end }}
+<a href="/export">下載本日資料 (.csv)</a>
 {{ with .Data }}
 <table>
     <tr>
@@ -28,9 +28,9 @@
         <td>{{ .Fevered }}</td>
     </tr>
 </table>
-<input type="radio" name="list_type" onchange="loadAccountList(2, '{{ .Class }}')" checked><label>未記錄</label>
-<input type="radio" name="list_type" onchange="loadAccountList(1, '{{ .Class }}')"><label>已記錄</label>
-<input type="radio" name="list_type" onchange="loadAccountList(3, '{{ .Class }}')"><label>發燒</label>
+<input type="radio" name="list_type" onchange="loadAccountList(2, '{{ .Class }}')" checked autocomplete="off"><label>未記錄</label>
+<input type="radio" name="list_type" onchange="loadAccountList(1, '{{ .Class }}')" autocomplete="off"><label>已記錄</label>
+<input type="radio" name="list_type" onchange="loadAccountList(3, '{{ .Class }}')" autocomplete="off"><label>發燒</label>
 <div id="list"></div>
 <script>
     loadAccountList(2, '{{ .Class }}')
@@ -55,7 +55,7 @@
         <td>{{ .Class }}</td>
         <td>{{ .Number }}</td>
         <td><a href="/list?account_id={{ .Account.ID }}">{{ .Name }}</a></td>
-        <td>{{ .Record.Temperature }}</td>
+        <td>{{ if .Recorded }}{{ .Record.Temperature }}{{ end }}</td>
         <td>{{ .Authority }}</td>
     </tr>
     {{ end }}
