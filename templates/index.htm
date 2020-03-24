@@ -5,48 +5,34 @@
     <div>
         <h1 id="home-h1">Fever Pass</h1>
         <h2 id="home-h2">體溫記錄系統</h2>
-        {{ if .Login }}
-            <form action="/" id="home-form" method="POST">
-                <label for="temperature">體溫（℃）</label>
-                <input type="number" name="temperature" required autofocus autocomplete="off" min="34" max="41" step="0.1">
-                <input type="radio" name="type" value="1" checked>
-                <label for="type">耳溫</label>
-                <input type="radio" name="type" value="2">
-                <label for="type">額溫</label>
-                <input type="submit" value="記錄">
-            </form>
-            <p id="result">{{ .Message }}</p>
-        {{ else }}
-            <script src="/static/js/login.js" defer></script>
-            <form action="" id="home-form">
-                <label for="username">帳號</label>
-                <input type="text" name="username">
-                <label for="password">密碼</label>
-                <input type="password" name="password">
-                <input type="submit" value="登入">
-                <input type="reset" value="清空">
-                <p id="msg"></p>
-            </form>
-        {{ end }}
+        <form action="/" id="home-form" method="POST">
+            <label for="temperature">體溫（℃）</label>
+            <input type="number" name="temperature" required autofocus autocomplete="off" min="34" max="41" step="0.1">
+            <input type="radio" name="type" value="1" checked>
+            <label for="type">耳溫</label>
+            <input type="radio" name="type" value="2">
+            <label for="type">額溫</label>
+            <input type="submit" value="記錄">
+        </form>
         {{ with .Data }}
-            <table>
-                <tr>
-                    <th>最新體溫記錄（℃）</th>
-                    <th>狀態</th>
-                    <th>類型</th>
-                    <th>時間</th>
-                    <th></th>
-                </tr>
-                {{ range . }}
-                <tr {{ if .Fever }}class="fever"{{ end }}>
-                    <td>{{ .Temperature }}</td>
-                    <td>{{ if .Fever }}發燒{{ else }}正常{{ end }}</td>
-                    <td>{{ .Type }}</td>
-                    <td>{{ formatTime .CreatedAt }}</td>
-                    <td><button value="{{ .ID }}" onclick="deleteRow(this, 'records')">刪除</button></td>
-                </tr>
-                {{ end }}
-            </table>
+        <table>
+            <tr>
+                <th>最新體溫記錄（℃）</th>
+                <th>狀態</th>
+                <th>類型</th>
+                <th>時間</th>
+                <th></th>
+            </tr>
+            {{ range . }}
+            <tr {{ if .Fever }}class="fever"{{ end }}>
+                <td>{{ .Temperature }}</td>
+                <td>{{ if .Fever }}發燒{{ else }}正常{{ end }}</td>
+                <td>{{ .Type }}</td>
+                <td>{{ formatTime .CreatedAt }}</td>
+                <td><button value="{{ .ID }}" onclick="deleteRow(this, 'records')">刪除</button></td>
+            </tr>
+            {{ end }}
+        </table>
         {{ end }}
     </div>
 </div>

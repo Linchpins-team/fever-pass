@@ -108,17 +108,18 @@ func (h Handler) login(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("username:", r.FormValue("username"))
 	err := h.db.Where("id = ?", r.FormValue("username")).First(&acct).Error
 	if gorm.IsRecordNotFoundError(err) {
-		http.Error(w, UserNotFound.Error(), 404)
+		h.HTML(w, addMessage(r, UserNotFound.Error()), "login.htm", nil)
 		return
 	} else if err != nil {
 		panic(err)
 	}
 	password := r.FormValue("password")
 	if bcrypt.CompareHashAndPassword(acct.Password, []byte(password)) != nil {
-		http.Error(w, WrongPassword.Error(), 403)
+		h.HTML(w, addMessage(r, WrongPassword.Error()), "login.htm", nil)
 		return
 	}
 	http.SetCookie(w, newSession(acct.ID))
+	http.Redirect(w, r, "/", 303)
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {
@@ -126,7 +127,7 @@ func logout(w http.ResponseWriter, r *http.Request) {
 		cookie.MaxAge = -1
 		http.SetCookie(w, cookie)
 	}
-	http.Redirect(w, r, "/", 303)
+	http.Redirect(w, r, "/login", 303)
 }
 
 func (h Handler) register(w http.ResponseWriter, r *http.Request) {

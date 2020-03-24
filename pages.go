@@ -17,13 +17,11 @@ const (
 func (h Handler) index(w http.ResponseWriter, r *http.Request) {
 	acct, ok := session(r)
 	if ok {
-		records, err := h.lastRecords(acct, 3)
-		if err == nil {
-			h.HTML(w, r, "index.htm", records)
-			return
-		}
+		records, _ := h.lastRecords(acct, 3)
+		h.HTML(w, r, "index.htm", records)
+	} else {
+		http.Redirect(w, r, "/login", 303)
 	}
-	h.HTML(w, r, "index.htm", nil)
 }
 
 // get the last record today of the account

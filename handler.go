@@ -55,6 +55,8 @@ func (h *Handler) newRouter() {
 	r.HandleFunc("/import", h.auth(h.importHandler, None, All)).Methods("POST")
 	r.HandleFunc("/export", h.auth(h.exportCSV, Group, None))
 	r.HandleFunc("/accounts/{id}", h.auth(h.profile, Self, Self))
+	r.HandleFunc("/login", h.page("login.htm")).Methods("GET")
+	r.HandleFunc("/login", h.login).Methods("POST")
 
 	r.HandleFunc("/doc/{title}", h.doc)
 
