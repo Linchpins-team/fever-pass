@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/jinzhu/gorm"
 )
@@ -16,23 +17,27 @@ const (
 	Fevered
 )
 
-func statsQuery(db, base *gorm.DB, t ListType) (tx *gorm.DB) {
-	subQuery := db.Table("records").Select("max(id) as id, account_id").Where("created_at > ?", today()).Where("deleted_at is NULL").Group("account_id").SubQuery()
+func statsQuery(db, base *gorm.DB, t ListType, date time.Time) (tx *gorm.DB) {
+	subQuery := db.Table("records").Select(
+		"max(id) as id",
+	).Where(
+		"created_at > ? and created_at < ?", date, date.AddDate(0, 0, 1),
+	).Where("deleted_at is NULL").Group("account_id").SubQuery()
+	subQuery = db.Table("records").Joins("inner join ? as m on m.id = records.id", subQuery).SubQuery()
+	base = base.Table("accounts").Joins(
+		"left join ? as records on records.account_id = accounts.id", subQuery)
 
 	switch t {
 	case Recorded:
-		return base.Table("accounts").Joins("inner join ? as r on accounts.id = r.account_id", subQuery)
+		return base.Where("records.id is not NULL")
 
 	case Unrecorded:
-		return base.Table("accounts").Joins("left join ? as r on accounts.id = r.account_id", subQuery).Where("r.id is NULL")
+		return base.Where("records.id is NULL")
 
 	case Fevered:
-		return base.Table("accounts").Joins(
-			"inner join records as r on r.account_id = accounts.id",
-		).Joins("inner join ? as m on m.id = r.id", subQuery).Where(
+		return base.Where(
 			"(temperature >= 38 and type = 1) or (temperature >= 37.5 and type = 2)",
 		)
-
 	}
 	return nil
 }
@@ -70,15 +75,15 @@ func (h Handler) stats(w http.ResponseWriter, r *http.Request) {
 		h.errorPage(w, r, "找不到班級", "找不到班級"+class)
 		return
 	}
-	err = statsQuery(h.db, base, Recorded).Count(&page.Recorded).Error
+	err = statsQuery(h.db, base, Recorded, today()).Count(&page.Recorded).Error
 	if err != nil {
 		panic(err)
 	}
-	err = statsQuery(h.db, base, Unrecorded).Count(&page.Unrecorded).Error
+	err = statsQuery(h.db, base, Unrecorded, today()).Count(&page.Unrecorded).Error
 	if err != nil {
 		panic(err)
 	}
-	err = statsQuery(h.db, base, Fevered).Count(&page.Fevered).Error
+	err = statsQuery(h.db, base, Fevered, today()).Count(&page.Fevered).Error
 	if err != nil {
 		panic(err)
 	}
@@ -94,19 +99,15 @@ func (h Handler) statsList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var accounts []Account
 	var err error
 	base, err := statsBase(h.db, acct, class)
 	if gorm.IsRecordNotFoundError(err) {
 		h.errorPage(w, r, "找不到班級", "找不到班級"+class)
 		return
 	}
-	err = statsQuery(h.db, base, t).Find(&accounts).Error
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	if err = h.tpls["stats.htm"].ExecuteTemplate(w, "account_list", accounts); err != nil {
+
+	result := selectRecords(statsQuery(h.db, base, t, today()))
+	if err = h.tpls["stats.htm"].ExecuteTemplate(w, "account_list", result); err != nil {
 		http.Error(w, err.Error(), 500)
 	}
 }

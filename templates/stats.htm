@@ -50,12 +50,12 @@
         <th>身份</th>
     </tr>
     {{ range . }}
-    <tr>
-        <td>{{ .ID }}</td>
+    <tr {{ if .Fever }}class="fever"{{ end }}>
+        <td>{{ .Account.ID }}</td>
         <td>{{ .Class }}</td>
         <td>{{ .Number }}</td>
-        <td><a href="/list?account_id={{ .ID }}">{{ .Name }}</a></td>
-        <td></td>
+        <td><a href="/list?account_id={{ .Account.ID }}">{{ .Name }}</a></td>
+        <td>{{ .Record.Temperature }}</td>
         <td>{{ .Authority }}</td>
     </tr>
     {{ end }}
