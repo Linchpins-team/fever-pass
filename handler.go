@@ -1,9 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
+	"io"
 	"net/http"
+	"os"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 )
@@ -36,6 +40,7 @@ func (h *Handler) newRouter() {
 	r := mux.NewRouter()
 
 	r.Use(h.identify)
+	r.Use(logger)
 
 	r.HandleFunc("/api/records", h.auth(h.newRecord, Self, None)).Methods("POST")
 	r.HandleFunc("/api/records/{id}", h.auth(h.deleteRecord, Self, None)).Methods("DELETE")
@@ -74,4 +79,25 @@ func (h *Handler) newRouter() {
 
 func (h Handler) Router() *mux.Router {
 	return h.router
+}
+
+func logger(next http.Handler) http.Handler {
+	return handlers.CustomLoggingHandler(os.Stdout, next, logFormat)
+}
+
+func logFormat(writer io.Writer, params handlers.LogFormatterParams) {
+	acct, ok := session(params.Request)
+	if !ok {
+		acct.ID = "-"
+	}
+
+	_, err := fmt.Fprintf(writer, `%s - %s %s "%s %s %s" %d %d`,
+		params.Request.RemoteAddr, acct.ID, params.TimeStamp.Format("2006-01-02 03:04:05"),
+		params.Request.Method, params.URL.RequestURI(), params.Request.Proto,
+		params.StatusCode, params.Size,
+	)
+	fmt.Fprintln(writer)
+	if err != nil {
+		fmt.Fprintln(writer, err)
+	}
 }

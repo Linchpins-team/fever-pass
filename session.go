@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/gob"
 	"errors"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -105,7 +104,6 @@ func expire() time.Time {
 
 func (h Handler) login(w http.ResponseWriter, r *http.Request) {
 	var acct Account
-	fmt.Println("username:", r.FormValue("username"))
 	err := h.db.Where("id = ?", r.FormValue("username")).First(&acct).Error
 	if gorm.IsRecordNotFoundError(err) {
 		h.HTML(w, addMessage(r, UserNotFound.Error()), "login.htm", nil)

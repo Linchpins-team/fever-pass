@@ -2,7 +2,6 @@ package main
 
 import (
 	"html/template"
-	"log"
 	"net/http"
 	"path/filepath"
 )
@@ -49,14 +48,12 @@ func (h Handler) HTML(w http.ResponseWriter, r *http.Request, page string, data 
 	}
 	if msg, ok := r.Context().Value(KeyMessage).(string); ok {
 		pageData.Message = msg
-		log.Println(msg)
 	}
 	if tpl, ok := h.tpls[page]; ok {
 		if err := tpl.ExecuteTemplate(w, "main", pageData); err != nil {
 			http.Error(w, err.Error(), 500)
 		}
 	} else {
-		log.Println(tpl)
 		http.Error(w, "cannot find templates", 500)
 	}
 }
