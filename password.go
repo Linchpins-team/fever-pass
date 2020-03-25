@@ -52,7 +52,6 @@ func (h Handler) resetPassword(w http.ResponseWriter, r *http.Request) {
 
 	current := r.FormValue("current_password")
 	new := r.FormValue("new_password")
-	fmt.Println(current, new)
 	if acct.ID == account.ID {
 		err = account.resetSelfPassword(current, new)
 	} else {
@@ -62,8 +61,6 @@ func (h Handler) resetPassword(w http.ResponseWriter, r *http.Request) {
 			err = WrongPassword
 		}
 	}
-
-	fmt.Println(account.Password)
 
 	if err == WrongPassword {
 		h.resetPage(w, addMessage(r, WrongPassword.Error()))
@@ -76,7 +73,7 @@ func (h Handler) resetPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.resetPage(w, addMessage(r, "已重設 "+account.Name+" 的密碼"))
+	h.message(w, r, "重設密碼成功", "已重設 "+account.Name+" 的密碼")
 }
 
 func (a *Account) resetSelfPassword(current, new string) error {
@@ -85,4 +82,19 @@ func (a *Account) resetSelfPassword(current, new string) error {
 	}
 	a.Password = generatePassword(new)
 	return nil
+}
+
+func (h Handler) resetPage(w http.ResponseWriter, r *http.Request) {
+	acct, _ := session(r)
+	account, err := h.getAccount(r.FormValue("account_id"))
+	if err == AccountNotFound {
+		account = acct
+	}
+
+	if !accountPermission(acct, account) {
+		h.message(w, r, "權限不足", "您沒有權限變更"+account.Name+"的密碼")
+		return
+	}
+
+	h.HTML(w, r, "reset.htm", account)
 }

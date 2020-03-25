@@ -152,21 +152,6 @@ func (h Handler) listAccountsPage(w http.ResponseWriter, r *http.Request) {
 	h.HTML(w, r, "account_list.htm", page)
 }
 
-func (h Handler) resetPage(w http.ResponseWriter, r *http.Request) {
-	acct, _ := session(r)
-	account, err := h.getAccount(r.FormValue("account_id"))
-	if err == AccountNotFound {
-		account = acct
-	}
-
-	if !accountPermission(acct, account) {
-		h.errorPage(w, r, "權限不足", "您沒有權限變更"+account.Name+"的密碼")
-		return
-	}
-
-	h.HTML(w, r, "reset.htm", account)
-}
-
 func addMessage(r *http.Request, msg string) *http.Request {
 	ctx := r.Context()
 	ctx = context.WithValue(ctx, KeyMessage, msg)
@@ -183,12 +168,12 @@ func (h Handler) profile(w http.ResponseWriter, r *http.Request) {
 	acct, _ := session(r)
 	account, err := h.getAccount(mux.Vars(r)["id"])
 	if err == AccountNotFound {
-		h.errorPage(w, r, "此帳號不存在", "")
+		h.message(w, r, "此帳號不存在", "")
 		return
 	}
 
 	if !accountPermission(acct, account) && !recordPermission(acct, account) {
-		h.errorPage(w, r, "權限不足", "你沒有權限查看此頁面")
+		h.message(w, r, "權限不足", "你沒有權限查看此頁面")
 		return
 	}
 

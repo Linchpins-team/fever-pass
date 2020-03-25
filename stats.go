@@ -69,7 +69,7 @@ func (h Handler) stats(w http.ResponseWriter, r *http.Request) {
 	var err error
 	base, err := statsBase(h.db, acct, class, r.FormValue("date"))
 	if gorm.IsRecordNotFoundError(err) {
-		h.errorPage(w, r, "找不到班級", "找不到班級"+class)
+		h.message(w, r, "找不到班級", "找不到班級"+class)
 		return
 	}
 
@@ -114,7 +114,7 @@ func (h Handler) statsList(w http.ResponseWriter, r *http.Request) {
 	var err error
 	base, err := statsBase(h.db, acct, class, r.FormValue("date"))
 	if gorm.IsRecordNotFoundError(err) {
-		h.errorPage(w, r, "找不到班級", "找不到班級"+class)
+		h.message(w, r, "找不到班級", "找不到班級"+class)
 		return
 	}
 

@@ -1,15 +1,16 @@
-{{ define "title" }}
-重設密碼 
-{{ end }}
 
+{{ define "title" }}
+重設密碼
+{{ end }}
 {{ define "content-with-session" }}
+{{ $acct := .Account }}
 <div class="middle">
 <h1>
-    {{ template "title" . }}
+{{ if eq $acct.ID .Data.ID }} 重設密碼 {{ else }} 將{{ .Data.Name }}重置為預設密碼 {{ end }}
 </h1>
-{{ $acct := .Account }}
 {{ with .Data }}
-<form action="/reset?account_id={{ .ID }}" method="POST">
+<form action="/reset" method="POST">
+    <input type="hidden" name="account_id" value="{{ .ID }}">
     {{ if eq $acct.ID .ID }}
         {{ if not .EmptyPassword }}
         <label for="current_passwd">原密碼</label>

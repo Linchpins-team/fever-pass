@@ -64,8 +64,8 @@ func (h Handler) page(path string) http.HandlerFunc {
 	}
 }
 
-func (h Handler) errorPage(w http.ResponseWriter, r *http.Request, title, msg string) {
-	h.HTML(w, r, "error.htm", struct {
+func (h Handler) message(w http.ResponseWriter, r *http.Request, title, msg string) {
+	h.HTML(w, r, "message.htm", struct {
 		Title, Message string
 	}{title, msg})
 }

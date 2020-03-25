@@ -27,7 +27,7 @@
         <th>體溫管理權限</th>
         <th>帳號管理權限</th>
         {{ if or (ge $acct.Authority.Account 2) (eq $acct.ID .ID) }}
-        <th>重設密碼</th>
+        <th></th>
         {{ end }}
         {{ if eq $acct.Authority.Account 3 }}
         <th>刪除帳號</th>
@@ -66,7 +66,7 @@
         {{ end }}
         {{ if or (ge $acct.Authority.Account 2) (eq $acct.ID .ID) }}
         <td>
-            <button><a href="/reset?account_id={{ .ID }}">重置密碼</a></button>
+            <button><a href="/reset?account_id={{ .ID }}">重設密碼</a></button>
         </td>
         {{ end }}
         {{ if eq $acct.Authority.Account 3 }}
