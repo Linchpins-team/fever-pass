@@ -118,8 +118,9 @@ input[type="number"], input[type="text"], input[type="password"] {
 
 input[type="date"] {
     font-size: 14px;
-    width: 144px;
+    width: 124px;
     height: 24px;
+    margin: 2px;
 }
 
 input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
@@ -236,7 +237,7 @@ tr {
 }
 
 h1 {
-    font-size: 36px;
+    font-size: 32px;
     margin: 24px 0;
 }
 

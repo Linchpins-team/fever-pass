@@ -40,7 +40,7 @@ func (h Handler) auth(next http.HandlerFunc, recordLevel, acctLevel AuthorityLev
 		if acct, ok := r.Context().Value(KeyAccount).(Account); ok && acct.Authority.permission(authority) {
 			next.ServeHTTP(w, r)
 		} else {
-			h.message(w, r, "權限不足", "您的權限不足")
+			h.message(w, r, "權限不足", "您沒有權限檢視此頁面")
 		}
 	}
 }
