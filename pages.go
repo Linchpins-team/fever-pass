@@ -104,6 +104,9 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 	page["PageLimit"] = PageLimit
 	page["Records"] = records
 	page["Count"] = pageCount(tx)
+	page["Class"] = r.FormValue("class")
+	page["Number"] = r.FormValue("number")
+	page["Date"] = r.FormValue("date")
 	h.HTML(w, r, "list.htm", page)
 }
 

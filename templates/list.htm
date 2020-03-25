@@ -8,11 +8,11 @@
 <form action="/list" method="get" id="form">
     {{ if ge .Authority.Record 3 }}
     <label>班級</label>
-    <input type="text" name="class"><br class="mobile-br">
+    <input type="text" name="class" value="{{ .Data.Class }}"><br class="mobile-br">
     {{ end }}
     {{ if ge .Authority.Record 2 }}
     <label>座號</label>
-    <input type="number" name="number"><br class="mobile-br">
+    <input type="number" name="number" value="{{ .Data.Number }}"><br class="mobile-br">
     {{ end }}
     <label>日期</label>
     <input type="date" name="date">
@@ -22,11 +22,11 @@
 {{ with .Data }}
 
 {{ block "page_number" . }}
-    <form action="/list" method="GET">
+    <form action="/list?class={{ .Class }}&number={{ .Number }}&date={{ .Date }}" method="GET">
     {{ if gt .Page 1 }}
     <a href="/list?page={{ add .Page -1 }}">上一頁</a>
     {{ end }}
-    <span>第<input id="page" type="number" name="page" value="{{ .Page }}" max="{{ .Count }}" min="1">頁</span>
+    <span>第<input id="page" type="number" name="page" value="{{ .Page }}" max="{{ .Count }}" min="1">頁/共{{ .Count }}頁</span>
     {{ if eq .PageLimit (len .Records) }}
     <a href="/list?page={{ add .Page 1}}">下一頁</a>
     {{ end }}
