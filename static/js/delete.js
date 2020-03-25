@@ -19,6 +19,7 @@ function removeRow(button) {
 
 async function deleteAccount(button) {
     if (confirm("確定刪除帳號？")) {
-        deleteRow(button, 'accounts')
+        await deleteRow(button, 'accounts')
+        window.history.back()
     }
 }

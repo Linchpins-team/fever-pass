@@ -14,10 +14,12 @@
     {{ if eq $acct.ID .ID }}
         {{ if not .EmptyPassword }}
         <label for="current_passwd">原密碼</label>
-        <input type="password" name="current_password"><br>
+        <input type="password" name="current_password" required><br>
+        {{ else }}
+        <p>您尚未設定密碼，請立即設定新密碼以保護您的帳戶</p>
         {{ end }}
         <label for="new_password">新密碼</label>
-        <input type="password" name="new_password"><br>
+        <input type="password" name="new_password" required><br>
     {{ else }}
         <label for="current_passwd">驗證密碼</label>
         <input type="password" name="current_password"><br>

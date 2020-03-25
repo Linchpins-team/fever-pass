@@ -115,7 +115,11 @@ func (h Handler) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.SetCookie(w, newSession(acct.ID))
-	http.Redirect(w, r, "/", 303)
+	if acct.EmptyPassword() {
+		http.Redirect(w, r, "/reset", 303)
+	} else {
+		http.Redirect(w, r, "/", 303)
+	}
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {
