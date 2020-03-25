@@ -10,7 +10,6 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
-	"golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -71,14 +70,6 @@ func NewAccount(db *gorm.DB, id, name, password, class, number, authority string
 
 func (a Authority) permission(authority Authority) bool {
 	return a.Account >= authority.Account && a.Record >= authority.Record
-}
-
-func generatePassword(password string) []byte {
-	pwd, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		panic(err)
-	}
-	return pwd
 }
 
 func (h Handler) deleteAccount(w http.ResponseWriter, r *http.Request) {
@@ -164,38 +155,6 @@ func (h Handler) getAccount(id string) (acct Account, err error) {
 		panic(err)
 	}
 	return
-}
-
-// 重設密碼
-func (h Handler) resetPassword(w http.ResponseWriter, r *http.Request) {
-	acct, _ := session(r)
-	account, err := h.getAccount(r.FormValue("account_id"))
-	if err == AccountNotFound {
-		account = acct
-	}
-
-	if !accountPermission(acct, account) {
-		w.WriteHeader(403)
-		h.resetPage(w, addMessage(r, "您沒有權限變更 "+account.Name+" 的密碼"))
-		return
-	}
-
-	current := r.FormValue("current_password")
-	if bcrypt.CompareHashAndPassword(acct.Password, []byte(current)) != nil {
-		w.WriteHeader(403)
-		h.resetPage(w, addMessage(r, "密碼錯誤"))
-		return
-	}
-
-	account.Password = generatePassword(r.FormValue("new_password"))
-
-	if err := h.db.Save(&account).Error; err != nil {
-		w.WriteHeader(500)
-		h.resetPage(w, addMessage(r, err.Error()))
-		return
-	}
-
-	h.resetPage(w, addMessage(r, "已重設 "+account.Name+" 的密碼"))
 }
 
 func (h Handler) findAccountByClassAndNumber(w http.ResponseWriter, r *http.Request) {

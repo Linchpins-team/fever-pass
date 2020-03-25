@@ -1,17 +1,29 @@
 {{ define "title" }}
-重設{{ .Name }}的密碼
+重設密碼 
 {{ end }}
-{{ define "content" }}
+
+{{ define "content-with-session" }}
 <div class="middle">
-<h1>{{ template "title" . }}</h1>
-<form action="/reset" method="POST">
-    <input type="hidden" name="account_id" value="{{ .ID }}">
-    <label for="current_passwd">操作者密碼</label>
-    <input type="password" name="current_password"><br>
-    <label for="new_password">新密碼</label>
-    <input type="password" name="new_password"><br>
+<h1>
+    {{ template "title" . }}
+</h1>
+{{ $acct := .Account }}
+{{ with .Data }}
+<form action="/reset?account_id={{ .ID }}" method="POST">
+    {{ if eq $acct.ID .ID }}
+        {{ if not .EmptyPassword }}
+        <label for="current_passwd">原密碼</label>
+        <input type="password" name="current_password"><br>
+        {{ end }}
+        <label for="new_password">新密碼</label>
+        <input type="password" name="new_password"><br>
+    {{ else }}
+        <label for="current_passwd">驗證密碼</label>
+        <input type="password" name="current_password"><br>
+    {{ end }}
     <input type="submit" value="重設">
-    <p id="msg">{{ .Message }}</p>
 </form>
+{{ end }}
+<p id="msg">{{ .Message }}</p>
 </div>
 {{ end }}

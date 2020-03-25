@@ -159,25 +159,12 @@ func (h Handler) resetPage(w http.ResponseWriter, r *http.Request) {
 		account = acct
 	}
 
-	msg, ok := r.Context().Value(KeyMessage).(string)
-	if !ok {
-		msg = ""
-	}
-
 	if !accountPermission(acct, account) {
 		h.errorPage(w, r, "權限不足", "您沒有權限變更"+account.Name+"的密碼")
 		return
 	}
 
-	page := struct {
-		Account
-		Message string
-	}{
-		Account: account,
-		Message: msg,
-	}
-
-	h.HTML(w, r, "reset.htm", page)
+	h.HTML(w, r, "reset.htm", account)
 }
 
 func addMessage(r *http.Request, msg string) *http.Request {

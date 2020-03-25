@@ -9,7 +9,6 @@ import (
 
 	"github.com/gorilla/securecookie"
 	"github.com/jinzhu/gorm"
-	"golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -103,8 +102,7 @@ func expire() time.Time {
 }
 
 func (h Handler) login(w http.ResponseWriter, r *http.Request) {
-	var acct Account
-	err := h.db.Where("id = ?", r.FormValue("username")).First(&acct).Error
+	acct, err := h.getAccount(r.FormValue("username"))
 	if gorm.IsRecordNotFoundError(err) {
 		h.HTML(w, addMessage(r, UserNotFound.Error()), "login.htm", nil)
 		return
@@ -112,7 +110,7 @@ func (h Handler) login(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	password := r.FormValue("password")
-	if bcrypt.CompareHashAndPassword(acct.Password, []byte(password)) != nil {
+	if !acct.login(password) {
 		h.HTML(w, addMessage(r, WrongPassword.Error()), "login.htm", nil)
 		return
 	}
