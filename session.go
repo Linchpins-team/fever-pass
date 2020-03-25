@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/gorilla/securecookie"
-	"github.com/jinzhu/gorm"
 )
 
 var (
@@ -103,11 +102,9 @@ func expire() time.Time {
 
 func (h Handler) login(w http.ResponseWriter, r *http.Request) {
 	acct, err := h.getAccount(r.FormValue("username"))
-	if gorm.IsRecordNotFoundError(err) {
+	if err == AccountNotFound {
 		h.HTML(w, addMessage(r, UserNotFound.Error()), "login.htm", nil)
 		return
-	} else if err != nil {
-		panic(err)
 	}
 	password := r.FormValue("password")
 	if !acct.login(password) {

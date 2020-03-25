@@ -23,9 +23,6 @@ func generatePassword(password string) []byte {
 }
 
 func (a Account) login(password string) bool {
-	fmt.Println(password)
-	fmt.Println(a.Password)
-	fmt.Println(a.defaultPassword())
 	if a.EmptyPassword() {
 		return a.defaultPassword() == password
 	}
