@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	PageLimit = 10
+	PageLimit = 100
 )
 
 func (h Handler) index(w http.ResponseWriter, r *http.Request) {
