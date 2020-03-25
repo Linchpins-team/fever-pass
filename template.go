@@ -10,10 +10,11 @@ func (h *Handler) loadTemplates() {
 	h.tpls = make(map[string]*template.Template)
 	mainTmpl := template.New("main")
 	mainTmpl.Funcs(template.FuncMap{
-		"formatTime": formatTime,
-		"formatDate": formatDate,
-		"add":        add,
-		"sub":        sub,
+		"formatTime":  formatTime,
+		"formatDate":  formatDate,
+		"add":         add,
+		"sub":         sub,
+		"dashToSlash": dashToSlash,
 	})
 	layoutFiles, err := filepath.Glob("templates/layouts/*.htm")
 	if err != nil {

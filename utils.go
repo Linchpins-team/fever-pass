@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -64,4 +65,8 @@ func weekday(t time.Time) string {
 		return "（日）"
 	}
 	return ""
+}
+
+func dashToSlash(s string) string {
+	return strings.ReplaceAll(s, "-", "/")
 }

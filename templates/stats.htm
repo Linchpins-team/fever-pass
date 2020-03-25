@@ -1,5 +1,5 @@
 {{ define "title" }}
-    {{ with .Class }}{{ . }}班{{ end }} {{ with .Date }}{{ . }}{{ end }} 統計資料
+    {{ with .Class }}{{ . }}班{{ end }} {{ with .Date }}{{ dashToSlash . }}{{ end }} 統計資料
 {{ end }}
 
 {{ define "content-with-session" }}
