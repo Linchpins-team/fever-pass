@@ -48,6 +48,8 @@ type Record struct {
 	Temperature float64
 	Type        TempType
 
+	Reason string // If reason is not empty, exclude from stats
+
 	Account    Account
 	AccountID  string
 	RecordedBy Account `gorm:"foreignkey:RecorderID"`
@@ -75,7 +77,7 @@ func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	acct := r.Context().Value(KeyAccount).(Account)
+	acct, _ := session(r)
 	if !recordPermission(acct, account) {
 		http.Error(w, "permission denied", 403)
 		return
@@ -84,6 +86,7 @@ func (h Handler) newRecord(w http.ResponseWriter, r *http.Request) {
 	record := Record{
 		Account:    account,
 		RecordedBy: acct,
+		Reason:     r.FormValue("reason"),
 	}
 
 	record.Temperature, err = strconv.ParseFloat(r.FormValue("temperature"), 64)
@@ -160,6 +163,7 @@ func (h Handler) newSelfRecord(w http.ResponseWriter, r *http.Request) {
 	record := Record{
 		Account:    acct,
 		RecordedBy: acct,
+		Reason:     r.FormValue("reason"),
 	}
 
 	var err error

@@ -15,6 +15,7 @@ const (
 	Recorded
 	Unrecorded
 	Fevered
+	Other
 	Complete
 )
 
@@ -38,6 +39,9 @@ func statsQuery(db, base *gorm.DB, t ListType, date time.Time) *gorm.DB {
 		return base.Where(
 			"(temperature >= 38 and type = 1) or (temperature >= 37.5 and type = 2)",
 		)
+
+	case Other:
+		return base.Where("records.reason IS NOT NULL")
 
 	case Complete:
 		return base
@@ -79,9 +83,9 @@ func (h Handler) stats(w http.ResponseWriter, r *http.Request) {
 	}
 
 	page := struct {
-		Class                         string
-		Date                          string
-		Recorded, Unrecorded, Fevered int
+		Class                                string
+		Date                                 string
+		Recorded, Unrecorded, Fevered, Other int
 	}{
 		Class: class,
 		Date:  date.Format("2006-01-02"),
@@ -99,6 +103,11 @@ func (h Handler) stats(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+	err = statsQuery(h.db, base, Other, date).Count(&page.Other).Error
+	if err != nil {
+		panic(err)
+	}
+
 	h.HTML(w, r, "stats.htm", page)
 }
 
@@ -130,7 +139,7 @@ func (h Handler) statsList(w http.ResponseWriter, r *http.Request) {
 
 func parseListType(s string) ListType {
 	n, err := strconv.Atoi(s)
-	if err != nil || n < 1 || n > 3 {
+	if err != nil || n < 1 || n > 4 {
 		return UnknownListType
 	}
 	return ListType(n)

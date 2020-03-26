@@ -23,17 +23,20 @@
         <th>已記錄人數</th>
         <th>未記錄人數</th>
         <th>發燒人數</th>
+        <th>其他</th>
     </tr>
     <tr>
         <td>{{ add .Recorded .Unrecorded }}</td>
         <td>{{ .Recorded }}</td>
         <td>{{ .Unrecorded }}</td>
         <td>{{ .Fevered }}</td>
+        <td>{{ .Other }}</td>
     </tr>
 </table>
 <input type="radio" name="list_type" onchange="loadAccountList(2, '{{ .Class }}', '{{ .Date }}')" checked autocomplete="off"><label>未記錄</label>
 <input type="radio" name="list_type" onchange="loadAccountList(1, '{{ .Class }}', '{{ .Date }}')" autocomplete="off"><label>已記錄</label>
 <input type="radio" name="list_type" onchange="loadAccountList(3, '{{ .Class }}', '{{ .Date }}')" autocomplete="off"><label>發燒</label>
+<input type="radio" name="list_type" onchange="loadAccountList(4, '{{ .Class }}', '{{ .Date }}')" autocomplete="off"><label>其他</label>
 <div id="list"></div>
 <script>
     loadAccountList(2, '{{ .Class }}', '{{ .Date }}')
@@ -51,6 +54,7 @@
         <th>姓名</th>
         <th>體溫</th>
         <th>身份</th>
+        <th>備註</th>
     </tr>
     {{ range . }}
     <tr {{ if .Fever }}class="fever"{{ end }}>
@@ -60,6 +64,7 @@
         <td><a href="/list?account_id={{ .Account.ID }}">{{ .Name }}</a></td>
         <td>{{ if .Recorded }}{{ .Record.Temperature }}{{ end }}</td>
         <td>{{ .Authority }}</td>
+        <td>{{ .Reason }}</td>
     </tr>
     {{ end }}
 </table>

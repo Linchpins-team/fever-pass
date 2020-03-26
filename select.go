@@ -13,6 +13,7 @@ type AccountRecords struct {
 	temperature sql.NullFloat64
 	tempType    sql.NullInt32
 	createdAt   sql.NullTime
+	reason      sql.NullString
 }
 
 func selectRecords(tx *gorm.DB) (result []AccountRecords) {
@@ -21,7 +22,7 @@ func selectRecords(tx *gorm.DB) (result []AccountRecords) {
 	rows, err := tx.Select(`
 		accounts.id, classes.name, accounts.number, accounts.name,
 		role, record, account, 
-		temperature, type, records.created_at
+		temperature, type, records.created_at, records.reason
 		`).Count(&length).Rows()
 	if err != nil {
 		panic(err)
@@ -33,7 +34,7 @@ func selectRecords(tx *gorm.DB) (result []AccountRecords) {
 		err = rows.Scan(
 			&r.Account.ID, &r.Class.Name, &r.Number, &r.Name,
 			&r.Role, &r.Authority.Record, &r.Authority.Account,
-			&r.temperature, &r.tempType, &r.createdAt,
+			&r.temperature, &r.tempType, &r.createdAt, &r.reason,
 		)
 		if err != nil {
 			panic(err)
@@ -43,6 +44,7 @@ func selectRecords(tx *gorm.DB) (result []AccountRecords) {
 			r.Record.Temperature = r.temperature.Float64
 			r.Record.Type = TempType(r.tempType.Int32)
 			r.Record.CreatedAt = r.createdAt.Time
+			r.Record.Reason = r.reason.String
 		}
 		result[i] = r
 	}
