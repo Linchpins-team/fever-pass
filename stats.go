@@ -41,7 +41,7 @@ func statsQuery(db, base *gorm.DB, t ListType, date time.Time) *gorm.DB {
 		)
 
 	case Other:
-		return base.Where("records.reason IS NOT NULL")
+		return base.Where("records.reason != ''")
 
 	case Complete:
 		return base
@@ -132,7 +132,11 @@ func (h Handler) statsList(w http.ResponseWriter, r *http.Request) {
 		date = today()
 	}
 	result := selectRecords(statsQuery(h.db, base, t, date))
-	if err = h.tpls["stats.htm"].ExecuteTemplate(w, "account_list", result); err != nil {
+
+	page := make(map[string]interface{})
+	page["Records"] = result
+	page["Type"] = t
+	if err = h.tpls["stats.htm"].ExecuteTemplate(w, "account_list", page); err != nil {
 		http.Error(w, err.Error(), 500)
 	}
 }

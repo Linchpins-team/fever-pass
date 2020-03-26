@@ -34,6 +34,7 @@
                 <th>狀態</th>
                 <th>類型</th>
                 <th>時間</th>
+                <th>備註</th>
                 <th></th>
             </tr>
             {{ range . }}
@@ -42,6 +43,7 @@
                 <td>{{ if .Fever }}發燒{{ else }}正常{{ end }}</td>
                 <td>{{ .Type }}</td>
                 <td>{{ formatTime .CreatedAt }}</td>
+                <td>{{ .Reason }}</td>
                 <td><button value="{{ .ID }}" onclick="deleteRow(this, 'records')">刪除</button></td>
             </tr>
             {{ end }}

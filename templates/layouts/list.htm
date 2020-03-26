@@ -11,7 +11,6 @@
         <th>時間</th>
         <th>記錄者</th>
         <th></th>
-        <th></th>
     </tr>
     <tbody id="table">
         {{ range . }}
@@ -25,7 +24,6 @@
             <td>{{ .Type }}</td>
             <td>{{ formatTime .CreatedAt }}</td>
             <td>{{ .RecordedBy }}</td>
-            <td>{{ .Reason }}</td>
             <td><button value="{{ .ID }}" onclick="deleteRow(this, 'records')">刪除</button></td>
         </tr>
         {{ end }}

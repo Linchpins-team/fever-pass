@@ -46,25 +46,34 @@
 {{ end }}
 
 {{ define "account_list" }}
+{{ $type := .Type }}
 <table>
     <tr>
         <th>帳號</th>
         <th>班級</th>
         <th>座號</th>
         <th>姓名</th>
+        {{ if ne .Type 2 }}
         <th>體溫</th>
+        {{ end }}
         <th>身份</th>
+        {{ if eq .Type 4 }}
         <th>備註</th>
+        {{ end }}
     </tr>
-    {{ range . }}
+    {{ range .Records }}
     <tr {{ if .Fever }}class="fever"{{ end }}>
         <td>{{ .Account.ID }}</td>
         <td>{{ .Class }}</td>
         <td>{{ .Number }}</td>
         <td><a href="/list?account_id={{ .Account.ID }}">{{ .Name }}</a></td>
-        <td>{{ if .Recorded }}{{ .Record.Temperature }}{{ end }}</td>
+        {{ if ne $type 2 }}
+        <td>{{ .Record.Temperature }}</td>
+        {{ end }}
         <td>{{ .Authority }}</td>
+        {{ if eq $type 4 }}
         <td>{{ .Reason }}</td>
+        {{ end }}
     </tr>
     {{ end }}
 </table>
