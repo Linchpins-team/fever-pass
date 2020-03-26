@@ -132,6 +132,10 @@ input[type="number"] {
     -moz-appearance: textfield;
 }
 
+label[for="reason"] {
+	margin: 8px;
+}
+
 select {
     text-align-last: center;
     -moz-text-align-last: center;
