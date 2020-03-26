@@ -23,6 +23,7 @@ var (
 	ConfPath    string
 	Init        bool
 	UseTestData bool
+	Mock        bool
 )
 
 func init() {
@@ -38,6 +39,7 @@ func init() {
 	flag.BoolVar(&Init, "init", false, "init configuration")
 	flag.StringVar(&ConfPath, "conf", "config.toml", "configuration file path")
 	flag.BoolVar(&UseTestData, "t", false, "use -t to import test data")
+	flag.BoolVar(&Mock, "mock", false, "use -mock to insert mock data for every accounts")
 	flag.Parse()
 }
 
@@ -74,6 +76,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	if Mock {
+		MockData(db)
+		return
+	}
+
 	h := NewHandler(db, c)
 	defer h.db.Close()
 
