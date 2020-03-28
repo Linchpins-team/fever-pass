@@ -152,6 +152,10 @@ select {
     width: 72px;
 }
 
+select[name="reason"] {
+    width: 108px;
+}
+
 footer {
     height: 54px;
     margin: auto;
