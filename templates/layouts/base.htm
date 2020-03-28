@@ -3,7 +3,7 @@
 <html>
 
 <head>
-    {{ template "head" .Data }}
+    {{ template "head" . }}
 </head>
 
 <body>
@@ -32,7 +32,7 @@
 {{ define "head" }}
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fever Pass - {{ block "title" . }} {{ end }}</title>
+<title>{{ .Config.Site.Name }} - {{ block "title" .Data }} {{ end }}</title>
 <link rel="stylesheet" href="/static/css/style.css">
 <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
 <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">

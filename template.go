@@ -40,11 +40,13 @@ func (h Handler) HTML(w http.ResponseWriter, r *http.Request, page string, data 
 		Data  interface{}
 		Login bool
 		Account
+		Config  Config
 		Message string
 	}{
 		data,
 		ok,
 		acct,
+		h.config,
 		"",
 	}
 	if msg, ok := r.Context().Value(KeyMessage).(string); ok {
