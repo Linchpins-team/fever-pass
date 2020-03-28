@@ -12,7 +12,10 @@ func initDB(c Config) (db *gorm.DB, err error) {
 		db, err = gorm.Open("sqlite3", "/tmp/gorm.sqlite")
 
 	case Release:
-		connection := fmt.Sprintf("%s:%s@/%s?charset=utf8&parseTime=True&loc=Local", c.Database.User, c.Database.Password, c.Database.Name)
+		connection := fmt.Sprintf(
+			"%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local",
+			c.Database.User, c.Database.Password, c.Database.Host, c.Database.Name,
+		)
 		db, err = gorm.Open("mysql", connection)
 	}
 	if err != nil {
@@ -41,8 +44,5 @@ func setupDB(c Config, db *gorm.DB) {
 	)
 	if err != nil {
 		panic(err)
-	}
-	if UseTestData {
-		importTestData(db)
 	}
 }

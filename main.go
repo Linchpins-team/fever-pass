@@ -20,10 +20,11 @@ var (
 )
 
 var (
-	ConfPath    string
-	Init        bool
-	UseTestData bool
-	Mock        bool
+	GenerateConfigure bool
+	ConfPath          string
+	SetAdminPassword  bool
+	Mock              bool
+	InitDB            bool
 )
 
 func init() {
@@ -36,9 +37,10 @@ func init() {
 	hashKey = loadKey("HASH_KEY", file)
 	blockKey = loadKey("BLOCK_KEY", file)
 
-	flag.BoolVar(&Init, "init", false, "init configuration")
+	flag.BoolVar(&GenerateConfigure, "g", false, "generate new configure")
+	flag.BoolVar(&SetAdminPassword, "s", false, "set admin password")
+	flag.BoolVar(&InitDB, "init", false, "use -init to generate the sql code to initialize database.")
 	flag.StringVar(&ConfPath, "conf", "config.toml", "configuration file path")
-	flag.BoolVar(&UseTestData, "t", false, "use -t to import test data")
 	flag.BoolVar(&Mock, "mock", false, "use -mock to insert mock data for every accounts")
 	flag.Parse()
 }
@@ -66,15 +68,25 @@ func decodeKey(key string) []byte {
 }
 
 func main() {
-	if Init {
-		setupConfig()
+	if GenerateConfigure {
+		genDefaultConf()
+		return
+	}
+	c := loadConfig()
+	if InitDB {
+		createDatabaseCode(c)
+		return
+	}
+	if SetAdminPassword {
+		setupAdminPassword()
 		return
 	}
 
-	c := loadConfig()
 	db, err := initDB(c)
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		createDatabaseCode(c)
+		return
 	}
 
 	if Mock {

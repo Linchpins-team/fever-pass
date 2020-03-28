@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/jinzhu/gorm"
@@ -45,22 +44,6 @@ func (h Handler) importHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	r = addMessage(r, fmt.Sprintf("成功匯入%d筆資料", n))
 	h.importPage(w, r)
-}
-
-func importTestData(db *gorm.DB) {
-	file, err := os.Open("testdata/test-teachers.csv")
-	if err != nil {
-		panic(err)
-	}
-	_, err = importAccounts(db, file, Tutor.Key())
-	if err != nil {
-		panic(err)
-	}
-	file, err = os.Open("testdata/test-students.csv")
-	if err != nil {
-		panic(err)
-	}
-	_, err = importAccounts(db, file, Student.Key())
 }
 
 func importAccounts(db *gorm.DB, r io.Reader, authroity string) (n int, err error) {
