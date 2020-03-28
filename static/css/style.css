@@ -64,8 +64,10 @@ main {
 }
 
 #icon {
-	height: 64px;
-	width: 64px;
+    position: absolute;
+    left: -54px;
+	height: 54px;
+    width: 54px;
 }
 
 nav {
@@ -258,7 +260,9 @@ h2 {
 }
 
 #home-h1 {
+    position: relative;
     font-size: 52px;
+    display: inline;
 }
 
 #home-h2 {
