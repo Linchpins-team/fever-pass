@@ -112,7 +112,7 @@ func (h Handler) listRecordsPage(w http.ResponseWriter, r *http.Request) {
 
 func pageCount(tx *gorm.DB) int {
 	var count int
-	tx.Where("records.deleted_at is NULL").Count(&count)
+	tx.Count(&count)
 	if count%PageLimit == 0 {
 		count /= PageLimit
 	} else {
