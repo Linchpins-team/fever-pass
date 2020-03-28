@@ -63,6 +63,11 @@ main {
     bottom: 21px;
 }
 
+#icon {
+	height: 64px;
+	width: 64px;
+}
+
 nav {
     height: 54px;
     float: right;
@@ -214,8 +219,10 @@ footer a:hover {
 }
 
 a[href="/"] {
+	padding: 0 16px;
+	text-align: left;
     height: 54px;
-    width: 176px;
+    max-width: 280px;
 }
 
 a[href="/"]:hover {
