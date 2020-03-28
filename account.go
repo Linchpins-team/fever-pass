@@ -52,7 +52,7 @@ func NewAccount(db *gorm.DB, id, name, password, class, number, authority string
 	}
 
 	if strings.TrimSpace(class) == "" {
-		class = "T"
+		class = "0"
 	}
 	if err = db.FirstOrCreate(&account.Class, Class{Name: class}).Error; err != nil {
 		return

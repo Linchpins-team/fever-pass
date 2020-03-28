@@ -38,7 +38,7 @@ func setupDB(c Config, db *gorm.DB) {
 		"admin",
 		"admin",
 		c.Password,
-		"T",
+		"0",
 		"0",
 		Admin.Key(),
 	)

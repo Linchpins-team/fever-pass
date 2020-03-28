@@ -11,7 +11,7 @@
         <th>班級</th>
         <th>座號</th>
         <th>姓名</th>
-        <th>職稱</th>
+        <th>身份</th>
     </tr>
     <tr>
         <td>{{ .ID }}</td>
@@ -23,7 +23,7 @@
 </table>
 <table>
     <tr>
-        <th>身份</th>
+        <th>身份組</th>
         <th>體溫管理權限</th>
         <th>帳號管理權限</th>
         {{ if or (ge $acct.Authority.Account 2) (eq $acct.ID .ID) }}

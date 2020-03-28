@@ -38,15 +38,23 @@ main {
 }
 
 .admin {
-    background: #8ec;
+    background: #5ec;
 }
 
-.staff {
+.nurse {
+    background: #7ea;
+}
+
+.faculty {
     background: #86ebb2;
 }
 
+.tutor {
+    background: #9ce7b2;
+}
+
 .hygiene {
-    background: #9ea;
+    background: #8ec;
 }
 
 #logo {
@@ -112,7 +120,7 @@ input[type="file"] {
 input[type="radio"] {
     height: 16px;
     width: 16px;
-    margin: 6px
+    margin: 20px 6px;
 }
 
 input:focus {

@@ -43,8 +43,7 @@
     </tr>
     <tbody>
         {{ range .Accounts }}
-        <tr {{ if eq .Role 1 }} class="admin" {{ end }} {{ if eq .Role 2 }} class="staff" {{ end }}
-            {{ if and ( eq .Authority.Record 2 ) ( eq .Role 3 ) }} class="hygiene" {{ end }}>
+        <tr class="{{ .Authority.Key }}">
             <td>{{ .ID }}</td>
             <td>{{ .Class }}</td>
             <td>{{ .Number }}</td>
