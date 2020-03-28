@@ -50,14 +50,18 @@
             <select name="record_authority" onchange="update('{{ .ID }}', this.name, this.value)" autocomplete="off">
                 <option value="self" {{ if eq .Authority.Record 1 }}selected{{ end }}>個人</option>
                 <option value="group" {{ if eq .Authority.Record 2 }}selected{{ end }}>班級</option>
+                {{ if eq $acct.Authority.Account 3 }}
                 <option value="all" {{ if eq .Authority.Record 3 }}selected{{ end }}>全校</option>
+                {{ end }}
             </select>
         </td>
         <td>
             <select name="account_authority" onchange="update('{{ .ID }}', this.name, this.value)" autocomplete="off">
                 <option value="self" {{ if eq .Authority.Account 1 }}selected{{ end }}>個人</option>
                 <option value="group" {{ if eq .Authority.Account 2 }}selected{{ end }}>班級</option>
+                {{ if eq $acct.Authority.Account 3 }}
                 <option value="all" {{ if eq .Authority.Account 3 }}selected{{ end }}>全校</option>
+                {{ end }}
             </select>
         </td>
         {{ else }}
