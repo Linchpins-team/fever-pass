@@ -275,6 +275,7 @@ h2 {
     position: relative;
     font-size: 52px;
     display: inline;
+    z-index: -1;
 }
 
 #home-h2 {
