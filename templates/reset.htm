@@ -22,11 +22,13 @@
         <input type="password" name="new_password" required><br>
         <label for="match_password">驗證密碼</label>
         <input type="password" name="match_password" oninput="checkPassword()" required><br>
+        <input id="reset" disabled type="submit" value="重設">
     {{ else }}
         <label for="current_passwd">驗證密碼</label>
         <input type="password" name="current_password"><br>
+        <input type="submit" value="重設">
     {{ end }}
-    <input id="reset" disabled type="submit" value="重設">
+   
 </form>
 {{ end }}
 <p id="msg">{{ .Message }}</p>
