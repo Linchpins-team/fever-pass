@@ -134,8 +134,8 @@ input[type="number"], input[type="text"], input[type="password"] {
 input[type="date"] {
     font-size: 14px;
     width: 124px;
-    height: 24px;
-    margin: 2px;
+    height: 20px;
+    margin: 0 2px;
 }
 
 input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
@@ -156,7 +156,7 @@ select {
     -moz-text-align-last: center;
     -ms-text-align-last: center;
     margin: 2px;
-    height: 28px;
+    height: 32px;
     width: 80px;
 }
 
