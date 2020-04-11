@@ -2,6 +2,8 @@
 
 Fever Pass 是一個數位體溫記錄系統，可使用此系統取代紙本體溫記錄表。
 
+若需要代為或協助佈署，請來信 linchpins-team@protonmail.com 商談。
+
 ## License 
 本網站由 Linchpins 團隊開發，以 GPL v3 釋出。
 
@@ -94,4 +96,12 @@ admin password: password
 
 ---
 
-若需要代為或協助佈署，請來信 linchpins-team@protonmail.com 商談。
+## Custom Template
+
+### 自訂 head
+
+建立 `templates/custom/head.htm`，內容將會在 <head> 中。
+
+### 自訂登入提示訊息
+
+建立 `templates/custom/login_info.htm`，內容將會出現在登入畫面的提示文字。

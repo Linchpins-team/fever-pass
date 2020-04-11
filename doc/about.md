@@ -1,4 +1,4 @@
-# 關於 Fever Pass
+# 關於 Fever Pass [v1.1](https://github.com/Linchpins-team/fever-pass/releases/tag/v1.1)  
 
 Fever Pass 是一個數位體溫記錄系統。可使用此系統取代紙本體溫記錄表。
 
