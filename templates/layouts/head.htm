@@ -1,0 +1,11 @@
+{{ define "head" }}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ .Config.Site.Name }} - {{ block "title" .Data }} {{ end }}</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
+<link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
+<link rel="apple-touch-icon" sizes="180x180" href="/static/img/apple-touch-icon.png">
+<script src="/static/js/nav.js"></script>
+{{ block "custom_head.htm" . }}{{ end }}
+{{ end }}

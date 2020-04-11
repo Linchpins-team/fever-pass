@@ -8,3 +8,4 @@ static/qrcodes
 *.toml
 *.sqlite
 build
+templates/custom

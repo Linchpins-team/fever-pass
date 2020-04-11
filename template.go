@@ -21,14 +21,22 @@ func (h *Handler) loadTemplates() {
 		panic(err)
 	}
 
+	customFiles, err := filepath.Glob("templates/custom/*.htm")
+	if err != nil {
+		panic(err)
+	}
+
 	includeFiles, err := filepath.Glob("templates/*.htm")
 	if err != nil {
 		panic(err)
 	}
 
+	files := make([]string, 1, len(layoutFiles)+len(customFiles)+1)
+	files = append(files, layoutFiles...)
+	files = append(files, customFiles...)
 	for _, file := range includeFiles {
 		fileName := filepath.Base(file)
-		files := append(layoutFiles, file)
+		files[0] = file
 		tpl := template.Must(mainTmpl.Clone())
 		h.tpls[fileName] = template.Must(tpl.ParseFiles(files...))
 	}
