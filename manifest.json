@@ -1,0 +1,22 @@
+{
+    "short_name": "Fever Pass",
+    "name": "Fever Pass",
+    "icons": [
+        {
+            "src": "/static/img/android-192x192.png",
+            "type": "image/png",
+            "sizes": "192x192"
+          },
+          {
+            "src": "/static/img/android-512x512.png",
+            "type": "image/png",
+            "sizes": "512x512"
+          }
+    ],
+    "start_url": "/?source=pwa",
+    "background_color": "#1b8",
+    "display": "standalone",
+    "scope": "/",
+    "theme_color": "#1b8"
+  }
+  

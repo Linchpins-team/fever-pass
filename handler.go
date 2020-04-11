@@ -72,9 +72,16 @@ func (h *Handler) newRouter() {
 	r.HandleFunc("/logout", logout)
 	r.HandleFunc("/register", h.auth(h.registerPage, None, All)).Methods("GET")
 	r.HandleFunc("/register", h.auth(h.register, None, All)).Methods("POST")
+	r.HandleFunc("/manifest.json", serveFile("manifest.json"))
 
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 	h.router = r
+}
+
+func serveFile(file string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, file)
+	}
 }
 
 func (h Handler) Router() *mux.Router {
