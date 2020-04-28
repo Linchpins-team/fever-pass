@@ -24,11 +24,11 @@
 {{ block "page_number" . }}
     <form action="/list?class={{ .Class }}&number={{ .Number }}&date={{ .Date }}" method="GET">
     {{ if gt .Page 1 }}
-    <a href="/list?page={{ add .Page -1 }}">上一頁</a>
+    <a href="/list?page={{ add .Page -1 }}&class={{ .Class }}&number={{ .Number }}&date={{ .Date }}">上一頁</a>
     {{ end }}
     <span>第<input id="page" type="number" name="page" value="{{ .Page }}" max="{{ .Count }}" min="1">頁/共{{ .Count }}頁</span>
     {{ if eq .PageLimit (len .Records) }}
-    <a href="/list?page={{ add .Page 1}}">下一頁</a>
+    <a href="/list?page={{ add .Page 1}}&class={{ .Class }}&number={{ .Number }}&date={{ .Date }}">下一頁</a>
     {{ end }}
     </form>
 {{ end }}
